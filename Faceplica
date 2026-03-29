@@ -4,9 +4,6 @@ CC      ?= cc
 CFLAGS  ?= -Wall -Wextra -pedantic -std=c99 -O2
 LDFLAGS = -lm
 
-SDL2_CFLAGS = `sdl2-config --cflags`
-SDL2_LDFLAGS = `sdl2-config --libs`
-
 LIBISON = $(APOTHECA)/ison/libison.a
 LIBPHANTASMA = $(APOTHECA)/phantasma/libphantasma.a
 
@@ -40,8 +37,8 @@ torus_planus: torus_planus.c helvea.o astra.o helvea.h astra.h $(LIBISON)
 torus_animare: torus_animare.c helvea.o astra.o helvea.h astra.h $(LIBISON)
 	$(CC) $(CFLAGS) -o $@ torus_animare.c helvea.o astra.o $(LIBISON) $(LDFLAGS)
 
-torus_specta: torus_specta.c helvea.o astra.o helvea.h astra.h $(LIBISON)
-	$(CC) $(CFLAGS) $(SDL2_CFLAGS) -o $@ torus_specta.c helvea.o astra.o $(LIBISON) $(LDFLAGS) $(SDL2_LDFLAGS)
+torus_specta: torus_specta.c helvea.o astra.o helvea.h astra.h $(LIBISON) $(LIBPHANTASMA)
+	$(CC) $(CFLAGS) -o $@ torus_specta.c helvea.o astra.o $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS) -framework Cocoa
 
 astra_proba: astra_proba.c astra.o astra.h $(LIBISON)
 	$(CC) $(CFLAGS) -o $@ astra_proba.c astra.o $(LIBISON) $(LDFLAGS)
