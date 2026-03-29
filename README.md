@@ -78,4 +78,4 @@ No external dependencies. C99 and libm. The interactive viewer (`torus_specta`) 
 
 ## License
 
-Free. Public domain.
+Free. Public domain. Use however you like.
