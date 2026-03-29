@@ -8,20 +8,25 @@ SDL2_CFLAGS = `sdl2-config --cflags`
 SDL2_LDFLAGS = `sdl2-config --libs`
 
 LIBISON = $(APOTHECA)/ison/libison.a
+LIBPHANTASMA = $(APOTHECA)/phantasma/libphantasma.a
 
 omnia: torus_planus torus_animare torus_specta astra_proba caele redde
 
 omnia: $(NOMEN)
 
 para:
-	git submodule update --init ison
+	git submodule update --init ison phantasma
 	$(FACE) -C ison
+	$(FACE) -C phantasma
 
 expara:
-	git submodule deinit -f ison
+	git submodule deinit -f ison phantasma
 
 $(LIBISON):
         $(FACE) -C $(APOTHECA)/ison
+
+$(LIBPHANTASMA):
+	$(FACE) -C $(APOTHECA)/phantasma
 
 helvea.o: helvea.c helvea.h
 	$(CC) $(CFLAGS) -c -o helvea.o helvea.c
