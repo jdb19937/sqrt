@@ -1,7 +1,7 @@
 /*
  * torus_animare.c — animatio tori Hevea, imagines PPM scribens
  *
- * Camera circa torum rotans; fundum stellarum toroidaliter volvitur.
+ * camera_t circa torum rotans; fundum stellarum toroidaliter volvitur.
  * Rotatio camerae perioditatem cosmicam spatii T² demonstrat:
  * post revolutionem plenam, eaedem stellae redeunt.
  * Usus: ./torus_animare [numerus_imaginum]
@@ -55,8 +55,8 @@ int main(int argc, char **argv)
     /* superficiem praecomputare */
     fprintf(stderr, "Superficiem computans...\n");
     size_t n_vert = (size_t)(GRADUS_U + 1) * (GRADUS_V + 1);
-    Vec3 *puncta = (Vec3 *)malloc(n_vert * sizeof(Vec3));
-    Vec3 *normae = (Vec3 *)malloc(n_vert * sizeof(Vec3));
+    vec3_t *puncta = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
+    vec3_t *normae = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
 
     if (!puncta || !normae) {
         fprintf(stderr, "ERROR: memoria insufficiens pro superficie!\n");
@@ -75,11 +75,11 @@ int main(int argc, char **argv)
         double angulus = DUO_PI * (double)f / (double)numerus_imaginum;
         double dist_cam = 3.2;
         double alt_cam  = 1.3;
-        Vec3 pos_cam = vec3(dist_cam * cos(angulus),
+        vec3_t pos_cam = vec3(dist_cam * cos(angulus),
                             dist_cam * sin(angulus),
                             alt_cam);
-        Vec3 scopus = vec3(0.0, 0.0, -0.05);
-        Camera cam = helvea_cameram_constituere(pos_cam, scopus);
+        vec3_t scopus = vec3(0.0, 0.0, -0.05);
+        camera_t cam = helvea_cameram_constituere(pos_cam, scopus);
 
         /* fundum stellarum — toroidaliter volvitur cum camera */
         int delta_x = (int)(angulus / DUO_PI * campus->latitudo);

@@ -21,12 +21,12 @@ const char *helvea_nomina_methodorum[HELVEA_NUMERUS_METHODORUM] = {
 
 /* --- torus sine corrugationis (basis) --- */
 
-static Vec3 torus_basis(double u, double v,
+static vec3_t torus_basis(double u, double v,
                         double radius_maior, double radius_minor)
 {
     double cu = cos(u), su = sin(u);
     double cv = cos(v), sv = sin(v);
-    return (Vec3){
+    return (vec3_t){
         (radius_maior + radius_minor * cv) * cu,
         (radius_maior + radius_minor * cv) * su,
         radius_minor * sv
@@ -35,7 +35,7 @@ static Vec3 torus_basis(double u, double v,
 
 /* --- methodus 0: corrugata (originalis) --- */
 
-static Vec3 superficies_corrugata(double u, double v,
+static vec3_t superficies_corrugata(double u, double v,
                                   double R, double r)
 {
     double corrugatio = 0.0;
@@ -63,7 +63,7 @@ static Vec3 superficies_corrugata(double u, double v,
     double vv = v + perturb_v;
     double r_eff = r + corrugatio;
 
-    return (Vec3){
+    return (vec3_t){
         (R + r_eff * cos(vv)) * cos(uu),
         (R + r_eff * cos(vv)) * sin(uu),
         r_eff * sin(vv)
@@ -78,7 +78,7 @@ static Vec3 superficies_corrugata(double u, double v,
  * ex errore metricum derivat.
  */
 
-static Vec3 superficies_iterata(double u, double v,
+static vec3_t superficies_iterata(double u, double v,
                                 double R, double r)
 {
     /* torus basalis */
@@ -128,7 +128,7 @@ static Vec3 superficies_iterata(double u, double v,
         pz += delta * nz;
     }
 
-    return (Vec3){px, py, pz};
+    return (vec3_t){px, py, pz};
 }
 
 /* --- methodus 2: spiralis ---
@@ -137,7 +137,7 @@ static Vec3 superficies_iterata(double u, double v,
  * Character minus graticula, magis organicus.
  */
 
-static Vec3 superficies_spiralis(double u, double v,
+static vec3_t superficies_spiralis(double u, double v,
                                  double R, double r)
 {
     double corrugatio = 0.0;
@@ -174,7 +174,7 @@ static Vec3 superficies_spiralis(double u, double v,
     double vv = v + perturb_v;
     double r_eff = r + corrugatio;
 
-    return (Vec3){
+    return (vec3_t){
         (R + r_eff * cos(vv)) * cos(uu),
         (R + r_eff * cos(vv)) * sin(uu),
         r_eff * sin(vv)
@@ -187,15 +187,15 @@ static Vec3 superficies_spiralis(double u, double v,
  * superficiei. Geometrice mundius — triangula minus deformat.
  */
 
-static Vec3 superficies_normalis(double u, double v,
+static vec3_t superficies_normalis(double u, double v,
                                  double R, double r)
 {
-    Vec3 p = torus_basis(u, v, R, r);
+    vec3_t p = torus_basis(u, v, R, r);
 
     /* norma tori basalis */
     double cu = cos(u), su = sin(u);
     double cv = cos(v), sv = sin(v);
-    Vec3 n = vec3(cv * cu, cv * su, sv);
+    vec3_t n = vec3(cv * cu, cv * su, sv);
 
     double amp_scala = r / HELVEA_RADIUS_MINOR;
     double dislocatio = 0.0;
@@ -224,7 +224,7 @@ static Vec3 superficies_normalis(double u, double v,
  * selectio methodi et norma
  * ================================================================ */
 
-Vec3 helvea_superficies(double u, double v,
+vec3_t helvea_superficies(double u, double v,
                         double radius_maior, double radius_minor,
                         helvea_methodus_t methodus)
 {
@@ -241,21 +241,21 @@ Vec3 helvea_superficies(double u, double v,
     return superficies_corrugata(u, v, radius_maior, radius_minor);
 }
 
-Vec3 helvea_norma(double u, double v,
+vec3_t helvea_norma(double u, double v,
                   double radius_maior, double radius_minor,
                   helvea_methodus_t methodus)
 {
     double h = 5e-5;
-    Vec3 du = differentia(
+    vec3_t du = differentia(
         helvea_superficies(u + h, v, radius_maior, radius_minor, methodus),
         helvea_superficies(u - h, v, radius_maior, radius_minor, methodus));
-    Vec3 dv = differentia(
+    vec3_t dv = differentia(
         helvea_superficies(u, v + h, radius_maior, radius_minor, methodus),
         helvea_superficies(u, v - h, radius_maior, radius_minor, methodus));
     return normalizare(productum_vectoriale(du, dv));
 }
 
-void helvea_superficiem_computare(Vec3 *puncta, Vec3 *normae,
+void helvea_superficiem_computare(vec3_t *puncta, vec3_t *normae,
                                   int gradus_u, int gradus_v,
                                   double radius_maior, double radius_minor,
                                   helvea_methodus_t methodus)
@@ -290,24 +290,24 @@ void helvea_superficiem_computare(Vec3 *puncta, Vec3 *normae,
  * camera perspectiva
  * ================================================================ */
 
-Camera helvea_cameram_constituere(Vec3 positio, Vec3 scopus)
+camera_t helvea_cameram_constituere(vec3_t positio, vec3_t scopus)
 {
-    Camera cam;
+    camera_t cam;
     cam.positio = positio;
     cam.ante    = normalizare(differentia(scopus, positio));
 
-    Vec3 mundi_sursum = vec3(0.0, 0.0, 1.0);
+    vec3_t mundi_sursum = vec3(0.0, 0.0, 1.0);
     cam.dextrum = normalizare(productum_vectoriale(cam.ante, mundi_sursum));
     cam.sursum  = productum_vectoriale(cam.dextrum, cam.ante);
     cam.focalis = 1.6;
     return cam;
 }
 
-int helvea_proicere(const Camera *cam, Vec3 p,
+int helvea_proicere(const camera_t *cam, vec3_t p,
                     double *scr_x, double *scr_y, double *prof,
                     int latitudo, int altitudo)
 {
-    Vec3 d = differentia(p, cam->positio);
+    vec3_t d = differentia(p, cam->positio);
     double z = productum_scalare(d, cam->ante);
     if (z < 0.05) return 0;
 
@@ -324,32 +324,32 @@ int helvea_proicere(const Camera *cam, Vec3 p,
  * illuminatio simplex (Blinn-Phong, aurum)
  * ================================================================ */
 
-Color helvea_illuminare(Vec3 punct, Vec3 norm, Vec3 oculus)
+color_t helvea_illuminare(vec3_t punct, vec3_t norm, vec3_t oculus)
 {
-    static const Vec3 lux_dir[3] = {
+    static const vec3_t lux_dir[3] = {
         { 1.0, -0.6,  1.8},
         {-0.7,  0.8,  0.4},
         { 0.2, -1.0, -0.2}
     };
-    static const Color lux_intens[3] = {
+    static const color_t lux_intens[3] = {
         {0.90, 0.80, 0.65},
         {0.20, 0.30, 0.55},
         {0.12, 0.10, 0.08}
     };
 
     double mat_r = 0.78, mat_g = 0.55, mat_b = 0.28;
-    Color res = {mat_r * 0.06, mat_g * 0.06, mat_b * 0.06};
+    color_t res = {mat_r * 0.06, mat_g * 0.06, mat_b * 0.06};
 
-    Vec3 ad_oculum = normalizare(differentia(oculus, punct));
+    vec3_t ad_oculum = normalizare(differentia(oculus, punct));
     if (productum_scalare(norm, ad_oculum) < 0.0)
         norm = multiplicare(norm, -1.0);
 
     for (int i = 0; i < 3; i++) {
-        Vec3 ld = normalizare(lux_dir[i]);
+        vec3_t ld = normalizare(lux_dir[i]);
         double NdotL = productum_scalare(norm, ld);
         if (NdotL < 0.0) NdotL = 0.0;
 
-        Vec3 semi = normalizare(summa(ld, ad_oculum));
+        vec3_t semi = normalizare(summa(ld, ad_oculum));
         double NdotH = productum_scalare(norm, semi);
         if (NdotH < 0.0) NdotH = 0.0;
         double spec = pow(NdotH, 60.0);
@@ -475,21 +475,21 @@ const helvea_thema_t helvea_themata[16] = {
 };
 
 /* luces scaenae (communes) */
-static const Vec3 lux_cruda[3] = {
+static const vec3_t lux_cruda[3] = {
     { 1.0, -0.6,  1.8},
     {-0.7,  0.8,  0.4},
     { 0.2, -1.0, -0.2}
 };
-static const Color lux_intens_th[3] = {
+static const color_t lux_intens_th[3] = {
     {0.95, 0.90, 0.75},
     {0.25, 0.35, 0.60},
     {0.15, 0.12, 0.10}
 };
 
-static Color iridescentia(double t, const helvea_thema_t *th)
+static color_t iridescentia(double t, const helvea_thema_t *th)
 {
     double phase = t * th->ir_freq * PI_GRAECUM;
-    return (Color){
+    return (color_t){
         0.5 + 0.5 * cos(phase + th->ir_phase.r),
         0.5 + 0.5 * cos(phase + th->ir_phase.g),
         0.5 + 0.5 * cos(phase + th->ir_phase.b)
@@ -501,20 +501,20 @@ static inline double tabulare(double v, int g)
     return floor(v * (double)g + 0.5) / (double)g;
 }
 
-Color helvea_illuminare_thema(Vec3 punct, Vec3 norm, Vec3 oculus)
+color_t helvea_illuminare_thema(vec3_t punct, vec3_t norm, vec3_t oculus)
 {
     const helvea_thema_t *th = &helvea_themata[helvea_index_thematis];
 
-    Vec3 ad_oculum = normalizare(differentia(oculus, punct));
+    vec3_t ad_oculum = normalizare(differentia(oculus, punct));
     if (productum_scalare(norm, ad_oculum) < 0.0)
         norm = multiplicare(norm, -1.0);
 
     double NdotV = productum_scalare(norm, ad_oculum);
     if (NdotV < 0.0) NdotV = 0.0;
 
-    Color mat = th->materia;
+    color_t mat = th->materia;
     if (th->modus == LUX_IRIDESCENS) {
-        Color ir = iridescentia(NdotV, th);
+        color_t ir = iridescentia(NdotV, th);
         double s = th->ir_saturatio;
         mat.r = mat.r * (1.0 - s) + ir.r * s;
         mat.g = mat.g * (1.0 - s) + ir.g * s;
@@ -522,7 +522,7 @@ Color helvea_illuminare_thema(Vec3 punct, Vec3 norm, Vec3 oculus)
     }
 
     if (th->modus == LUX_RAMPA) {
-        Vec3 ld = normalizare(lux_cruda[0]);
+        vec3_t ld = normalizare(lux_cruda[0]);
         double NdotL = productum_scalare(norm, ld);
         if (NdotL < 0.0) NdotL = 0.0;
 
@@ -533,9 +533,9 @@ Color helvea_illuminare_thema(Vec3 punct, Vec3 norm, Vec3 oculus)
         f = f * f * (3.0 - 2.0 * f);
         f = f * f * (3.0 - 2.0 * f);
 
-        const Color *ca = &th->rampa[seg];
-        const Color *cb = &th->rampa[seg + 1];
-        Color res;
+        const color_t *ca = &th->rampa[seg];
+        const color_t *cb = &th->rampa[seg + 1];
+        color_t res;
         res.r = ca->r * (1.0 - f) + cb->r * f;
         res.g = ca->g * (1.0 - f) + cb->g * f;
         res.b = ca->b * (1.0 - f) + cb->b * f;
@@ -548,14 +548,14 @@ Color helvea_illuminare_thema(Vec3 punct, Vec3 norm, Vec3 oculus)
         return res;
     }
 
-    Color res = {mat.r * th->ambiens, mat.g * th->ambiens, mat.b * th->ambiens};
+    color_t res = {mat.r * th->ambiens, mat.g * th->ambiens, mat.b * th->ambiens};
 
     for (int i = 0; i < 3; i++) {
-        Vec3 ld = normalizare(lux_cruda[i]);
+        vec3_t ld = normalizare(lux_cruda[i]);
         double NdotL = productum_scalare(norm, ld);
         if (NdotL < 0.0) NdotL = 0.0;
 
-        Vec3 semi = normalizare(summa(ld, ad_oculum));
+        vec3_t semi = normalizare(summa(ld, ad_oculum));
         double NdotH = productum_scalare(norm, semi);
         if (NdotH < 0.0) NdotH = 0.0;
         double spec = pow(NdotH, th->spec_potentia);
@@ -614,7 +614,7 @@ void helvea_tabulam_purgare(helvea_tabula_t *t)
 }
 
 void helvea_pixel_rgb(helvea_tabula_t *t, int x, int y,
-                      double prof, Color c)
+                      double prof, color_t c)
 {
     if (x < 0 || x >= t->latitudo || y < 0 || y >= t->altitudo) return;
     int idx = y * t->latitudo + x;
@@ -628,7 +628,7 @@ void helvea_pixel_rgb(helvea_tabula_t *t, int x, int y,
 }
 
 void helvea_pixel_bgra(helvea_tabula_t *t, int x, int y,
-                       double prof, Color c)
+                       double prof, color_t c)
 {
     if (x < 0 || x >= t->latitudo || y < 0 || y >= t->altitudo) return;
     int idx = y * t->latitudo + x;
@@ -687,10 +687,10 @@ void helvea_fundum_implere(helvea_tabula_t *t,
 
 void helvea_triangulum_reddere(
     helvea_tabula_t *t,
-    double sx0, double sy0, double sz0, Vec3 p0, Vec3 n0,
-    double sx1, double sy1, double sz1, Vec3 p1, Vec3 n1,
-    double sx2, double sy2, double sz2, Vec3 p2, Vec3 n2,
-    Vec3 oculus,
+    double sx0, double sy0, double sz0, vec3_t p0, vec3_t n0,
+    double sx1, double sy1, double sz1, vec3_t p1, vec3_t n1,
+    double sx2, double sy2, double sz2, vec3_t p2, vec3_t n2,
+    vec3_t oculus,
     helvea_illuminare_fn illum_fn,
     helvea_pixel_fn pixel_fn)
 {
@@ -725,15 +725,15 @@ void helvea_triangulum_reddere(
 
             double z = w0 * sz0 + w1 * sz1 + w2 * sz2;
 
-            Vec3 punct = summa(summa(multiplicare(p0, w0),
+            vec3_t punct = summa(summa(multiplicare(p0, w0),
                                      multiplicare(p1, w1)),
                                multiplicare(p2, w2));
-            Vec3 norm  = normalizare(
+            vec3_t norm  = normalizare(
                          summa(summa(multiplicare(n0, w0),
                                      multiplicare(n1, w1)),
                                multiplicare(n2, w2)));
 
-            Color c = illum_fn(punct, norm, oculus);
+            color_t c = illum_fn(punct, norm, oculus);
             pixel_fn(t, x, y, z, c);
         }
     }
@@ -745,9 +745,9 @@ void helvea_triangulum_reddere(
 
 void helvea_scaenam_reddere(
     helvea_tabula_t *t,
-    const Vec3 *puncta, const Vec3 *normae,
+    const vec3_t *puncta, const vec3_t *normae,
     int gradus_u, int gradus_v,
-    const Camera *cam,
+    const camera_t *cam,
     helvea_illuminare_fn illum_fn,
     helvea_pixel_fn pixel_fn)
 {

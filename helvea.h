@@ -28,56 +28,56 @@
  * typi mathematici
  * ================================================================ */
 
-typedef struct { double x, y, z; } Vec3;
-typedef struct { double r, g, b; } Color;
+typedef struct { double x, y, z; } vec3_t;
+typedef struct { double r, g, b; } color_t;
 
 /* ================================================================
  * operationes vectoriales (inline in capite)
  * ================================================================ */
 
-static inline Vec3 vec3(double x, double y, double z)
+static inline vec3_t vec3(double x, double y, double z)
 {
-    return (Vec3){x, y, z};
+    return (vec3_t){x, y, z};
 }
 
-static inline Vec3 summa(Vec3 a, Vec3 b)
+static inline vec3_t summa(vec3_t a, vec3_t b)
 {
-    return (Vec3){a.x + b.x, a.y + b.y, a.z + b.z};
+    return (vec3_t){a.x + b.x, a.y + b.y, a.z + b.z};
 }
 
-static inline Vec3 differentia(Vec3 a, Vec3 b)
+static inline vec3_t differentia(vec3_t a, vec3_t b)
 {
-    return (Vec3){a.x - b.x, a.y - b.y, a.z - b.z};
+    return (vec3_t){a.x - b.x, a.y - b.y, a.z - b.z};
 }
 
-static inline double productum_scalare(Vec3 a, Vec3 b)
+static inline double productum_scalare(vec3_t a, vec3_t b)
 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-static inline Vec3 productum_vectoriale(Vec3 a, Vec3 b)
+static inline vec3_t productum_vectoriale(vec3_t a, vec3_t b)
 {
-    return (Vec3){
+    return (vec3_t){
         a.y * b.z - a.z * b.y,
         a.z * b.x - a.x * b.z,
         a.x * b.y - a.y * b.x
     };
 }
 
-static inline Vec3 multiplicare(Vec3 v, double s)
+static inline vec3_t multiplicare(vec3_t v, double s)
 {
-    return (Vec3){v.x * s, v.y * s, v.z * s};
+    return (vec3_t){v.x * s, v.y * s, v.z * s};
 }
 
-static inline double magnitudo(Vec3 v)
+static inline double magnitudo(vec3_t v)
 {
     return sqrt(productum_scalare(v, v));
 }
 
-static inline Vec3 normalizare(Vec3 v)
+static inline vec3_t normalizare(vec3_t v)
 {
     double m = magnitudo(v);
-    if (m < 1e-15) return (Vec3){0.0, 0.0, 1.0};
+    if (m < 1e-15) return (vec3_t){0.0, 0.0, 1.0};
     return multiplicare(v, 1.0 / m);
 }
 
@@ -107,12 +107,12 @@ extern const char *helvea_nomina_methodorum[HELVEA_NUMERUS_METHODORUM];
  * helvea_superficies — punctum superficiei.
  * methodus: algorithmum corrugationis eligit.
  */
-Vec3 helvea_superficies(double u, double v,
+vec3_t helvea_superficies(double u, double v,
                         double radius_maior, double radius_minor,
                         helvea_methodus_t methodus);
 
 /* norma per differentias finitas centrales */
-Vec3 helvea_norma(double u, double v,
+vec3_t helvea_norma(double u, double v,
                   double radius_maior, double radius_minor,
                   helvea_methodus_t methodus);
 
@@ -121,7 +121,7 @@ Vec3 helvea_norma(double u, double v,
  * vertices marginales copiantur ut superficies claudatur
  * (corrugatio non est periodica in [0,2π]).
  */
-void helvea_superficiem_computare(Vec3 *puncta, Vec3 *normae,
+void helvea_superficiem_computare(vec3_t *puncta, vec3_t *normae,
                                   int gradus_u, int gradus_v,
                                   double radius_maior, double radius_minor,
                                   helvea_methodus_t methodus);
@@ -131,16 +131,16 @@ void helvea_superficiem_computare(Vec3 *puncta, Vec3 *normae,
  * ================================================================ */
 
 typedef struct {
-    Vec3   positio;
-    Vec3   ante;
-    Vec3   dextrum;
-    Vec3   sursum;
+    vec3_t   positio;
+    vec3_t   ante;
+    vec3_t   dextrum;
+    vec3_t   sursum;
     double focalis;
-} Camera;
+} camera_t;
 
-Camera helvea_cameram_constituere(Vec3 positio, Vec3 scopus);
+camera_t helvea_cameram_constituere(vec3_t positio, vec3_t scopus);
 
-int helvea_proicere(const Camera *cam, Vec3 p,
+int helvea_proicere(const camera_t *cam, vec3_t p,
                     double *scr_x, double *scr_y, double *prof,
                     int latitudo, int altitudo);
 
@@ -148,7 +148,7 @@ int helvea_proicere(const Camera *cam, Vec3 p,
  * illuminatio simplex (Blinn-Phong, aurum)
  * ================================================================ */
 
-Color helvea_illuminare(Vec3 punct, Vec3 norm, Vec3 oculus);
+color_t helvea_illuminare(vec3_t punct, vec3_t norm, vec3_t oculus);
 
 /* ================================================================
  * themata — colores et modi lucis
@@ -170,17 +170,17 @@ typedef struct {
     helvea_modus_lucis_t modus;
     int                  pfx;           /* vexilla post-effectuum (bit OR) */
     double               ir_freq;
-    Color                ir_phase;
+    color_t                ir_phase;
     double               ir_saturatio;
-    Color                materia;
-    Color                fresnel_color;
+    color_t                materia;
+    color_t                fresnel_color;
     double               fresnel_vis;
     double               spec_potentia;
     double               spec_vis;
     double               ambiens;
     int                  cel_gradus;
     int                  posteriza_niv;
-    Color                rampa[4];
+    color_t                rampa[4];
 } helvea_thema_t;
 
 /* vexilla post-effectuum (combinabilia per OR) */
@@ -202,7 +202,7 @@ extern int helvea_index_thematis;
  * Signaturam helvea_illuminare_fn habet, ergo directe
  * ut callback transmitti potest.
  */
-Color helvea_illuminare_thema(Vec3 punct, Vec3 norm, Vec3 oculus);
+color_t helvea_illuminare_thema(vec3_t punct, vec3_t norm, vec3_t oculus);
 
 /* ================================================================
  * tabula imaginis (framebuffer)
@@ -360,11 +360,11 @@ void helvea_fundum_implere(helvea_tabula_t *t,
 
 /* pixel scribere cum profunditate — RGB ordo (PPM) */
 void helvea_pixel_rgb(helvea_tabula_t *t, int x, int y,
-                      double prof, Color c);
+                      double prof, color_t c);
 
 /* pixel scribere cum profunditate — BGRA ordo (SDL ARGB8888) */
 void helvea_pixel_bgra(helvea_tabula_t *t, int x, int y,
-                       double prof, Color c);
+                       double prof, color_t c);
 
 /* ================================================================
  * rasterizatio triangulorum
@@ -374,17 +374,17 @@ void helvea_pixel_bgra(helvea_tabula_t *t, int x, int y,
  * pixel_fn: functio quae pixel scribit.
  * ================================================================ */
 
-typedef Color (*helvea_illuminare_fn)(Vec3 punct, Vec3 norm, Vec3 oculus);
+typedef color_t (*helvea_illuminare_fn)(vec3_t punct, vec3_t norm, vec3_t oculus);
 
 typedef void (*helvea_pixel_fn)(helvea_tabula_t *t, int x, int y,
-                                double prof, Color c);
+                                double prof, color_t c);
 
 void helvea_triangulum_reddere(
     helvea_tabula_t *t,
-    double sx0, double sy0, double sz0, Vec3 p0, Vec3 n0,
-    double sx1, double sy1, double sz1, Vec3 p1, Vec3 n1,
-    double sx2, double sy2, double sz2, Vec3 p2, Vec3 n2,
-    Vec3 oculus,
+    double sx0, double sy0, double sz0, vec3_t p0, vec3_t n0,
+    double sx1, double sy1, double sz1, vec3_t p1, vec3_t n1,
+    double sx2, double sy2, double sz2, vec3_t p2, vec3_t n2,
+    vec3_t oculus,
     helvea_illuminare_fn illum_fn,
     helvea_pixel_fn pixel_fn);
 
@@ -397,9 +397,9 @@ void helvea_triangulum_reddere(
 
 void helvea_scaenam_reddere(
     helvea_tabula_t *t,
-    const Vec3 *puncta, const Vec3 *normae,
+    const vec3_t *puncta, const vec3_t *normae,
     int gradus_u, int gradus_v,
-    const Camera *cam,
+    const camera_t *cam,
     helvea_illuminare_fn illum_fn,
     helvea_pixel_fn pixel_fn);
 

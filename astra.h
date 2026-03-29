@@ -45,7 +45,7 @@
  * typi
  * ================================================================ */
 
-typedef struct { double r, g, b, a; } Astra_color;
+typedef struct { double r, g, b, a; } astra_color_t;
 
 /*
  * Genus sideris — ex diagrammate Hertzsprung-Russell (1911).
@@ -281,7 +281,7 @@ void astra_sidus_reddere(unsigned char *fenestra,
  * ================================================================ */
 
 /* colorem ex temperatura (Kelvin) per Planck approximare */
-Astra_color astra_temperatura_ad_colorem(double kelvin);
+astra_color_t astra_temperatura_ad_colorem(double kelvin);
 
 /* pixel in campum toroidalem scribere (coordinatae modulantur) */
 void astra_pixel_scribere(astra_campus_t *c, int x, int y,

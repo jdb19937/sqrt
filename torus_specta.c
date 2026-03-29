@@ -115,25 +115,25 @@ static void orbita_creare(const char *dir, int tabulae)
  * rotatio punctorum circa axem
  * ================================================================ */
 
-static Vec3 rotare_x(Vec3 p, double a)
+static vec3_t rotare_x(vec3_t p, double a)
 {
     double ca = cos(a), sa = sin(a);
     return vec3(p.x, p.y * ca - p.z * sa, p.y * sa + p.z * ca);
 }
 
-static Vec3 rotare_y(Vec3 p, double a)
+static vec3_t rotare_y(vec3_t p, double a)
 {
     double ca = cos(a), sa = sin(a);
     return vec3(p.x * ca + p.z * sa, p.y, -p.x * sa + p.z * ca);
 }
 
-static Vec3 rotare_z(Vec3 p, double a)
+static vec3_t rotare_z(vec3_t p, double a)
 {
     double ca = cos(a), sa = sin(a);
     return vec3(p.x * ca - p.y * sa, p.x * sa + p.y * ca, p.z);
 }
 
-typedef Vec3 (*functio_rotandi)(Vec3, double);
+typedef vec3_t (*functio_rotandi)(vec3_t, double);
 
 /* themata et illuminatio thematica nunc in helvea.h/c */
 
@@ -250,10 +250,10 @@ int main(int argc, char **argv)
     helvea_methodus_t methodus = HELVEA_CORRUGATA;
 
     size_t n_vert = (size_t)(GRADUS_U + 1) * (GRADUS_V + 1);
-    Vec3 *puncta_orig = (Vec3 *)malloc(n_vert * sizeof(Vec3));
-    Vec3 *normae_orig = (Vec3 *)malloc(n_vert * sizeof(Vec3));
-    Vec3 *puncta_rot  = (Vec3 *)malloc(n_vert * sizeof(Vec3));
-    Vec3 *normae_rot  = (Vec3 *)malloc(n_vert * sizeof(Vec3));
+    vec3_t *puncta_orig = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
+    vec3_t *normae_orig = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
+    vec3_t *puncta_rot  = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
+    vec3_t *normae_rot  = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
 
     if (!puncta_orig || !normae_orig || !puncta_rot || !normae_rot) {
         fprintf(stderr, "ERROR: memoria insufficiens!\n");
@@ -569,15 +569,15 @@ int main(int argc, char **argv)
         /* camera: positio ex coordinatis toroidalibus (theta, phi).
          * theta = horizontalis, phi = verticalis. ambo libere volvuntur.
          * camera orbitat in plano inclinato per phi. */
-        Vec3 pos_cam = vec3(distantia * cos(theta),
+        vec3_t pos_cam = vec3(distantia * cos(theta),
                             distantia * sin(theta),
                             0.0);
         pos_cam = rotare_x(pos_cam, phi);
-        Vec3 scopus = vec3(0.0, 0.0, 0.0);
+        vec3_t scopus = vec3(0.0, 0.0, 0.0);
 
         /* sursum: perpendiculare ad orbitam, rotatum per phi */
-        Vec3 sursum_cam = rotare_x(vec3(0.0, 0.0, 1.0), phi);
-        Camera cam;
+        vec3_t sursum_cam = rotare_x(vec3(0.0, 0.0, 1.0), phi);
+        camera_t cam;
         cam.positio = pos_cam;
         cam.ante    = normalizare(differentia(scopus, pos_cam));
         cam.dextrum = normalizare(productum_vectoriale(cam.ante, sursum_cam));

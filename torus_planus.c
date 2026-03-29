@@ -57,8 +57,8 @@ int main(int argc, char **argv)
             GRADUS_U, GRADUS_V);
 
     size_t n_vert = (size_t)(GRADUS_U + 1) * (GRADUS_V + 1);
-    Vec3 *puncta = (Vec3 *)malloc(n_vert * sizeof(Vec3));
-    Vec3 *normae = (Vec3 *)malloc(n_vert * sizeof(Vec3));
+    vec3_t *puncta = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
+    vec3_t *normae = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
 
     if (!puncta || !normae) {
         fprintf(stderr, "ERROR: memoria insufficiens pro superficie!\n");
@@ -70,9 +70,9 @@ int main(int argc, char **argv)
                                  HELVEA_CORRUGATA);
 
     /* cameram constituere */
-    Vec3 positio_camerae = vec3(2.6, -2.0, 1.5);
-    Vec3 scopus          = vec3(0.0, 0.0, -0.05);
-    Camera cam = helvea_cameram_constituere(positio_camerae, scopus);
+    vec3_t positio_camerae = vec3(2.6, -2.0, 1.5);
+    vec3_t scopus          = vec3(0.0, 0.0, -0.05);
+    camera_t cam = helvea_cameram_constituere(positio_camerae, scopus);
 
     /* fundum stellarum — translatio ex angulo camerae */
     double angulus_cam = atan2(positio_camerae.y, positio_camerae.x);
