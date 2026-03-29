@@ -2,14 +2,44 @@ APOTHECA ?= .
 
 CC      ?= cc
 CFLAGS  ?= -Wall -Wextra -pedantic -std=c99 -O2
-LDFLAGS = -lm
+LDFLAGS = -lm `cat $(APOTHECA)/phantasma/nexus_phantasma`
 
 LIBISON = $(APOTHECA)/ison/libison.a
 LIBPHANTASMA = $(APOTHECA)/phantasma/libphantasma.a
 
+CAELAE = caelae/terra.isonl caelae/hubble.isonl caelae/jwst.isonl \
+         caelae/nuclei.isonl caelae/vacuum.isonl caelae/mortis.isonl \
+         caelae/binarium.isonl
+
 omnia: torus_planus torus_animare torus_specta astra_proba caele redde
 
 omnia: $(NOMEN)
+
+caelae: $(CAELAE)
+
+caelae/terra.isonl: campi/terra.ison caele
+	./caele campi/terra.ison > caelae/terra.isonl
+
+caelae/hubble.isonl: campi/hubble.ison caele
+	./caele campi/hubble.ison > caelae/hubble.isonl
+
+caelae/jwst.isonl: campi/jwst.ison caele
+	./caele campi/jwst.ison > caelae/jwst.isonl
+
+caelae/nuclei.isonl: campi/nuclei.ison caele
+	./caele campi/nuclei.ison > caelae/nuclei.isonl
+
+caelae/vacuum.isonl: campi/vacuum.ison caele
+	./caele campi/vacuum.ison > caelae/vacuum.isonl
+
+caelae/mortis.isonl: campi/mortis.ison caele
+	./caele campi/mortis.ison > caelae/mortis.isonl
+
+caelae/binarium.isonl: campi/binarium.ison caele
+	./caele campi/binarium.ison > caelae/binarium.isonl
+
+lude: torus_specta caelae/terra.isonl
+	./torus_specta
 
 para:
 	git submodule update --init ison phantasma
@@ -38,7 +68,7 @@ torus_animare: torus_animare.c helvea.o astra.o helvea.h astra.h $(LIBISON)
 	$(CC) $(CFLAGS) -o $@ torus_animare.c helvea.o astra.o $(LIBISON) $(LDFLAGS)
 
 torus_specta: torus_specta.c helvea.o astra.o helvea.h astra.h $(LIBISON) $(LIBPHANTASMA)
-	$(CC) $(CFLAGS) -o $@ torus_specta.c helvea.o astra.o $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS) -framework Cocoa
+	$(CC) $(CFLAGS) -o $@ torus_specta.c helvea.o astra.o $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
 astra_proba: astra_proba.c astra.o astra.h $(LIBISON)
 	$(CC) $(CFLAGS) -o $@ astra_proba.c astra.o $(LIBISON) $(LDFLAGS)
@@ -53,4 +83,4 @@ purga:
 	rm -f torus_planus torus_animare torus_specta astra_proba caele redde helvea.o astra.o caele.o redde.o
 	rm -f caelae/*.ppm caelae/*.isonl
 
-.PHONY: omnia purga
+.PHONY: omnia purga caelae lude
