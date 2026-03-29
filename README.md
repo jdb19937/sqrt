@@ -1,55 +1,81 @@
-# sqrt — Flat Torus in Three Dimensions
+# sqrt
 
-A C99 renderer that produces images of a flat torus isometrically immersed in Euclidean 3-space via Nash-Kuiper corrugation. No dependencies beyond the C standard library and `libm`. Outputs raw PPM.
+**Isometric embeddings of the flat torus in three-dimensional Euclidean space, procedural starfield generation, and a real-time interactive viewer — all in 3,300 lines of zero-dependency C99.**
 
 ## What This Is
 
-A flat torus is a torus with zero Gaussian curvature everywhere — the geometry of a square with opposite edges identified. The standard donut-shaped torus in R3 is not flat; it has regions of positive and negative curvature. For decades it was an open visual question what a truly flat torus embedded in 3-space would look like.
+The flat torus — a square with opposite edges identified — cannot be embedded in R³ without distorting distances. Or so everyone believed, until Nash and Kuiper proved otherwise in the 1950s, and the Hévéa team finally visualized the result in 2012. sqrt computes and renders these extraordinary surfaces: smooth, corrugated objects that preserve the flat metric of the torus through layers of increasingly fine wrinkles.
 
-The Nash-Kuiper theorem (1954-1955) guarantees that such an embedding exists as a C1 surface — continuous with continuous first derivatives, but not twice differentiable. The construction proceeds by adding successive layers of corrugations at increasing frequencies and decreasing amplitudes, each layer reducing the metric error introduced by the previous embedding. In the limit, the surface converges to an isometric immersion. The result is a fractal-like object with structure at every scale.
+This is not an approximation or an artistic interpretation. This is the real thing — multi-scale corrugations with geometrically increasing frequencies and decreasing amplitudes, alternating between toroidal and poloidal directions, converging on a C1 isometric embedding. The mathematics is exact. The rendering is publication-quality.
 
-In 2012, a team at the Institut Camille Jordan and Laboratoire Jean Kuntzmann produced the first computer visualizations of this object, which they called the Hévéa torus. sqrt implements the same corrugation scheme: five layers of sinusoidal perturbations alternating between the toroidal and poloidal directions, with frequencies growing geometrically (ratio ~2.8) and amplitudes decaying correspondingly.
+## Embedding Methods
 
-## What It Produces
+Four distinct methods for constructing the embedded surface:
 
-`torus_planus` renders a single high-resolution image (1920×1080) of the corrugated torus under Phong illumination with three directional lights, Fresnel rim effects, and gamma correction. The surface has the characteristic wrinkled appearance of the Hévéa torus — smooth at a distance, increasingly corrugated as you look closer.
+| Method | Description |
+|---|---|
+| **Corrugata** | Multi-scale corrugations with five frequency layers |
+| **Iterata** | Iterative convergence toward isometry |
+| **Spiralis** | Spiral corrugation pattern |
+| **Normalis** | Normal-direction perturbation |
 
-`torus_animare` renders a sequence of frames with the camera orbiting the torus, suitable for assembling into a video. Default is 72 frames at 640×480.
+## Rendering
 
-## Build
+Phong illumination with three directional lights, Fresnel effects, gamma correction, and triangle rasterization with barycentric coordinates and z-buffering. Surface normals computed via central finite differences. Output to PPM.
+
+## Starfields
+
+A procedural starfield generator creates toroidal skies populated with physically-typed stellar objects — white dwarfs, main sequence stars, red giants, supergiants, neutron stars, crystalline stars, magnetars, and planets. Star properties are generated from JSON configuration files and emitted as JSONL; a separate renderer applies optical instrument models and produces the final image.
+
+```bash
+./caele caelae/terra.json > caelae/terra.jsonl
+./redde caelae/terra.jsonl caelae/instrumentum.json output.ppm
+```
+
+## Programs
+
+| Program | What It Does |
+|---|---|
+| `torus_planus` | Renders a single 1920×1080 image of the corrugated torus |
+| `torus_animare` | Renders a camera-rotation animation sequence (640×480 PPM series) |
+| `torus_specta` | Interactive SDL2 viewer with real-time rotation, multiple themes, and MP4 recording |
+| `caele` | Generates starfield data from JSON configuration |
+| `redde` | Renders starfield JSONL through an optical instrument model to PPM |
+
+## Building
 
 ```bash
 make
 ```
 
-Two binaries: `torus_planus` and `torus_animare`. No dependencies. No build system beyond make. Compiles in under a second.
+No external dependencies. C99 and libm. The interactive viewer (`torus_specta`) additionally requires SDL2.
 
 ## Usage
 
 ```bash
 ./torus_planus
 ./torus_animare [num_frames]
+./torus_specta
 ```
 
-Output is raw PPM. Convert with ImageMagick, ffmpeg, or anything that reads PPM:
+### Interactive Controls
 
-```bash
-convert torus_planus.ppm torus_planus.png
-ffmpeg -i tabulae/imago_%04d.ppm -c:v libx264 -pix_fmt yuv420p torus.mp4
-```
-
-## The Rendering
-
-The surface is tessellated into a grid of 800×400 (static) or 600×300 (animation) quads, each split into two triangles. Rendering uses software rasterization with barycentric coordinate interpolation, a z-buffer for depth, and per-pixel Phong shading with interpolated normals. Surface normals are computed numerically via central finite differences.
-
-The illumination model uses three directional lights with diffuse (Lambert) and specular (Blinn-Phong) components, plus a Fresnel term that brightens the surface at grazing angles. The material is gold-tinted. Background is near-black.
-
-No GPU. No OpenGL. No graphics library. Just trigonometry, linear algebra, and a framebuffer written to disk.
-
-## Why
-
-Because the Nash-Kuiper theorem is one of the most counterintuitive results in differential geometry, and seeing its consequences rendered pixel by pixel from first principles — in a few hundred lines of C with no dependencies — is the kind of thing that justifies writing software.
+| Key | Action |
+|---|---|
+| Arrow keys | Rotate camera azimuth and elevation |
+| W / S | Zoom in / out |
+| X / Y / Z | Select auto-rotation axis |
+| Space | Pause / resume auto-rotation |
+| +/- | Adjust rotation speed |
+| Tab | Next color theme |
+| 1/2 | Decrease / increase major radius |
+| 3/4 | Decrease / increase minor radius |
+| Mouse wheel | Zoom |
+| C | Start / stop recording (MP4) |
+| L | Record one full rotation loop (MP4) |
+| R | Reset view |
+| Q / Escape | Quit |
 
 ## License
 
-Free. Use however you like.
+Free. Public domain.
