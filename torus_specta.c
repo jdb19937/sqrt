@@ -90,7 +90,7 @@ static void orbita_creare(const char *dir, int tabulae)
 
     /* GIF dimidiata — loop infinitus */
     snprintf(mandatum, sizeof(mandatum),
-        "ffmpeg -y -framerate 30 "
+        "ffmpeg -y "
         "-i '%s/%%06d.ppm' "
         "-vf 'scale=iw/2:ih/2,split[s0][s1];"
         "[s0]palettegen=max_colors=128[p];"
