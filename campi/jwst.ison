@@ -1,0 +1,18 @@
+{
+  "latitudo": 1024,
+  "altitudo": 1024,
+  "numerus_stellarum": 4000,
+  "densitas_galaxiae": "0.2",
+  "inclinatio_galaxiae": "0.5",
+  "latitudo_galaxiae": "0.4",
+  "semen": 2022,
+  "galaxia_glow": "0",
+  "galaxia_rift": "0",
+  "galaxia_nebulae": 0,
+  "max_supergigantes": 1,
+  "max_gigantes": 2,
+  "max_exotica": 1,
+  "numerus_planetarum": 0,
+  "planetae_temp_min": "0",
+  "planetae_temp_max": "0"
+}

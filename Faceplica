@@ -1,16 +1,54 @@
-CC = cc
-CFLAGS = -O2 -std=c99 -Wall
+APOTHECA ?= .
+
+CC      ?= cc
+CFLAGS  ?= -Wall -Wextra -pedantic -std=c99 -O2
 LDFLAGS = -lm
 
-omnia: torus_planus torus_animare
+SDL2_CFLAGS = `sdl2-config --cflags`
+SDL2_LDFLAGS = `sdl2-config --libs`
 
-torus_planus: torus_planus.c
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+LIBISON = $(APOTHECA)/ison/libison.a
 
-torus_animare: torus_animare.c
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+omnia: torus_planus torus_animare torus_specta astra_proba caele redde
+
+omnia: $(NOMEN)
+
+para:
+	git submodule update --init ison
+	$(FACE) -C ison
+
+expara:
+	git submodule deinit -f ison
+
+$(LIBISON):
+        $(FACE) -C $(APOTHECA)/ison
+
+helvea.o: helvea.c helvea.h
+	$(CC) $(CFLAGS) -c -o helvea.o helvea.c
+
+astra.o: astra.c astra.h
+	$(CC) $(CFLAGS) -c -o astra.o astra.c
+
+torus_planus: torus_planus.c helvea.o helvea.h $(LIBISON)
+	$(CC) $(CFLAGS) -o $@ torus_planus.c helvea.o $(LIBISON) $(LDFLAGS)
+
+torus_animare: torus_animare.c helvea.o helvea.h $(LIBISON)
+	$(CC) $(CFLAGS) -o $@ torus_animare.c helvea.o $(LIBISON) $(LDFLAGS)
+
+torus_specta: torus_specta.c helvea.o helvea.h $(LIBISON)
+	$(CC) $(CFLAGS) $(SDL2_CFLAGS) -o $@ torus_specta.c helvea.o $(LIBISON) $(LDFLAGS) $(SDL2_LDFLAGS)
+
+astra_proba: astra_proba.c astra.o astra.h $(LIBISON)
+	$(CC) $(CFLAGS) -o $@ astra_proba.c astra.o $(LIBISON) $(LDFLAGS)
+
+caele: caele.c astra.o astra.h $(LIBISON)
+	$(CC) $(CFLAGS) -I ison -o $@ caele.c astra.o $(LIBISON) $(LDFLAGS)
+
+redde: redde.c astra.o astra.h $(LIBISON)
+	$(CC) $(CFLAGS) -I ison -o $@ redde.c astra.o $(LIBISON) $(LDFLAGS)
 
 purga:
-	rm -f torus_planus torus_animare
+	rm -f torus_planus torus_animare torus_specta astra_proba caele redde helvea.o astra.o
+	rm -f caelae/*.ppm caelae/*.isonl
 
 .PHONY: omnia purga

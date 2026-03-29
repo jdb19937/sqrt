@@ -1,0 +1,291 @@
+/*
+ * astra.h — sidera et planetae, bitmap caeli nocturni
+ *
+ * Generat campum stellarum cum topologia toroidali.
+ * Reddit singula sidera in fenestra 64x64 pixelorum.
+ *
+ * Fundamenta physica:
+ *
+ *   Color stellae ex radiatio corporis nigri (Planck 1900) derivatur.
+ *   Lex Wien: λ_max = b/T ubi b = 2.898e-3 m·K.
+ *   Approximatio Tanner Helland RGB adhibetur — errore < 1% in
+ *   campo 1000-40000 K contra integrationem Planckianam plenam
+ *   per functiones colorimetricas CIE 1931.
+ *
+ *   Magnitudo apparens sequitur scalam Pogson (1856):
+ *   m = -2.5 log10(F/F_0). Differentia 5 magnitudinum = factor 100
+ *   in fluxu. Oculus nudus videt usque ad mag ~6 (Bortle 1).
+ *
+ *   Distributio generum stellarum ex functione initiali massae
+ *   (IMF, Kroupa 2001) derivatur: dN/dM ∝ M^(-2.3) pro M > 0.5 M☉.
+ *   Hoc significat stellas parvas (M, K) enormiter dominare.
+ *   Gigantes et supergigantes rarissimi sunt quia:
+ *   (a) progenitores massivi rari per IMF,
+ *   (b) phase gigantis brevis (~10% vitae stellae).
+ *
+ *   Densitas stellaris in vicinitate solari: ~0.14 pc^(-3)
+ *   (Reylé et al. 2021). In caelo Bortle 2 (ut Vallis Mortis)
+ *   ~4500 stellae oculo nudo visibiles, ~15000 cum averted vision.
+ */
+
+#ifndef ASTRA_H
+#define ASTRA_H
+
+#include <math.h>
+
+/* ================================================================
+ * constantes
+ * ================================================================ */
+
+#define ASTRA_PI        3.14159265358979323846
+#define ASTRA_DUO_PI   (2.0 * ASTRA_PI)
+#define ASTRA_FENESTRA  64      /* latitudo et altitudo fenestrae sideris */
+
+/* ================================================================
+ * typi
+ * ================================================================ */
+
+typedef struct { double r, g, b, a; } Astra_color;
+
+/*
+ * Genus sideris — ex diagrammate Hertzsprung-Russell (1911).
+ *
+ * Sequentia principalis: fusio H→He in nucleo. 90% omnium stellarum.
+ *   Classes spectrales O B A F G K M per temperaturam superficiei.
+ *   Sol = G2V, T_eff = 5778 K, mag_abs = +4.83.
+ *
+ * Nanum album: nucleus degenere post eiectionem nebulae planetariae.
+ *   Massa ~0.6 M☉ in volumine Terrae. Pressure degenerationis
+ *   electronium (Chandrasekhar 1931, limitus 1.4 M☉).
+ *   T_eff = 4000-150000 K, refrigerans per ~10^10 annos.
+ *   ~6% stellarum visibilium (Holberg et al. 2008).
+ *
+ * Gigas rubrum: post exhaustionem H in nucleo, involucrum expandit.
+ *   Radius 10-100 R☉, T_eff = 2500-5000 K. Phase brevis (~10^8 a).
+ *   Rara in campo visibili quia (a) progenitores 1-8 M☉ rari per IMF,
+ *   (b) tempus in hac phase breve.
+ *
+ * Supergigas: stellae massivissimae (>8 M☉), omnes classes spectrales.
+ *   Radius 30-1500 R☉. Vita brevissima (~10^6-10^7 a).
+ *   Extremiter rara: ~0.001% stellarum, sed lucidissimae (M_abs -5 ad -9).
+ *   Betelgeuse (M2Iab), Rigel (B8Ia), Deneb (A2Ia).
+ *
+ * Neutronium: post supernovam, nucleus > 1.4 M☉ collapsus.
+ *   Radius ~10 km, densitas ~10^17 kg/m^3. T_superficiei ~10^6 K
+ *   (initiale), refrigerans. Radiat maxime in X-ray.
+ *   Pulsar: fasciculus radio rotans (Hewish & Bell 1967).
+ *   Campus magneticus ~10^8-10^15 T (magnetar).
+ *
+ * Magnetar: stella neutronium cum campo magnetico extremo.
+ *   B ~10^9-10^11 T (Duncan & Thompson 1992).
+ *   Cf pulsar ordinarius: B ~10^8 T. Cf Terra: B ~5×10^-5 T.
+ *   Campus tam fortis ut vacuum QED birefringentiam exhibeat
+ *   (Heisenberg & Euler 1936): photones in duos modos polarizantur
+ *   cum velocitatibus diversis. Prope superficiem, B > B_Schwinger
+ *   (4.4×10^9 T) et paria e+e- ex vacuo creari possunt.
+ *   Soft Gamma Repeaters (SGR) et Anomalous X-ray Pulsars (AXP)
+ *   nunc ut magnetares identificantur (Mereghetti 2008).
+ *   SGR 1806-20 (2004): eruptio γ cum E ~10^39 J in 0.2 s,
+ *   ionosphaeram Terrae ex 50000 ly perturbavit.
+ *   Apparentia: nucleus intensissimus cum halo asymmetrico
+ *   ex birefringentia vacui — lux in duos modos separatur,
+ *   creans imaginem duplicem vel elongatam.
+ *
+ * Crystallinum (RARUM — rarum):
+ *   Stella ex materia quark in phase "color-flavor locked" (CFL).
+ *   Alford, Rajagopal & Wilczek (1999) praedixerunt materiam quark
+ *   densam transituram in statum CFL ubi quarks in tribus coloribus
+ *   et tribus saporibus crystallinam symmetriam formant.
+ *   Gap energiae ~100 MeV spectrale emissionem in lineas discretas
+ *   frangit — non continuum Plancki sed colores puros spectrales.
+ *   Apparentia: filamenta luminosa in coloribus spectralibus discretis
+ *   irradiantia ex nucleo — quasi "globus Koosh" stellaris.
+ *   Nondum observatum sed theoretice firmum (Alford+ 1999, Rajagopal+ 2001).
+ */
+typedef enum {
+    SIDUS_NANUM_ALBUM,
+    SIDUS_SEQUENTIA,
+    SIDUS_GIGAS_RUBRUM,
+    SIDUS_SUPERGIGAS,
+    SIDUS_NEUTRONIUM,
+    SIDUS_CRYSTALLINUM,
+    SIDUS_MAGNETAR,         /* magnetar */
+    SIDUS_PLANETA,
+    SIDUS_NUMERUS
+} astra_genus_t;
+
+extern const char *astra_nomina_generum[SIDUS_NUMERUS];
+
+/*
+ * Proprietates instrumenti optici — NON sideris ipsius.
+ *
+ * Spiculae diffractionis oriuntur ex struttura telescopii:
+ *   - Newtonianum: 4 spiculae ex araneo secundario (4 bracchia)
+ *   - Cassegrain: 4 spiculae (plerumque)
+ *   - JWST: 6 spiculae ex segmentis hexagonalibus
+ *   - Refractor: nullae spiculae (apertum circulare)
+ *
+ * Haec effecta sunt functio instrumenti, non stellae.
+ * Stella ipsa est punctum (angulus << resolutio).
+ * Halo (bloom) ex dispersione in atmosphaera vel opticis oritur.
+ *
+ * Separatio haec physice iustificata: eadem stella per
+ * refractorem nullas spiculas ostendit, per Newtonianum quattuor.
+ */
+/*
+ * Saturatio coloris:
+ *   Oculus humanus: responsio spectrale per curvas CIE 1931 x̄ȳz̄.
+ *   CCD (silicon): responsio latior, praesertim in rubro et infrarubro.
+ *   Quantum efficiency CCD ~80% vs oculus ~5% in rubro extremo.
+ *   Processio astrophotographica semper saturationem auget
+ *   ut differentiae spectrales visibiles fiant.
+ *   saturatio = 1.0: naturalis (oculus). >1.0: CCD/processita.
+ *
+ * Aberratio chromatica:
+ *   Lentes refringentes indicem refractionis λ-dependentem habent
+ *   (dispersio: n(λ) per formulam Cauchy vel Sellmeier).
+ *   Lux rubra longius a centro focali cadit quam caerulea.
+ *   Effectus: fimbriae coloratae circa stellas lucidas.
+ *   Achromaticae (doublet) reducunt sed non eliminant.
+ *   Apochromaticae (triplet) fere eliminant.
+ *   aberratio = 0: perfectum. >0: pixeles dislocatio per canalem.
+ */
+typedef struct {
+    int    spiculae;         /* numerus spicularum diffractionis (0 = nullae) */
+    double spiculae_long;    /* longitudo spicularum (in pixelis) */
+    double spiculae_ang;     /* angulus rotationis spicularum (radianes) */
+    double halo_radius;      /* radius hali (bloom) */
+    double halo_vis;         /* intensitas hali */
+    double amplificatio;     /* zoom: 1.0 = normalis, >1 = propinquior */
+    double saturatio;        /* color boost: 1.0 = naturalis, 2.0 = vivida */
+    double aberratio;        /* aberratio chromatica (pixeles) */
+} astra_instrumentum_t;
+
+/* proprietates sideris */
+typedef struct {
+    astra_genus_t genus;
+    double        magnitudo;     /* magnitudo apparens (0=lucidissimum, 6=vix visibile) */
+    double        temperatura;   /* temperatura coloris (Kelvin), 2000-40000 */
+    double        phase;         /* phase planetae: 0=plenus, 0.5=dimidius, 1=novus */
+    double        angulus_phase;  /* angulus illuminationis planetae (radianes) */
+} astra_sidus_t;
+
+/* campus stellarum (bitmap toroidalis) */
+typedef struct {
+    unsigned char *pixels;   /* RGB, latitudo * altitudo * 3 */
+    int            latitudo;
+    int            altitudo;
+} astra_campus_t;
+
+/* ================================================================
+ * campus stellarum
+ *
+ * Fundamenta cosmologica:
+ *
+ *   Distributio stellarum in caelo non uniformis est sed structuram
+ *   hierarchicam reflectit a primordiis cosmicis derivatam:
+ *
+ *   Fluctuationes quanticae in campo inflatonis (Guth 1981, Linde 1982)
+ *   per inflationem cosmicam amplificatae sunt in perturbationes
+ *   densitatis macroscopicas. Spectrum potentiae P(k) ∝ k^(n_s-1)
+ *   ubi n_s ≈ 0.965 (Planck 2018) — fere invariantem sed non exacte,
+ *   indicans campum inflaton non perfecte liberum fuisse.
+ *
+ *   Hae perturbationes per instabilitatem gravitationalem Jeans
+ *   (λ_J = c_s √(π/Gρ)) in structuras hierarchicas collapserunt:
+ *   filamenta → nodi → halos → galaxiae → stellae.
+ *   Hoc est "cosmic web" (Bond, Kofman & Pogosyan 1996).
+ *
+ *   In theoria chordarum (string landscape, Bousso & Polchinski 2000),
+ *   constantiae physicae (α_EM, m_e/m_p, Λ) ex selectione vacui
+ *   in ~10^500 possibilibus dependent. Principium anthropicum
+ *   (Weinberg 1987) limitat Λ ad valorem observatum ~10^(-122) M_Pl^4
+ *   — si Λ maior esset, nulla structura formaretur.
+ *
+ *   Nucleosynthesis primordialis (Alpher, Bethe, Gamow 1948):
+ *   ratio H/He ~75/25 per massam, determinata per η = n_B/n_γ ≈ 6×10^(-10).
+ *   Haec compositio primaeva stellarum spectra et evolutionem regit:
+ *   - Populatio III (Z=0): primae stellae, massivissimae, calidissimae
+ *   - Populatio II (Z bassa): halo galacticum, globulares
+ *   - Populatio I (Z alta): discus, brachia spiralia, Sol
+ *
+ *   Fascia galatctica (Via Lactea) structuram disci reflectit:
+ *   scala altitudinis h_z ≈ 300 pc (discus tenuis), profilo sech²(z/h_z).
+ *   Nucleus lucidior quia densitas stellaris ∝ exp(-R/R_d) ubi R_d ≈ 2.6 kpc.
+ *   Great Rift ex nubibus molecularibus (H₂, CO, pulvis silicatum)
+ *   cum extinctione A_V ≈ 1 mag/kpc in plano.
+ *
+ *   Topologia toroidalis campi stellarum non est mera commoditas
+ *   computationis: cosmologia inflationaria universum spatialiter
+ *   planum praedicit (Ω_k = 0.001 ± 0.002, Planck 2018).
+ *   Universum finitum cum topologia toroidali T³ non excluditur
+ *   per data CMB actualia (Luminet et al. 2003).
+ * ================================================================ */
+
+/* parametri generationis campi stellarum */
+typedef struct {
+    int    numerus_stellarum;     /* stellae totales tentandae */
+    double densitas_galaxiae;     /* 0..1: intensitas concentrationis in fascia */
+    double inclinatio_galaxiae;   /* angulus fasciae (radianes) */
+    double latitudo_galaxiae;     /* latitudo fasciae (fractio altitudinis) */
+    unsigned int semen;           /* semen aleatorium */
+
+    /* via lactea — glow diffusum */
+    double galaxia_glow;          /* 0..1: intensitas glow (0 = nullum) */
+    double galaxia_rift;          /* 0..1: intensitas fasciae pulveris */
+    int    galaxia_nebulae;       /* numerus nebulosarum emissionis */
+
+    /* limites per genus (0 = illimitatum) */
+    int    max_supergigantes;
+    int    max_gigantes;
+    int    max_exotica;           /* crystallinum + magnetar + neutronium */
+
+    /* planetae */
+    int    numerus_planetarum;
+    double planetae_temp_min;     /* temperatura minima planetarum */
+    double planetae_temp_max;
+} astra_parametri_t;
+
+/* campum creare et destruere */
+astra_campus_t *astra_campum_creare(int latitudo, int altitudo);
+void astra_campum_destruere(astra_campus_t *c);
+
+/* campum stellarum generare — instrumentum separatum a campo */
+void astra_campum_generare(astra_campus_t *c, const astra_parametri_t *p,
+                           const astra_instrumentum_t *instrumentum);
+
+/* ================================================================
+ * sidus reddere
+ *
+ * Reddit sidus in fenestram 64x64.
+ * fenestra: RGBA buffer, ASTRA_FENESTRA * ASTRA_FENESTRA * 4 bytes.
+ * alpha indicat quantum pixel a sidere afficitur.
+ * ================================================================ */
+
+void astra_sidus_reddere(unsigned char *fenestra,
+                         const astra_sidus_t *sidus,
+                         const astra_instrumentum_t *instrumentum);
+
+/* ================================================================
+ * auxiliaria
+ * ================================================================ */
+
+/* colorem ex temperatura (Kelvin) per Planck approximare */
+Astra_color astra_temperatura_ad_colorem(double kelvin);
+
+/* pixel in campum toroidalem scribere (coordinatae modulantur) */
+void astra_pixel_scribere(astra_campus_t *c, int x, int y,
+                          unsigned char r, unsigned char g, unsigned char b);
+
+/*
+ * astra_regio_vacua — inspicit an regio circa (cx,cy) satis obscura sit.
+ * radius: distantia minimalis in pixelis.
+ * reddit 1 si regio vacua, 0 si iam stella praesens.
+ */
+int astra_regio_vacua(const astra_campus_t *c, int cx, int cy, int radius);
+
+/* sidus in campum inserere ad positionem (x,y) — toroidale */
+void astra_sidus_in_campum(astra_campus_t *c, int cx, int cy,
+                           const unsigned char *fenestra);
+
+#endif /* ASTRA_H */

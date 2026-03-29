@@ -1,0 +1,14 @@
+{
+  "titulus": "instrumentum",
+  "properties": {
+    "spiculae":       {"type": "integer"},
+    "spiculae_long":  {"type": "string"},
+    "spiculae_ang":   {"type": "string"},
+    "halo_radius":    {"type": "string"},
+    "halo_vis":       {"type": "string"},
+    "amplificatio":   {"type": "string"},
+    "saturatio":      {"type": "string"},
+    "aberratio":      {"type": "string"}
+  },
+  "required": []
+}

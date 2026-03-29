@@ -1,0 +1,13 @@
+{
+  "titulus": "sidus",
+  "properties": {
+    "genus":          {"type": "string"},
+    "magnitudo":      {"type": "string"},
+    "temperatura":    {"type": "string"},
+    "x":              {"type": "integer"},
+    "y":              {"type": "integer"},
+    "phase":          {"type": "string"},
+    "angulus_phase":  {"type": "string"}
+  },
+  "required": ["genus", "magnitudo", "temperatura", "x", "y"]
+}
