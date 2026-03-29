@@ -69,6 +69,42 @@ static void mp4_creare(const char *dir, int tabulae)
     purgare_dir(dir);
 }
 
+/* orbita: MP4 plena + GIF dimidiata */
+static void orbita_creare(const char *dir, int tabulae)
+{
+    if (tabulae < 1) { purgare_dir(dir); return; }
+
+    char mandatum[1024];
+
+    /* MP4 plena */
+    snprintf(mandatum, sizeof(mandatum),
+        "ffmpeg -y -framerate 30 "
+        "-i '%s/%%06d.ppm' "
+        "-c:v libx264 -pix_fmt yuv420p "
+        "-crf 18 '%s.mp4' "
+        "2>/dev/null",
+        dir, dir);
+    int res = system(mandatum);
+    if (res == 0)
+        fprintf(stderr, "  MP4: %s.mp4\n", dir);
+
+    /* GIF dimidiata — loop infinitus */
+    snprintf(mandatum, sizeof(mandatum),
+        "ffmpeg -y -framerate 30 "
+        "-i '%s/%%06d.ppm' "
+        "-vf 'scale=iw/2:ih/2,split[s0][s1];"
+        "[s0]palettegen=max_colors=128[p];"
+        "[s1][p]paletteuse=dither=bayer' "
+        "-loop 0 '%s.gif' "
+        "2>/dev/null",
+        dir, dir);
+    res = system(mandatum);
+    if (res == 0)
+        fprintf(stderr, "  GIF: %s.gif\n", dir);
+
+    purgare_dir(dir);
+}
+
 #define LATITUDO_IMG  768
 #define ALTITUDO_IMG  768
 #define GRADUS_U      300
@@ -626,7 +662,7 @@ int main(int argc, char **argv)
                 orbita_inscribit = 0;
                 fprintf(stderr, "◎ ORBITA PERFECTA: %d tabulae\n",
                         orbita_tabula);
-                mp4_creare(orbita_dir, orbita_tabula);
+                orbita_creare(orbita_dir, orbita_tabula);
             }
         }
     }
