@@ -29,14 +29,14 @@ helvea.o: helvea.c helvea.h
 astra.o: astra.c astra.h
 	$(CC) $(CFLAGS) -c -o astra.o astra.c
 
-torus_planus: torus_planus.c helvea.o helvea.h $(LIBISON)
-	$(CC) $(CFLAGS) -o $@ torus_planus.c helvea.o $(LIBISON) $(LDFLAGS)
+torus_planus: torus_planus.c helvea.o astra.o helvea.h astra.h $(LIBISON)
+	$(CC) $(CFLAGS) -o $@ torus_planus.c helvea.o astra.o $(LIBISON) $(LDFLAGS)
 
-torus_animare: torus_animare.c helvea.o helvea.h $(LIBISON)
-	$(CC) $(CFLAGS) -o $@ torus_animare.c helvea.o $(LIBISON) $(LDFLAGS)
+torus_animare: torus_animare.c helvea.o astra.o helvea.h astra.h $(LIBISON)
+	$(CC) $(CFLAGS) -o $@ torus_animare.c helvea.o astra.o $(LIBISON) $(LDFLAGS)
 
-torus_specta: torus_specta.c helvea.o helvea.h $(LIBISON)
-	$(CC) $(CFLAGS) $(SDL2_CFLAGS) -o $@ torus_specta.c helvea.o $(LIBISON) $(LDFLAGS) $(SDL2_LDFLAGS)
+torus_specta: torus_specta.c helvea.o astra.o helvea.h astra.h $(LIBISON)
+	$(CC) $(CFLAGS) $(SDL2_CFLAGS) -o $@ torus_specta.c helvea.o astra.o $(LIBISON) $(LDFLAGS) $(SDL2_LDFLAGS)
 
 astra_proba: astra_proba.c astra.o astra.h $(LIBISON)
 	$(CC) $(CFLAGS) -o $@ astra_proba.c astra.o $(LIBISON) $(LDFLAGS)
@@ -48,7 +48,7 @@ redde: redde.c astra.o astra.h $(LIBISON)
 	$(CC) $(CFLAGS) -I ison -o $@ redde.c astra.o $(LIBISON) $(LDFLAGS)
 
 purga:
-	rm -f torus_planus torus_animare torus_specta astra_proba caele redde helvea.o astra.o
+	rm -f torus_planus torus_animare torus_specta astra_proba caele redde helvea.o astra.o caele.o redde.o
 	rm -f caelae/*.ppm caelae/*.isonl
 
 .PHONY: omnia purga

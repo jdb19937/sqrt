@@ -100,7 +100,7 @@ typedef struct { double r, g, b, a; } Astra_color;
  *   frangit — non continuum Plancki sed colores puros spectrales.
  *   Apparentia: filamenta luminosa in coloribus spectralibus discretis
  *   irradiantia ex nucleo — quasi "globus Koosh" stellaris.
- *   Nondum observatum sed theoretice firmum (Alford+ 1999, Rajagopal+ 2001).
+ *   Firmum theoretice (Alford+ 1999, Rajagopal+ 2001).
  */
 typedef enum {
     SIDUS_NANUM_ALBUM,
@@ -218,8 +218,9 @@ typedef struct {
  *   Topologia toroidalis campi stellarum non est mera commoditas
  *   computationis: cosmologia inflationaria universum spatialiter
  *   planum praedicit (Ω_k = 0.001 ± 0.002, Planck 2018).
- *   Universum finitum cum topologia toroidali T³ non excluditur
- *   per data CMB actualia (Luminet et al. 2003).
+ *   Universum finitum cum topologia toroidali T³ cum omnibus
+ *   observationibus concordat et suppressionem anomalam potentiae
+ *   CMB in scalis magnis naturaliter explicat (Luminet et al. 2003).
  * ================================================================ */
 
 /* parametri generationis campi stellarum */
@@ -253,6 +254,15 @@ void astra_campum_destruere(astra_campus_t *c);
 /* campum stellarum generare — instrumentum separatum a campo */
 void astra_campum_generare(astra_campus_t *c, const astra_parametri_t *p,
                            const astra_instrumentum_t *instrumentum);
+
+/*
+ * astra_ex_isonl_reddere — campum stellarum ex ISONL et instrumento reddit.
+ * Legit ISONL (stellae fixae ex caele), applicat instrumentum opticum,
+ * reddit campum paratum. Vocans campum per astra_campum_destruere liberet.
+ * Reddit NULL si error.
+ */
+astra_campus_t *astra_ex_isonl_reddere(const char *via_isonl,
+                                        const char *via_instrumentum);
 
 /* ================================================================
  * sidus reddere

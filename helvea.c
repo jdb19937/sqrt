@@ -643,6 +643,45 @@ void helvea_pixel_bgra(helvea_tabula_t *t, int x, int y,
 }
 
 /* ================================================================
+ * fundum bitmap toroidale
+ * ================================================================ */
+
+void helvea_fundum_implere(helvea_tabula_t *t,
+                           const unsigned char *bitmap,
+                           int bm_latitudo, int bm_altitudo,
+                           int delta_x, int delta_y)
+{
+    /* delta in [0, bm) normalizare */
+    delta_x = ((delta_x % bm_latitudo) + bm_latitudo) % bm_latitudo;
+    delta_y = ((delta_y % bm_altitudo) + bm_altitudo) % bm_altitudo;
+
+    for (int y = 0; y < t->altitudo; y++) {
+        int by = (y + delta_y) % bm_altitudo;
+        for (int x = 0; x < t->latitudo; x++) {
+            int bx = (x + delta_x) % bm_latitudo;
+            int bm_idx = (by * bm_latitudo + bx) * 3;
+            unsigned char r = bitmap[bm_idx + 0];
+            unsigned char g = bitmap[bm_idx + 1];
+            unsigned char b = bitmap[bm_idx + 2];
+
+            size_t idx = (size_t)y * t->latitudo + x;
+            if (t->bytes_pixel == 4) {
+                size_t base = idx * 4;
+                t->imaginis[base + 0] = b;
+                t->imaginis[base + 1] = g;
+                t->imaginis[base + 2] = r;
+                t->imaginis[base + 3] = 255;
+            } else {
+                size_t base = idx * 3;
+                t->imaginis[base + 0] = r;
+                t->imaginis[base + 1] = g;
+                t->imaginis[base + 2] = b;
+            }
+        }
+    }
+}
+
+/* ================================================================
  * rasterizatio triangulorum
  * ================================================================ */
 
@@ -712,8 +751,6 @@ void helvea_scaenam_reddere(
     helvea_illuminare_fn illum_fn,
     helvea_pixel_fn pixel_fn)
 {
-    helvea_tabulam_purgare(t);
-
     for (int i = 0; i < gradus_u; i++) {
         for (int j = 0; j < gradus_v; j++) {
             size_t vi[4] = {

@@ -15,20 +15,65 @@
  *   1/2                  — radium maiorem minuere / augere
  *   3/4                  — radium minorem minuere / augere
  *   Rota muris           — propinquare / recedere
+ *   C                    — inscriptionem incipere / finire (→ MP4)
+ *   L                    — unum cyclum inscribere (→ MP4 loop)
  *   R                    — restituere
  *   Q / Escape           — exire
  */
 
 #include "helvea.h"
+#include "astra.h"
 
 #include <SDL.h>
 
+#include <dirent.h>
 #include <stdio.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <unistd.h>
 
-#define LATITUDO_IMG  800
-#define ALTITUDO_IMG  600
+/* directorium PPM purgare — plicae et directorium removentur */
+static void purgare_dir(const char *via)
+{
+    DIR *d = opendir(via);
+    if (!d) return;
+    struct dirent *e;
+    char plica[512];
+    while ((e = readdir(d)) != NULL) {
+        if (e->d_name[0] == '.') continue;
+        snprintf(plica, sizeof(plica), "%s/%s", via, e->d_name);
+        unlink(plica);
+    }
+    closedir(d);
+    rmdir(via);
+}
+
+/* MP4 ex PPM creare (synchrone), deinde PPM purgare */
+static void mp4_creare(const char *dir, int tabulae)
+{
+    if (tabulae < 1) { purgare_dir(dir); return; }
+
+    char mandatum[1024];
+    snprintf(mandatum, sizeof(mandatum),
+        "ffmpeg -y -framerate 30 "
+        "-i '%s/%%06d.ppm' "
+        "-c:v libx264 -pix_fmt yuv420p "
+        "-crf 18 '%s.mp4' "
+        "2>/dev/null",
+        dir, dir);
+    int res = system(mandatum);
+    if (res == 0)
+        fprintf(stderr, "  MP4: %s.mp4\n", dir);
+    else
+        fprintf(stderr, "  ERROR: ffmpeg fallivit (%d)\n", res);
+    purgare_dir(dir);
+}
+
+#define LATITUDO_IMG  768
+#define ALTITUDO_IMG  768
 #define GRADUS_U      300
 #define GRADUS_V      150
+
 
 /* ================================================================
  * rotatio punctorum circa axem
@@ -185,6 +230,17 @@ int main(int argc, char **argv)
     int superficies_obsoleta = 0;
     fprintf(stderr, "Superficies parata: %zu vertices.\n", n_vert);
 
+    /* campum stellarum ex ISONL reddere */
+    const char *via_isonl = "caelae/terra.isonl";
+    const char *via_instr = "instrumenta/oculus.ison";
+    fprintf(stderr, "Campum stellarum reddens: %s + %s\n", via_isonl, via_instr);
+    astra_campus_t *campus = astra_ex_isonl_reddere(via_isonl, via_instr);
+    if (!campus) {
+        fprintf(stderr, "ERROR: campus stellarum reddere non possum!\n");
+        return 1;
+    }
+    fprintf(stderr, "Campus stellarum paratus.\n");
+
     size_t n_pix = (size_t)LATITUDO_IMG * ALTITUDO_IMG;
     helvea_tabula_t tab;
     tab.latitudo = LATITUDO_IMG;
@@ -228,8 +284,9 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    double azimuthum   = 0.6;
-    double elevatio    = 0.4;
+    /* positio in toro T² — duo anguli libere volventes */
+    double theta       = 0.6;    /* toroidalis (horizontalis) */
+    double phi         = 0.4;    /* poloidalis (verticalis) */
     double distantia   = 3.2;
     double angulus_rot  = 0.0;
     double celeritas    = 0.8;
@@ -249,10 +306,23 @@ int main(int argc, char **argv)
     fprintf(stderr, "  M          — methodum superficiei mutare\n");
     fprintf(stderr, "  1/2        — radium maiorem (R=%.2f)\n", radius_maior);
     fprintf(stderr, "  3/4        — radium minorem (r=%.2f)\n", radius_minor);
+    fprintf(stderr, "  C          — inscriptionem incipere / finire (MP4)\n");
+    fprintf(stderr, "  L          — unum cyclum rotationis inscribere (MP4)\n");
     fprintf(stderr, "  R          — restituere\n");
     fprintf(stderr, "  Q/Escape   — exire\n");
     fprintf(stderr, "Thema [0]: %s\n", helvea_themata[helvea_index_thematis].nomen);
     fprintf(stderr, "Methodus [0]: %s\n", helvea_nomina_methodorum[methodus]);
+
+    /* inscriptio (recording) */
+    int inscribit = 0;
+    int inscr_tabula = 0;
+    char inscr_dir[256] = {0};
+
+    /* orbita inscriptio — unus cyclus exactus */
+    int orbita_inscribit = 0;
+    int orbita_tabula = 0;
+    double orbita_angulus_init = 0;
+    char orbita_dir[256] = {0};
 
     int currit = 1;
     Uint32 tempus_prius = SDL_GetTicks();
@@ -270,21 +340,30 @@ int main(int argc, char **argv)
                 distantia -= eventus.wheel.y * 0.25;
                 if (distantia < 1.8) distantia = 1.8;
                 if (distantia > 8.0) distantia = 8.0;
+                if (orbita_inscribit) {
+                    orbita_inscribit = 0;
+                    fprintf(stderr, "  orbita cancellata\n");
+                    purgare_dir(orbita_dir);
+                }
             } else if (eventus.type == SDL_KEYDOWN) {
                 switch (eventus.key.keysym.sym) {
                 case SDLK_ESCAPE:
                 case SDLK_q:
                     currit = 0;
                     break;
-                case SDLK_LEFT:  azimuthum -= 0.08; break;
-                case SDLK_RIGHT: azimuthum += 0.08; break;
+                case SDLK_LEFT:
+                case SDLK_RIGHT:
                 case SDLK_UP:
-                    elevatio += 0.06;
-                    if (elevatio > 1.5) elevatio = 1.5;
-                    break;
                 case SDLK_DOWN:
-                    elevatio -= 0.06;
-                    if (elevatio < -1.5) elevatio = -1.5;
+                    if (eventus.key.keysym.sym == SDLK_LEFT)  theta -= 0.08;
+                    if (eventus.key.keysym.sym == SDLK_RIGHT) theta += 0.08;
+                    if (eventus.key.keysym.sym == SDLK_UP)    phi   += 0.06;
+                    if (eventus.key.keysym.sym == SDLK_DOWN)  phi   -= 0.06;
+                    if (orbita_inscribit) {
+                        orbita_inscribit = 0;
+                        fprintf(stderr, "  orbita cancellata\n");
+                        purgare_dir(orbita_dir);
+                    }
                     break;
                 case SDLK_w:
                     distantia -= 0.15;
@@ -357,9 +436,47 @@ int main(int argc, char **argv)
                     fprintf(stderr, "Methodus [%d]: %s\n",
                             methodus, helvea_nomina_methodorum[methodus]);
                     break;
+                case SDLK_c:
+                    if (!inscribit) {
+                        /* incipe inscriptionem */
+                        time_t nunc = time(NULL);
+                        struct tm *tm = localtime(&nunc);
+                        snprintf(inscr_dir, sizeof(inscr_dir),
+                                 "caelae/inscr_%04d%02d%02d_%02d%02d%02d",
+                                 tm->tm_year + 1900, tm->tm_mon + 1,
+                                 tm->tm_mday, tm->tm_hour,
+                                 tm->tm_min, tm->tm_sec);
+                        mkdir(inscr_dir, 0755);
+                        inscr_tabula = 0;
+                        inscribit = 1;
+                        fprintf(stderr, "● INSCRIPTIO: %s\n", inscr_dir);
+                    } else {
+                        inscribit = 0;
+                        fprintf(stderr, "■ INSCRIPTIO FINITA: %d tabulae\n",
+                                inscr_tabula);
+                        mp4_creare(inscr_dir, inscr_tabula);
+                    }
+                    break;
+                case SDLK_l:
+                    if (!orbita_inscribit && rotatio_activa) {
+                        time_t nunc = time(NULL);
+                        struct tm *tm = localtime(&nunc);
+                        snprintf(orbita_dir, sizeof(orbita_dir),
+                                 "caelae/orbita_%04d%02d%02d_%02d%02d%02d",
+                                 tm->tm_year + 1900, tm->tm_mon + 1,
+                                 tm->tm_mday, tm->tm_hour,
+                                 tm->tm_min, tm->tm_sec);
+                        mkdir(orbita_dir, 0755);
+                        orbita_tabula = 0;
+                        orbita_angulus_init = angulus_rot;
+                        orbita_inscribit = 1;
+                        fprintf(stderr, "◎ ORBITA: %s (unus cyclus)\n",
+                                orbita_dir);
+                    }
+                    break;
                 case SDLK_r:
-                    azimuthum = 0.6;
-                    elevatio  = 0.4;
+                    theta     = 0.6;
+                    phi       = 0.4;
                     distantia = 3.2;
                     angulus_rot = 0.0;
                     celeritas  = 0.8;
@@ -382,15 +499,18 @@ int main(int argc, char **argv)
         }
 
         const Uint8 *status_clavium = SDL_GetKeyboardState(NULL);
-        if (status_clavium[SDL_SCANCODE_LEFT])  azimuthum -= 1.5 * dt;
-        if (status_clavium[SDL_SCANCODE_RIGHT]) azimuthum += 1.5 * dt;
-        if (status_clavium[SDL_SCANCODE_UP])    elevatio  += 1.0 * dt;
-        if (status_clavium[SDL_SCANCODE_DOWN])  elevatio  -= 1.0 * dt;
-        if (status_clavium[SDL_SCANCODE_W])     distantia -= 2.0 * dt;
-        if (status_clavium[SDL_SCANCODE_S])     distantia += 2.0 * dt;
-
-        if (elevatio >  1.5) elevatio =  1.5;
-        if (elevatio < -1.5) elevatio = -1.5;
+        int perturbatum = 0;
+        if (status_clavium[SDL_SCANCODE_LEFT])  { theta -= 1.5 * dt; perturbatum = 1; }
+        if (status_clavium[SDL_SCANCODE_RIGHT]) { theta += 1.5 * dt; perturbatum = 1; }
+        if (status_clavium[SDL_SCANCODE_UP])    { phi   += 1.0 * dt; perturbatum = 1; }
+        if (status_clavium[SDL_SCANCODE_DOWN])  { phi   -= 1.0 * dt; perturbatum = 1; }
+        if (status_clavium[SDL_SCANCODE_W])     { distantia -= 2.0 * dt; perturbatum = 1; }
+        if (status_clavium[SDL_SCANCODE_S])     { distantia += 2.0 * dt; perturbatum = 1; }
+        if (perturbatum && orbita_inscribit) {
+            orbita_inscribit = 0;
+            fprintf(stderr, "  orbita cancellata\n");
+            purgare_dir(orbita_dir);
+        }
         if (distantia < 1.8) distantia = 1.8;
         if (distantia > 8.0) distantia = 8.0;
 
@@ -410,12 +530,31 @@ int main(int argc, char **argv)
             normae_rot[i] = rotare(normae_orig[i], angulus_rot);
         }
 
-        Vec3 pos_cam = vec3(
-            distantia * cos(elevatio) * cos(azimuthum),
-            distantia * cos(elevatio) * sin(azimuthum),
-            distantia * sin(elevatio));
+        /* camera: positio ex coordinatis toroidalibus (theta, phi).
+         * theta = horizontalis, phi = verticalis. ambo libere volvuntur.
+         * camera orbitat in plano inclinato per phi. */
+        Vec3 pos_cam = vec3(distantia * cos(theta),
+                            distantia * sin(theta),
+                            0.0);
+        pos_cam = rotare_x(pos_cam, phi);
         Vec3 scopus = vec3(0.0, 0.0, 0.0);
-        Camera cam = helvea_cameram_constituere(pos_cam, scopus);
+
+        /* sursum: perpendiculare ad orbitam, rotatum per phi */
+        Vec3 sursum_cam = rotare_x(vec3(0.0, 0.0, 1.0), phi);
+        Camera cam;
+        cam.positio = pos_cam;
+        cam.ante    = normalizare(differentia(scopus, pos_cam));
+        cam.dextrum = normalizare(productum_vectoriale(cam.ante, sursum_cam));
+        cam.sursum  = productum_vectoriale(cam.dextrum, cam.ante);
+        cam.focalis = 1.6;
+
+        /* fundum stellarum — toroidaliter volvitur cum (theta, phi) */
+        helvea_tabulam_purgare(&tab);
+        int delta_x = (int)(theta / DUO_PI * campus->latitudo);
+        int delta_y = (int)(phi   / DUO_PI * campus->altitudo);
+        helvea_fundum_implere(&tab, campus->pixels,
+                              campus->latitudo, campus->altitudo,
+                              delta_x, delta_y);
 
         helvea_scaenam_reddere(&tab, puncta_rot, normae_rot,
                                GRADUS_U, GRADUS_V, &cam,
@@ -427,9 +566,82 @@ int main(int argc, char **argv)
         SDL_UpdateTexture(textura, NULL, tab.imaginis, LATITUDO_IMG * 4);
         SDL_RenderClear(pictor);
         SDL_RenderCopy(pictor, textura, NULL, NULL);
+
+        /* indicium inscriptionis — circulus ruber */
+        if (inscribit) {
+            SDL_SetRenderDrawColor(pictor, 220, 30, 30, 255);
+            for (int dy = -5; dy <= 5; dy++)
+                for (int dx = -5; dx <= 5; dx++)
+                    if (dx * dx + dy * dy <= 25)
+                        SDL_RenderDrawPoint(pictor, 20 + dx, 20 + dy);
+        }
+
+        /* indicium orbitae — circulus caeruleus */
+        if (orbita_inscribit) {
+            SDL_SetRenderDrawColor(pictor, 30, 120, 220, 255);
+            for (int dy = -5; dy <= 5; dy++)
+                for (int dx = -5; dx <= 5; dx++)
+                    if (dx * dx + dy * dy <= 25)
+                        SDL_RenderDrawPoint(pictor, inscribit ? 40 : 20,
+                                            20 + dy + dx * 0);
+            /* arcum progressus reddere */
+            double prog = angulus_rot - orbita_angulus_init;
+            if (prog < 0) prog = -prog;
+            double frac = prog / DUO_PI;
+            if (frac > 1.0) frac = 1.0;
+            int arc_px = (int)(frac * (LATITUDO_IMG - 40));
+            SDL_SetRenderDrawColor(pictor, 30, 120, 220, 255);
+            SDL_Rect bar = {20, ALTITUDO_IMG - 8, arc_px, 4};
+            SDL_RenderFillRect(pictor, &bar);
+        }
+
         SDL_RenderPresent(pictor);
+
+        /* tabulam PPM scribere si inscribimus */
+        if (inscribit || orbita_inscribit) {
+            const char *dir = inscribit ? inscr_dir : orbita_dir;
+            int *num = inscribit ? &inscr_tabula : &orbita_tabula;
+            char via[512];
+            snprintf(via, sizeof(via), "%s/%06d.ppm", dir, *num);
+            FILE *f = fopen(via, "wb");
+            if (f) {
+                fprintf(f, "P6\n%d %d\n255\n", LATITUDO_IMG, ALTITUDO_IMG);
+                size_t n_pix = (size_t)LATITUDO_IMG * ALTITUDO_IMG;
+                for (size_t i = 0; i < n_pix; i++) {
+                    size_t base = i * 4;
+                    fputc(tab.imaginis[base + 2], f);
+                    fputc(tab.imaginis[base + 1], f);
+                    fputc(tab.imaginis[base + 0], f);
+                }
+                fclose(f);
+                (*num)++;
+            }
+        }
+
+        /* orbita: fini post unum cyclum (2π) */
+        if (orbita_inscribit) {
+            double progressus = angulus_rot - orbita_angulus_init;
+            if (progressus < 0) progressus = -progressus;
+            if (progressus >= DUO_PI) {
+                orbita_inscribit = 0;
+                fprintf(stderr, "◎ ORBITA PERFECTA: %d tabulae\n",
+                        orbita_tabula);
+                mp4_creare(orbita_dir, orbita_tabula);
+            }
+        }
     }
 
+    /* inscriptiones finire */
+    if (inscribit) {
+        fprintf(stderr, "■ INSCRIPTIO FINITA: %d tabulae\n", inscr_tabula);
+        mp4_creare(inscr_dir, inscr_tabula);
+    }
+    if (orbita_inscribit) {
+        fprintf(stderr, "  orbita cancellata (exit)\n");
+        purgare_dir(orbita_dir);
+    }
+
+    astra_campum_destruere(campus);
     free(puncta_orig);
     free(normae_orig);
     free(puncta_rot);

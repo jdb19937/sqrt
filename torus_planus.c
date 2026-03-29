@@ -3,9 +3,15 @@
  *
  * Immersio isometrica C1 tori plani quadrati in R3
  * secundum methodum Nash-Kuiper corrugationis.
+ *
+ * Fundum: campus stellarum toroidalis (parametri terrae).
+ * Observator intus universum toroidale T² sedet,
+ * immersionem concretam eiusdem topologiae spectans.
+ * Vide commentarium in helvea.h:helvea_fundum_implere.
  */
 
 #include "helvea.h"
+#include "astra.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,10 +21,23 @@
 #define GRADUS_U      800
 #define GRADUS_V      400
 
-int main(void)
+int main(int argc, char **argv)
 {
+    const char *via_isonl = "caelae/terra.isonl";
+    const char *via_instr = "instrumenta/oculus.ison";
+    if (argc > 1) via_isonl = argv[1];
+    if (argc > 2) via_instr = argv[2];
+
     fprintf(stderr, "=== TORUS PLANUS CORRUGATUS ===\n");
     fprintf(stderr, "Immersio isometrica C1 in R3\n\n");
+
+    /* campum stellarum ex ISONL reddere */
+    fprintf(stderr, "Campum stellarum reddens: %s + %s\n", via_isonl, via_instr);
+    astra_campus_t *campus = astra_ex_isonl_reddere(via_isonl, via_instr);
+    if (!campus) {
+        fprintf(stderr, "ERROR: campus stellarum reddere non possum!\n");
+        return 1;
+    }
 
     size_t n_pix = (size_t)LATITUDO_IMG * ALTITUDO_IMG;
     helvea_tabula_t tab;
@@ -55,6 +74,16 @@ int main(void)
     Vec3 scopus          = vec3(0.0, 0.0, -0.05);
     Camera cam = helvea_cameram_constituere(positio_camerae, scopus);
 
+    /* fundum stellarum — translatio ex angulo camerae */
+    double angulus_cam = atan2(positio_camerae.y, positio_camerae.x);
+    int delta_x = (int)(angulus_cam / DUO_PI * campus->latitudo);
+    int delta_y = (int)(positio_camerae.z / 4.0 * campus->altitudo);
+
+    helvea_tabulam_purgare(&tab);
+    helvea_fundum_implere(&tab, campus->pixels,
+                          campus->latitudo, campus->altitudo,
+                          delta_x, delta_y);
+
     /* scaenam reddere */
     fprintf(stderr, "Triangula reddens...\n");
     helvea_scaenam_reddere(&tab, puncta, normae, GRADUS_U, GRADUS_V,
@@ -64,15 +93,16 @@ int main(void)
     const char *via_ppm = "torus_planus.ppm";
     fprintf(stderr, "Imaginem scribens: %s\n", via_ppm);
 
-    FILE *fasciculus = fopen(via_ppm, "wb");
-    if (!fasciculus) {
+    FILE *plica = fopen(via_ppm, "wb");
+    if (!plica) {
         fprintf(stderr, "ERROR: fasciculum aperire non possum!\n");
         return 1;
     }
-    fprintf(fasciculus, "P6\n%d %d\n255\n", LATITUDO_IMG, ALTITUDO_IMG);
-    fwrite(tab.imaginis, 1, n_pix * 3, fasciculus);
-    fclose(fasciculus);
+    fprintf(plica, "P6\n%d %d\n255\n", LATITUDO_IMG, ALTITUDO_IMG);
+    fwrite(tab.imaginis, 1, n_pix * 3, plica);
+    fclose(plica);
 
+    astra_campum_destruere(campus);
     free(tab.imaginis);
     free(tab.profunditatis);
     free(puncta);

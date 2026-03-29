@@ -1,11 +1,14 @@
 /*
  * torus_animare.c — animatio tori Hevea, imagines PPM scribens
  *
- * Camera circa torum rotans.
+ * Camera circa torum rotans; fundum stellarum toroidaliter volvitur.
+ * Rotatio camerae perioditatem cosmicam spatii T² demonstrat:
+ * post revolutionem plenam, eaedem stellae redeunt.
  * Usus: ./torus_animare [numerus_imaginum]
  */
 
 #include "helvea.h"
+#include "astra.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,9 +20,24 @@
 
 int main(int argc, char **argv)
 {
+    const char *via_isonl = "caelae/terra.isonl";
+    const char *via_instr = "instrumenta/oculus.ison";
     int numerus_imaginum = 72;
-    if (argc > 1) numerus_imaginum = atoi(argv[1]);
+    int argi = 1;
+    if (argi < argc && argv[argi][0] != '-') {
+        numerus_imaginum = atoi(argv[argi++]);
+    }
+    if (argi < argc) via_isonl = argv[argi++];
+    if (argi < argc) via_instr = argv[argi++];
     if (numerus_imaginum < 1) numerus_imaginum = 72;
+
+    /* campum stellarum ex ISONL reddere */
+    fprintf(stderr, "Campum stellarum reddens: %s + %s\n", via_isonl, via_instr);
+    astra_campus_t *campus = astra_ex_isonl_reddere(via_isonl, via_instr);
+    if (!campus) {
+        fprintf(stderr, "ERROR: campus stellarum reddere non possum!\n");
+        return 1;
+    }
 
     size_t n_pix = (size_t)LATITUDO_IMG * ALTITUDO_IMG;
     helvea_tabula_t tab;
@@ -63,6 +81,15 @@ int main(int argc, char **argv)
         Vec3 scopus = vec3(0.0, 0.0, -0.05);
         Camera cam = helvea_cameram_constituere(pos_cam, scopus);
 
+        /* fundum stellarum — toroidaliter volvitur cum camera */
+        int delta_x = (int)(angulus / DUO_PI * campus->latitudo);
+        int delta_y = (int)(alt_cam / 4.0 * campus->altitudo);
+
+        helvea_tabulam_purgare(&tab);
+        helvea_fundum_implere(&tab, campus->pixels,
+                              campus->latitudo, campus->altitudo,
+                              delta_x, delta_y);
+
         helvea_scaenam_reddere(&tab, puncta, normae, GRADUS_U, GRADUS_V,
                                &cam, helvea_illuminare, helvea_pixel_rgb);
 
@@ -78,6 +105,7 @@ int main(int argc, char **argv)
         fclose(fas);
     }
 
+    astra_campum_destruere(campus);
     free(tab.imaginis);
     free(tab.profunditatis);
     free(puncta);
