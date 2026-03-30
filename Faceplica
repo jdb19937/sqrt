@@ -7,14 +7,14 @@ LDFLAGS = -lm `cat $(APOTHECA)/phantasma/nexus_phantasma`
 LIBISON = $(APOTHECA)/ison/libison.a
 LIBPHANTASMA = $(APOTHECA)/phantasma/libphantasma.a
 
-ASTRA = sidus.o campus.o instrumentum.o planeta.o
-CAPITA = sidus.h campus.h instrumentum.h planeta.h color.h vectores.h astra.h
+ASTRA = sidus.o campus.o instrumentum.o planeta.o aspectus.o perceptus.o
+CAPITA = sidus.h campus.h instrumentum.h planeta.h aspectus.h perceptus.h color.h vectores.h
 
 CAELAE = caelae/terra.isonl caelae/hubble.isonl caelae/jwst.isonl \
          caelae/nuclei.isonl caelae/vacuum.isonl caelae/mortis.isonl \
          caelae/binarium.isonl
 
-omnia: torus_planus torus_animare torus_specta astra_proba caele redde astra_animare proba planeta_proba
+omnia: torus_planus torus_animare torus_specta astra_proba caele redde astra_animare proba planeta_proba caelae_proba
 
 omnia: $(NOMEN)
 
@@ -73,6 +73,12 @@ campus.o: campus.c $(CAPITA)
 instrumentum.o: instrumentum.c $(CAPITA)
 	$(CC) $(CFLAGS) -c -o instrumentum.o instrumentum.c
 
+aspectus.o: aspectus.c $(CAPITA)
+	$(CC) $(CFLAGS) -c -o aspectus.o aspectus.c
+
+perceptus.o: perceptus.c $(CAPITA)
+	$(CC) $(CFLAGS) -c -o perceptus.o perceptus.c
+
 planeta.o: planeta.c $(CAPITA)
 	$(CC) $(CFLAGS) -c -o planeta.o planeta.c
 
@@ -94,6 +100,9 @@ astra_proba: astra_proba.c $(ASTRA) $(LIBISON) $(CAPITA)
 planeta_proba: planeta_proba.c $(ASTRA) $(LIBISON) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ planeta_proba.c $(ASTRA) $(LIBISON) $(LDFLAGS)
 
+caelae_proba: caelae_proba.c $(ASTRA) $(LIBISON) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ caelae_proba.c $(ASTRA) $(LIBISON) $(LDFLAGS)
+
 caele: caele.c $(ASTRA) $(LIBISON) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ caele.c $(ASTRA) $(LIBISON) $(LDFLAGS)
 
@@ -104,8 +113,8 @@ astra_animare: astra_animare.c $(ASTRA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ astra_animare.c $(ASTRA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
 purga:
-	rm -f torus_planus torus_animare torus_specta astra_proba planeta_proba caele redde astra_animare proba
-	rm -f pictura.o helvea.o sidus.o campus.o instrumentum.o planeta.o
+	rm -f torus_planus torus_animare torus_specta astra_proba planeta_proba caelae_proba caele redde astra_animare proba
+	rm -f pictura.o helvea.o sidus.o campus.o instrumentum.o planeta.o aspectus.o perceptus.o
 	rm -f caelae/*.ppm caelae/*.isonl
 
 .PHONY: omnia purga caelae lude

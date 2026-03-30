@@ -22,7 +22,9 @@
  *   -gif_mora <cs>    mora inter tabulas GIF centisecundis (defaltum 3)
  */
 
-#include "astra.h"
+#include "instrumentum.h"
+#include "sidus.h"
+#include "campus.h"
 #include "ison.h"
 #include "phantasma.h"
 

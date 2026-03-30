@@ -1,13 +1,13 @@
 {
   "spiculae": 0,
-  "spiculae_long": "0",
-  "spiculae_ang": "0",
-  "halo_radius": "2.0",
-  "halo_vis": "0.05",
-  "amplificatio": "1.0",
-  "saturatio": "1.2",
-  "aberratio": "1.0",
-  "vignetta": "0.25",
-  "distorsio": "0.25",
-  "fenestra": "8.0"
+  "spiculae_long": 0,
+  "spiculae_ang": 0,
+  "halo_radius": 2.0,
+  "halo_vis": 0.05,
+  "amplificatio": 1.0,
+  "saturatio": 1.2,
+  "aberratio": 1.0,
+  "vignetta": 0.25,
+  "distorsio": 0.25,
+  "fenestra": 8.0
 }

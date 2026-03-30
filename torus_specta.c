@@ -22,15 +22,17 @@
  */
 
 #include "helvea.h"
-#include "astra.h"
+#include "instrumentum.h"
+#include "sidus.h"
+#include "campus.h"
 
 #include "phantasma.h"
 
 #include <stdio.h>
 #include <time.h>
 
-#define LATITUDO_IMG  768
-#define ALTITUDO_IMG  768
+#define LATITUDO_IMG  1024
+#define ALTITUDO_IMG  1024
 #define GRADUS_U_INIT 300
 #define GRADUS_V_INIT 150
 #define GRADUS_MIN    40
@@ -249,6 +251,7 @@ int main(int argc, char **argv)
     fprintf(stderr, "  M          — methodum superficiei mutare\n");
     fprintf(stderr, "  1/2        — radium maiorem (R=%.2f)\n", radius_maior);
     fprintf(stderr, "  3/4        — radium minorem (r=%.2f)\n", radius_minor);
+    fprintf(stderr, "  G          — imaginem unam capere (GIF)\n");
     fprintf(stderr, "  C          — inscriptionem incipere / finire (MP4)\n");
     fprintf(stderr, "  L          — unum cyclum rotationis inscribere (MP4 + GIF)\n");
     fprintf(stderr, "  R          — restituere\n");
@@ -447,6 +450,34 @@ int main(int argc, char **argv)
                         inscr_mp4 = NULL;
                     }
                     break;
+                case 'g': {
+                    time_t nunc = time(NULL);
+                    struct tm *tm = localtime(&nunc);
+                    char via[256];
+                    snprintf(via, sizeof(via),
+                             "caelae/imago_%04d%02d%02d_%02d%02d%02d.gif",
+                             tm->tm_year + 1900, tm->tm_mon + 1,
+                             tm->tm_mday, tm->tm_hour,
+                             tm->tm_min, tm->tm_sec);
+                    pfr_gif_t *g = pfr_gif_initia(via, LATITUDO_IMG, ALTITUDO_IMG, 0, 1);
+                    if (g) {
+                        uint32_t *inv = (uint32_t *)malloc(
+                            (size_t)LATITUDO_IMG * ALTITUDO_IMG * 4);
+                        if (inv) {
+                            const uint32_t *src = (const uint32_t *)tab.imaginis;
+                            for (int iy = 0; iy < ALTITUDO_IMG; iy++)
+                                memcpy(inv + (size_t)(ALTITUDO_IMG - 1 - iy) * LATITUDO_IMG,
+                                       src + (size_t)iy * LATITUDO_IMG,
+                                       (size_t)LATITUDO_IMG * 4);
+                            pfr_gif_tabulam_adde(g, inv);
+                            free(inv);
+                        }
+                        pfr_gif_fini(g);
+                        snprintf(status_nuntius, sizeof(status_nuntius),
+                                 "■ IMAGO: %s", via);
+                    }
+                    break;
+                }
                 case 'l':
                     if (!orbita_mp4 && rotatio_activa) {
                         time_t nunc = time(NULL);

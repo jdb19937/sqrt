@@ -1,0 +1,9 @@
+{
+  "titulus": "aspectus",
+  "properties": {
+    "situs":   {"type": "number", "description": "0=plenus, 0.5=dimidius, 1=novus"},
+    "angulus": {"type": "number", "description": "directio lucis (radiani)"},
+    "lumen":   {"type": "number", "description": "quantitas illuminationis (praefinitum 1.0)"}
+  },
+  "required": []
+}

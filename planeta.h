@@ -10,6 +10,7 @@
 #ifndef PLANETA_H
 #define PLANETA_H
 
+#include "perceptus.h"
 #include "color.h"
 #include "instrumentum.h"
 
@@ -19,8 +20,8 @@
  * constantes
  * ================================================================ */
 
-#define PLANETA_FENESTRA  256
-#define PLANETA_SEMI      128
+#define PLANETA_FENESTRA  512
+#define PLANETA_SEMI      256
 
 /* ================================================================
  * typi
@@ -30,14 +31,14 @@ typedef enum {
     PLANETA_SAXOSUM,     /* Mercury, Venus, Terra, Mars, Luna, Io, Europa */
     PLANETA_GASEOSUM,    /* Jupiter, Saturnus */
     PLANETA_GLACIALE,    /* Uranus, Neptunus */
-    PLANETA_PARVUM       /* Pluto, Ceres, lunae parvae */
+    PLANETA_PARVUM,      /* Pluto, Ceres, lunae parvae */
+    PLANETA_SOL,         /* stella proxima — fusio completa */
+    PLANETA_NEBULA       /* nubes gasei procedurale */
 } planeta_genus_t;
 
 typedef struct {
     planeta_genus_t genus;
     double     radius;           /* 0.0-1.0: fractio fenestrae */
-    double     phase;            /* illuminatio: 0=plenus, 0.5=dimidius */
-    double     angulus_phase;    /* directio lucis (radiani) */
     double     inclinatio;       /* inclinatio axialis (radiani) */
     double     rotatio;          /* longitudo centralis visibilis (radiani) */
     unsigned   semen;            /* semen procedurale */
@@ -120,13 +121,36 @@ typedef struct {
     double     macula_lon;       /* longitudo (radiani) */
     double     macula_radius;    /* magnitudo 0..1 */
     double     macula_obscuritas; /* <0=lucidior, >0=obscurior */
+
+    /* ============================================================
+     * fusio stellaris — transitus continuus ex planeta ad stellam
+     *
+     * fusio=0: planeta ordinarius (nullus effectus).
+     * fusio=1: stella plena — limb darkening, corona, granulatio.
+     * Gradus intermedii: nana brunnea, sub-stella, corpus ignescens.
+     * Adhiberi potest cuique generi; maxime in PLANETA_GASEOSUM.
+     *
+     * PLANETA_SOL == PLANETA_GASEOSUM + fusio proxima 1.0, sed
+     * renderitor separatus est ob varietatem visualem.
+     *
+     * Compositio stellae ex campis h2/he/ch4 derivatur (H-He normalis):
+     *   h2 + he ~ 0.98: stella ordinaria (fusio = color Plancki)
+     *   ch4/nh3: doppleriani stellae frigidae
+     *   temperatura: praescriptio directa (0 = ex compositione)
+     * ============================================================ */
+    double     fusio;            /* intensitas fusionis [0,1] */
+    double     temperatura;      /* temperatura photosphaericae (K); 0=ex compositione */
+    double     luminositas;      /* multiplicator fulgoris (>1 = saturatio et fulgor) */
+    double     corona;           /* extensio/intensitas coronae [0,1] */
+    double     granulatio;       /* granulatio convectiva (cellulae) [0,1] */
 } planeta_t;
 
 /* ================================================================
  * functiones
  * ================================================================ */
 
-void planeta_reddere(unsigned char *fenestra, const planeta_t *planeta);
+void planeta_reddere(unsigned char *fenestra, const planeta_t *planeta,
+                     const planeta_perceptus_t *perceptus);
 
 planeta_t planeta_ex_ison(const char *ison);
 

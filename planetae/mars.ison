@@ -1,25 +1,23 @@
 {
   "nomen": "Mars",
   "genus": "saxosum",
-  "radius": "0.9",
-  "phase": "0.1",
-  "angulus_phase": "0.35",
-  "inclinatio": "0.4396",
-  "rotatio": "5.2",
+  "radius": 0.9,
+  "inclinatio": 0.4396,
+  "rotatio": 5.2,
   "semen": 50211,
 
-  "silicata": "0.30",
-  "ferrum": "0.55",
-  "carbo": "0.05",
+  "silicata": 0.30,
+  "ferrum": 0.55,
+  "carbo": 0.05,
 
-  "scala": "1.0",
-  "craterae": "0.45",
+  "scala": 1.0,
+  "craterae": 0.45,
 
-  "pressio_kPa": "0.6",
-  "co2": "0.953",
-  "n2": "0.027",
-  "pulvis": "0.6",
-  "nubes": "0.04",
+  "pressio_kPa": 0.6,
+  "co2": 0.953,
+  "n2": 0.027,
+  "pulvis": 0.6,
+  "nubes": 0.04,
 
-  "polaris": "0.06"
+  "polaris": 0.06
 }

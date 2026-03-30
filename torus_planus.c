@@ -11,7 +11,9 @@
  */
 
 #include "helvea.h"
-#include "astra.h"
+#include "instrumentum.h"
+#include "sidus.h"
+#include "campus.h"
 
 #include <stdio.h>
 #include <stdlib.h>

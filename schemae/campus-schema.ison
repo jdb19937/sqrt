@@ -4,21 +4,25 @@
     "latitudo":             {"type": "integer"},
     "altitudo":             {"type": "integer"},
     "numerus_stellarum":    {"type": "integer"},
-    "densitas_galaxiae":    {"type": "string"},
-    "inclinatio_galaxiae":  {"type": "string"},
-    "latitudo_galaxiae":    {"type": "string"},
+    "densitas_galaxiae":    {"type": "number"},
+    "inclinatio_galaxiae":  {"type": "number"},
+    "latitudo_galaxiae":    {"type": "number"},
     "semen":                {"type": "integer"},
-    "galaxia_glow":         {"type": "string"},
-    "galaxia_rift":         {"type": "string"},
+    "galaxia_glow":         {"type": "number"},
+    "galaxia_rift":         {"type": "number"},
     "galaxia_nebulae":      {"type": "integer"},
     "max_supergigantes":    {"type": "integer"},
     "max_gigantes":         {"type": "integer"},
     "max_exotica":          {"type": "integer"},
     "numerus_planetarum":   {"type": "integer"},
-    "planetae_temp_min":    {"type": "string"},
-    "planetae_temp_max":    {"type": "string"},
+    "planetae_temp_min":    {"type": "number"},
+    "planetae_temp_max":    {"type": "number"},
     "numerus_galaxiarum":   {"type": "integer"},
-    "max_galaxiae":         {"type": "integer"}
+    "max_galaxiae":         {"type": "integer"},
+    "planetae": {
+      "type": "array",
+      "items": {"$ref": "planeta-schema.ison"}
+    }
   },
   "required": ["latitudo", "altitudo", "numerus_stellarum", "semen"]
 }

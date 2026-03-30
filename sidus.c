@@ -27,7 +27,7 @@ const char *astra_nomina_generum[SIDUS_NUMERUS] = {
     "Crystallinum",
     "Magnetar",
     "Galaxia",
-    "Planeta"
+    "Vagans"
 };
 
 /* ================================================================
@@ -916,7 +916,7 @@ static void reddere_vagans(unsigned char *fen,
     (void)instr;
     color_t col = astra_temperatura_ad_colorem(s->temperatura);
 
-    /* planeta: discus maior, matte, cum falce (phase) */
+    /* vagans: discus maior, matte, cum falce (phase) */
     double radius = 8.0 + pow(10.0, -s->magnitudo * 0.4) * 6.0;
     if (radius > 25.0) radius = 25.0;
 

@@ -7,7 +7,8 @@
  */
 
 #include "instrumentum.h"
-#include "astra.h"
+#include "sidus.h"
+#include "campus.h"
 
 #include <math.h>
 #include <stdlib.h>

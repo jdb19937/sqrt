@@ -1,14 +1,16 @@
 {
   "titulus": "sidus",
   "properties": {
+    "phylum":         {"type": "string"},
     "genus":          {"type": "string"},
-    "magnitudo":      {"type": "string"},
-    "temperatura":    {"type": "string"},
+    "magnitudo":      {"type": "number"},
+    "temperatura":    {"type": "number"},
     "x":              {"type": "integer"},
     "y":              {"type": "integer"},
-    "phase":          {"type": "string"},
-    "angulus_phase":  {"type": "string"},
-    "morphologia":    {"type": "string"}
+    "phase":          {"type": "number"},
+    "angulus_phase":  {"type": "number"},
+    "morphologia":    {"type": "string"},
+    "instrumentum":   {"$ref": "instrumentum-schema.ison"}
   },
   "required": ["genus", "magnitudo", "temperatura", "x", "y"]
 }

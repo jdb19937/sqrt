@@ -9,7 +9,9 @@
  * Usus: ./caele caelae/terra.ison > caelae/terra.isonl
  */
 
-#include "astra.h"
+#include "instrumentum.h"
+#include "sidus.h"
+#include "campus.h"
 #include "vectores.h"
 #include "ison.h"
 
@@ -32,51 +34,38 @@ static double alea_f(void)
     return (double)(alea() & 0xFFFFFF) / (double)0x1000000;
 }
 
-static double lege_f(const char *ison, const char *via, double praef)
-{
-    char *v = ison_da_chordam(ison, via);
-    if (!v) {
-        long n = ison_da_numerum(ison, via);
-        if (n != 0) return (double)n;
-        return praef;
-    }
-    double r = atof(v);
-    free(v);
-    return r;
-}
-
-static long lege_n(const char *ison, const char *via, long praef)
-{
-    long n = ison_da_numerum(ison, via);
-    return (n != 0) ? n : praef;
-}
+/* ison_da_f / ison_da_n ex bibliotheca ison */
 
 static void sidus_emittere(const char *genus, double mag, double temp,
                            int x, int y, double phase, double ang_phase)
 {
-    ison_scriptor_t *js = ison_scriptor_crea();
-    ison_scriptor_adde(js, "genus", genus);
+    ison_scriptor_t *internum = ison_scriptor_crea();
+    ison_scriptor_adde(internum, "genus", genus);
 
     char buf[64];
     snprintf(buf, sizeof(buf), "%.3f", mag);
-    ison_scriptor_adde_crudum(js, "magnitudo", buf);
+    ison_scriptor_adde_crudum(internum, "magnitudo", buf);
     snprintf(buf, sizeof(buf), "%.1f", temp);
-    ison_scriptor_adde_crudum(js, "temperatura", buf);
+    ison_scriptor_adde_crudum(internum, "temperatura", buf);
     snprintf(buf, sizeof(buf), "%d", x);
-    ison_scriptor_adde_crudum(js, "x", buf);
+    ison_scriptor_adde_crudum(internum, "x", buf);
     snprintf(buf, sizeof(buf), "%d", y);
-    ison_scriptor_adde_crudum(js, "y", buf);
+    ison_scriptor_adde_crudum(internum, "y", buf);
 
     if (phase > 0.001) {
         snprintf(buf, sizeof(buf), "%.3f", phase);
-        ison_scriptor_adde_crudum(js, "phase", buf);
+        ison_scriptor_adde_crudum(internum, "phase", buf);
         snprintf(buf, sizeof(buf), "%.3f", ang_phase);
-        ison_scriptor_adde_crudum(js, "angulus_phase", buf);
+        ison_scriptor_adde_crudum(internum, "angulus_phase", buf);
     }
 
-    char *linea = ison_scriptor_fini(js);
+    char *internum_s = ison_scriptor_fini(internum);
+    ison_scriptor_t *outer = ison_scriptor_crea();
+    ison_scriptor_adde_crudum(outer, "sidus", internum_s);
+    char *linea = ison_scriptor_fini(outer);
     puts(linea);
     free(linea);
+    free(internum_s);
 }
 
 int main(int argc, char **argv)
@@ -92,45 +81,47 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    int latitudo        = (int)lege_n(ison, "latitudo", 1024);
-    int altitudo        = (int)lege_n(ison, "altitudo", 512);
-    int num_stellarum   = (int)lege_n(ison, "numerus_stellarum", 10000);
-    double dens_gal     = lege_f(ison, "densitas_galaxiae", 0.5);
-    double inc_gal      = lege_f(ison, "inclinatio_galaxiae", 0.0);
-    double lat_gal      = lege_f(ison, "latitudo_galaxiae", 0.2);
-    unsigned int semen  = (unsigned int)lege_n(ison, "semen", 1);
-    int max_sg          = (int)lege_n(ison, "max_supergigantes", 0);
-    int max_gi          = (int)lege_n(ison, "max_gigantes", 0);
-    int max_ex          = (int)lege_n(ison, "max_exotica", 0);
-    int num_planet      = (int)lege_n(ison, "numerus_planetarum", 0);
-    double pl_tmin      = lege_f(ison, "planetae_temp_min", 4000);
-    double pl_tmax      = lege_f(ison, "planetae_temp_max", 6000);
-    int num_galaxiarum  = (int)lege_n(ison, "numerus_galaxiarum", 0);
-    int max_galaxiae    = (int)lege_n(ison, "max_galaxiae", 0);
+    int latitudo        = (int)ison_da_n(ison, "latitudo", 1024);
+    int altitudo        = (int)ison_da_n(ison, "altitudo", 512);
+    int num_stellarum   = (int)ison_da_n(ison, "numerus_stellarum", 10000);
+    double dens_gal     = ison_da_f(ison, "densitas_galaxiae", 0.5);
+    double inc_gal      = ison_da_f(ison, "inclinatio_galaxiae", 0.0);
+    double lat_gal      = ison_da_f(ison, "latitudo_galaxiae", 0.2);
+    unsigned int semen  = (unsigned int)ison_da_n(ison, "semen", 1);
+    int max_sg          = (int)ison_da_n(ison, "max_supergigantes", 0);
+    int max_gi          = (int)ison_da_n(ison, "max_gigantes", 0);
+    int max_ex          = (int)ison_da_n(ison, "max_exotica", 0);
+    int num_planet      = (int)ison_da_n(ison, "numerus_planetarum", 0);
+    double pl_tmin      = ison_da_f(ison, "planetae_temp_min", 4000);
+    double pl_tmax      = ison_da_f(ison, "planetae_temp_max", 6000);
+    int num_galaxiarum  = (int)ison_da_n(ison, "numerus_galaxiarum", 0);
+    int max_galaxiae    = (int)ison_da_n(ison, "max_galaxiae", 0);
 
     /* meta linea — parametri campi pro redditore */
     {
-        ison_scriptor_t *js = ison_scriptor_crea();
+        ison_scriptor_t *internum = ison_scriptor_crea();
         char buf[64];
-        ison_scriptor_adde(js, "genus", "_meta");
         snprintf(buf, sizeof(buf), "%d", latitudo);
-        ison_scriptor_adde_crudum(js, "latitudo", buf);
+        ison_scriptor_adde_crudum(internum, "latitudo", buf);
         snprintf(buf, sizeof(buf), "%d", altitudo);
-        ison_scriptor_adde_crudum(js, "altitudo", buf);
-        snprintf(buf, sizeof(buf), "%.4f", lege_f(ison, "galaxia_glow", 0));
-        ison_scriptor_adde_crudum(js, "galaxia_glow", buf);
-        snprintf(buf, sizeof(buf), "%.4f", lege_f(ison, "galaxia_rift", 0));
-        ison_scriptor_adde_crudum(js, "galaxia_rift", buf);
-        snprintf(buf, sizeof(buf), "%d", (int)lege_n(ison, "galaxia_nebulae", 0));
-        ison_scriptor_adde_crudum(js, "galaxia_nebulae", buf);
+        ison_scriptor_adde_crudum(internum, "altitudo", buf);
+        snprintf(buf, sizeof(buf), "%.4f", ison_da_f(ison, "galaxia_glow", 0.0));
+        ison_scriptor_adde_crudum(internum, "galaxia_glow", buf);
+        snprintf(buf, sizeof(buf), "%.4f", ison_da_f(ison, "galaxia_rift", 0.0));
+        ison_scriptor_adde_crudum(internum, "galaxia_rift", buf);
+        snprintf(buf, sizeof(buf), "%d", (int)ison_da_n(ison, "galaxia_nebulae", 0));
+        ison_scriptor_adde_crudum(internum, "galaxia_nebulae", buf);
         snprintf(buf, sizeof(buf), "%.4f", inc_gal);
-        ison_scriptor_adde_crudum(js, "inclinatio_galaxiae", buf);
-        char *linea = ison_scriptor_fini(js);
+        ison_scriptor_adde_crudum(internum, "inclinatio_galaxiae", buf);
+        char *internum_s = ison_scriptor_fini(internum);
+        ison_scriptor_t *outer = ison_scriptor_crea();
+        ison_scriptor_adde_crudum(outer, "_meta", internum_s);
+        char *linea = ison_scriptor_fini(outer);
         puts(linea);
         free(linea);
+        free(internum_s);
     }
 
-    free(ison);
     semen_loc = semen;
 
     int n_gi = 0, n_sg = 0, n_ex = 0;
@@ -231,25 +222,29 @@ int main(int argc, char **argv)
 
             /* emittere galaxiam cum proprietatibus additis */
             {
-                ison_scriptor_t *js = ison_scriptor_crea();
+                ison_scriptor_t *internum = ison_scriptor_crea();
                 char buf[64];
-                ison_scriptor_adde(js, "genus", "galaxia");
+                ison_scriptor_adde(internum, "genus", "galaxia");
                 snprintf(buf, sizeof(buf), "%.3f", mag);
-                ison_scriptor_adde_crudum(js, "magnitudo", buf);
+                ison_scriptor_adde_crudum(internum, "magnitudo", buf);
                 snprintf(buf, sizeof(buf), "%.1f", temp_code);
-                ison_scriptor_adde_crudum(js, "temperatura", buf);
+                ison_scriptor_adde_crudum(internum, "temperatura", buf);
                 snprintf(buf, sizeof(buf), "%d", px);
-                ison_scriptor_adde_crudum(js, "x", buf);
+                ison_scriptor_adde_crudum(internum, "x", buf);
                 snprintf(buf, sizeof(buf), "%d", py);
-                ison_scriptor_adde_crudum(js, "y", buf);
+                ison_scriptor_adde_crudum(internum, "y", buf);
                 snprintf(buf, sizeof(buf), "%d", morph_id);
-                ison_scriptor_adde_crudum(js, "phase", buf);
+                ison_scriptor_adde_crudum(internum, "phase", buf);
                 snprintf(buf, sizeof(buf), "%.3f", ang);
-                ison_scriptor_adde_crudum(js, "angulus_phase", buf);
-                ison_scriptor_adde(js, "morphologia", morph_s);
-                char *linea = ison_scriptor_fini(js);
+                ison_scriptor_adde_crudum(internum, "angulus_phase", buf);
+                ison_scriptor_adde(internum, "morphologia", morph_s);
+                char *internum_s = ison_scriptor_fini(internum);
+                ison_scriptor_t *outer = ison_scriptor_crea();
+                ison_scriptor_adde_crudum(outer, "sidus", internum_s);
+                char *linea = ison_scriptor_fini(outer);
                 puts(linea);
                 free(linea);
+                free(internum_s);
             }
             n_gal++;
         }
@@ -263,8 +258,47 @@ int main(int argc, char **argv)
         int px = (int)(alea_f() * latitudo);
         int py = (int)(alea_f() * altitudo);
 
-        sidus_emittere("planeta", mag, temp, px, py, phase, ang);
+        sidus_emittere("vagans", mag, temp, px, py, phase, ang);
     }
 
+    /* planetae — corpora configurata (Terra, Luna, Sol, etc.)
+     * quodque corpus definitione integra (genus + geometria) in campum
+     * scriptum est; hic eam ut unam lineam ISONL re-emittimus. */
+    for (int i = 0; ; i++) {
+        char via[128];
+        snprintf(via, sizeof(via), "planetae[%d].genus", i);
+        char *genus = ison_da_chordam(ison, via);
+        if (!genus) break;
+        free(genus);
+
+        snprintf(via, sizeof(via), "planetae[%d]", i);
+        char *raw = ison_da_crudum(ison, via);
+        if (!raw) break;
+
+        char *per_raw = ison_da_crudum(raw, "perceptus");
+        ison_par_t pares[64];
+        int np = ison_lege(raw, pares, 64);
+        free(raw);
+        if (np <= 0) { free(per_raw); continue; }
+
+        ison_scriptor_t *internum = ison_scriptor_crea();
+        for (int k = 0; k < np; k++)
+            ison_scriptor_adde(internum, pares[k].clavis, pares[k].valor);
+        if (per_raw) {
+            char *per_c = ison_compacta(per_raw);
+            free(per_raw);
+            ison_scriptor_adde_crudum(internum, "perceptus", per_c ? per_c : "{}");
+            free(per_c);
+        }
+        char *internum_s = ison_scriptor_fini(internum);
+        ison_scriptor_t *outer = ison_scriptor_crea();
+        ison_scriptor_adde_crudum(outer, "planeta", internum_s);
+        char *linea = ison_scriptor_fini(outer);
+        puts(linea);
+        free(linea);
+        free(internum_s);
+    }
+
+    free(ison);
     return 0;
 }

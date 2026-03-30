@@ -6,6 +6,7 @@
  */
 
 #include "planeta.h"
+#include "perceptus.h"
 #include "ison.h"
 
 #include <stdio.h>
@@ -57,11 +58,15 @@ int main(void)
             continue;
         }
 
+        char *per_raw = ison_da_crudum(ison, "perceptus");
         planeta_t p = planeta_ex_ison(ison);
         free(ison);
 
+        planeta_perceptus_t perc = planeta_perceptus_ex_ison(per_raw);
+        free(per_raw);
         memset(fen, 0, PLANETA_FENESTRA * PLANETA_FENESTRA * 4);
-        planeta_reddere(fen, &p);
+        planeta_reddere(fen, &p, &perc);
+        planeta_perceptum_applicare(fen, &perc);
 
         /* nomen sine extensione */
         char basis[128];

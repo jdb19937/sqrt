@@ -6,6 +6,8 @@
 #include "vectores.h"
 #include "sidus.h"
 #include "instrumentum.h"
+#include "aspectus.h"
+#include "perceptus.h"
 #include "ison.h"
 
 #include <math.h>
@@ -125,25 +127,21 @@ int astra_regio_vacua(const astra_campus_t *c, int cx, int cy, int radius)
     return 1;
 }
 
-#define PLANETA_FEN 256
-#define PLANETA_SEMI_C 128
-
 void planeta_in_campum(astra_campus_t *c, int cx, int cy,
                        const unsigned char *fenestra, double scala)
 {
-    int dim = (int)(PLANETA_FEN * scala);
+    int dim = (int)(PLANETA_FENESTRA * scala);
     if (dim < 2) return;
     int semi = dim / 2;
 
     for (int dy = 0; dy < dim; dy++) {
         for (int dx = 0; dx < dim; dx++) {
-            /* resample ex fenestra 256×256 */
             int sx = (int)(dx / scala);
             int sy = (int)(dy / scala);
-            if (sx >= PLANETA_FEN) sx = PLANETA_FEN - 1;
-            if (sy >= PLANETA_FEN) sy = PLANETA_FEN - 1;
+            if (sx >= PLANETA_FENESTRA) sx = PLANETA_FENESTRA - 1;
+            if (sy >= PLANETA_FENESTRA) sy = PLANETA_FENESTRA - 1;
 
-            int fi = (sy * PLANETA_FEN + sx) * 4;
+            int fi = (sy * PLANETA_FENESTRA + sx) * 4;
             unsigned char a = fenestra[fi + 3];
             if (a == 0) continue;
 
@@ -460,44 +458,73 @@ void astra_campum_generare(astra_campus_t *c, const astra_parametri_t *p,
  * ISONL redditor — campum ex ISONL et instrumento reddit
  * ================================================================ */
 
-static double isonl_par_f(const ison_par_t *pp, int n,
-                           const char *clavis, double praef)
-{
-    for (int i = 0; i < n; i++)
-        if (strcmp(pp[i].clavis, clavis) == 0)
-            return atof(pp[i].valor);
-    return praef;
-}
 
-static long isonl_par_n(const ison_par_t *pp, int n,
-                         const char *clavis, long praef)
+static planeta_t planeta_ex_pares_c(const ison_par_t *pp, int n)
 {
-    for (int i = 0; i < n; i++)
-        if (strcmp(pp[i].clavis, clavis) == 0)
-            return atol(pp[i].valor);
-    return praef;
-}
+    planeta_t p;
+    memset(&p, 0, sizeof(p));
 
-static const char *isonl_par_s(const ison_par_t *pp, int n,
-                                const char *clavis)
-{
-    for (int i = 0; i < n; i++)
-        if (strcmp(pp[i].clavis, clavis) == 0)
-            return pp[i].valor;
-    return "";
-}
+    const char *g = ison_pares_s(pp, n, "genus");
+    if (strcmp(g, "gaseosum") == 0)      p.genus = PLANETA_GASEOSUM;
+    else if (strcmp(g, "glaciale") == 0) p.genus = PLANETA_GLACIALE;
+    else if (strcmp(g, "parvum") == 0)   p.genus = PLANETA_PARVUM;
+    else if (strcmp(g, "sol") == 0)      p.genus = PLANETA_SOL;
+    else if (strcmp(g, "nebula") == 0)   p.genus = PLANETA_NEBULA;
+    else                                  p.genus = PLANETA_SAXOSUM;
 
-static double isonl_lege_f(const char *ison, const char *via, double praef)
-{
-    char *v = ison_da_chordam(ison, via);
-    if (!v) {
-        long n = ison_da_numerum(ison, via);
-        if (n != 0) return (double)n;
-        return praef;
-    }
-    double r = atof(v);
-    free(v);
-    return r;
+    p.radius        = ison_pares_f(pp, n, "radius", 0.9);
+    p.inclinatio    = ison_pares_f(pp, n, "inclinatio", 0.0);
+    p.rotatio       = ison_pares_f(pp, n, "rotatio", 0.0);
+    p.semen         = (unsigned)ison_pares_n(pp, n, "semen", 42);
+
+    p.silicata    = ison_pares_f(pp, n, "silicata", 0.0);
+    p.ferrum      = ison_pares_f(pp, n, "ferrum", 0.0);
+    p.sulphur     = ison_pares_f(pp, n, "sulphur", 0.0);
+    p.carbo       = ison_pares_f(pp, n, "carbo", 0.0);
+    p.glacies     = ison_pares_f(pp, n, "glacies", 0.0);
+    p.glacies_co2 = ison_pares_f(pp, n, "glacies_co2", 0.0);
+    p.malachita   = ison_pares_f(pp, n, "malachita", 0.0);
+
+    p.aqua             = ison_pares_f(pp, n, "aqua", 0.0);
+    p.aqua_profunditas = ison_pares_f(pp, n, "aqua_profunditas", 0.5);
+
+    p.continentes      = (int)ison_pares_n(pp, n, "continentes", 0);
+    /* "scala" in ISONL = scala positionis; scala featurum ex "scala_featurae" */
+    p.scala            = ison_pares_f(pp, n, "scala_featurae", 1.0);
+    p.tectonica        = ison_pares_f(pp, n, "tectonica", 0.3);
+    p.craterae         = ison_pares_f(pp, n, "craterae", 0.0);
+    p.maria            = ison_pares_f(pp, n, "maria", 0.0);
+    p.vulcanismus      = ison_pares_f(pp, n, "vulcanismus", 0.0);
+
+    p.pressio_kPa = ison_pares_f(pp, n, "pressio_kPa", 0.0);
+    p.n2          = ison_pares_f(pp, n, "n2", 0.0);
+    p.o2          = ison_pares_f(pp, n, "o2", 0.0);
+    p.co2         = ison_pares_f(pp, n, "co2", 0.0);
+    p.ch4         = ison_pares_f(pp, n, "ch4", 0.0);
+    p.h2          = ison_pares_f(pp, n, "h2", 0.0);
+    p.he          = ison_pares_f(pp, n, "he", 0.0);
+    p.nh3         = ison_pares_f(pp, n, "nh3", 0.0);
+    p.pulvis      = ison_pares_f(pp, n, "pulvis", 0.0);
+    p.nubes       = ison_pares_f(pp, n, "nubes", 0.0);
+
+    p.polaris          = ison_pares_f(pp, n, "polaris", 0.0);
+    p.fasciae          = (int)ison_pares_n(pp, n, "fasciae", 0);
+    p.fasciae_contrast = ison_pares_f(pp, n, "fasciae_contrast", 0.5);
+
+    p.maculae           = (int)ison_pares_n(pp, n, "maculae", 0);
+    p.macula_lat        = ison_pares_f(pp, n, "macula_lat", 0.0);
+    p.macula_lon        = ison_pares_f(pp, n, "macula_lon", 0.0);
+    p.macula_radius     = ison_pares_f(pp, n, "macula_radius", 0.1);
+    p.macula_obscuritas = ison_pares_f(pp, n, "macula_obscuritas", 0.5);
+
+    p.fusio       = ison_pares_f(pp, n, "fusio",
+                                p.genus == PLANETA_SOL ? 1.0 : 0.0);
+    p.temperatura = ison_pares_f(pp, n, "temperatura", 0.0);
+    p.luminositas = ison_pares_f(pp, n, "luminositas", 1.0);
+    p.corona      = ison_pares_f(pp, n, "corona", 0.0);
+    p.granulatio  = ison_pares_f(pp, n, "granulatio", 0.0);
+
+    return p;
 }
 
 static astra_genus_t genus_ex_nomine(const char *nomen)
@@ -525,32 +552,75 @@ typedef struct {
     double i_halo_r, i_halo_v;
 } isonl_ctx_t;
 
-static void isonl_linea_reddere(const ison_par_t *pp, int n, void *ctx_v)
+static void isonl_linea_reddere(const char *linea, void *ctx_v)
 {
     isonl_ctx_t *ctx = (isonl_ctx_t *)ctx_v;
-    const char *genus_s = isonl_par_s(pp, n, "genus");
+    char *internum;
+    ison_par_t pp[64];
+    int n;
 
-    if (strcmp(genus_s, "_meta") == 0) {
-        int lat = (int)isonl_par_n(pp, n, "latitudo", 1024);
-        int alt = (int)isonl_par_n(pp, n, "altitudo", 512);
-        ctx->galaxia_glow    = isonl_par_f(pp, n, "galaxia_glow", 0);
-        ctx->galaxia_rift    = isonl_par_f(pp, n, "galaxia_rift", 0);
-        ctx->galaxia_nebulae = (int)isonl_par_n(pp, n, "galaxia_nebulae", 0);
-        ctx->inclinatio      = isonl_par_f(pp, n, "inclinatio_galaxiae", 0);
-        ctx->campus = astra_campum_creare(lat, alt);
-        ctx->meta_lecta = 1;
+    /* {"_meta": {...}} */
+    internum = ison_da_crudum(linea, "_meta");
+    if (internum) {
+        n = ison_lege(internum, pp, 64);
+        free(internum);
+        if (n > 0) {
+            int lat = (int)ison_pares_n(pp, n, "latitudo", 1024);
+            int alt = (int)ison_pares_n(pp, n, "altitudo", 512);
+            ctx->galaxia_glow    = ison_pares_f(pp, n, "galaxia_glow", 0);
+            ctx->galaxia_rift    = ison_pares_f(pp, n, "galaxia_rift", 0);
+            ctx->galaxia_nebulae = (int)ison_pares_n(pp, n, "galaxia_nebulae", 0);
+            ctx->inclinatio      = ison_pares_f(pp, n, "inclinatio_galaxiae", 0);
+            ctx->campus = astra_campum_creare(lat, alt);
+            ctx->meta_lecta = 1;
+        }
         return;
     }
 
     if (!ctx->meta_lecta || !ctx->campus) return;
 
-    astra_genus_t genus = genus_ex_nomine(genus_s);
-    double mag   = isonl_par_f(pp, n, "magnitudo", 5.0);
-    double temp  = isonl_par_f(pp, n, "temperatura", 5000);
-    int    x     = (int)isonl_par_n(pp, n, "x", 0);
-    int    y     = (int)isonl_par_n(pp, n, "y", 0);
-    double phase = isonl_par_f(pp, n, "phase", 0);
-    double ang   = isonl_par_f(pp, n, "angulus_phase", 0);
+    /* {"planeta": {...}} */
+    internum = ison_da_crudum(linea, "planeta");
+    if (internum) {
+        char *per_s = ison_da_crudum(internum, "perceptus");
+        n = ison_lege(internum, pp, 64);
+        free(internum);
+        if (n > 0) {
+            int x     = (int)ison_pares_n(pp, n, "x", 0);
+            int y     = (int)ison_pares_n(pp, n, "y", 0);
+            double sc = ison_pares_f(pp, n, "scala", 1.0);
+            planeta_t pl = planeta_ex_pares_c(pp, n);
+            planeta_perceptus_t perc = planeta_perceptus_ex_ison(per_s);
+            free(per_s);
+            unsigned char *fen = (unsigned char *)calloc(
+                (size_t)PLANETA_FENESTRA * PLANETA_FENESTRA * 4, 1);
+            if (fen) {
+                planeta_reddere(fen, &pl, &perc);
+                planeta_perceptum_applicare(fen, &perc);
+                planeta_in_campum(ctx->campus, x, y, fen, sc);
+                free(fen);
+            }
+        } else {
+            free(per_s);
+        }
+        return;
+    }
+
+    /* {"sidus": {...}} */
+    internum = ison_da_crudum(linea, "sidus");
+    if (!internum) return;
+    n = ison_lege(internum, pp, 64);
+    free(internum);
+    if (n <= 0) return;
+
+    int x = (int)ison_pares_n(pp, n, "x", 0);
+    int y = (int)ison_pares_n(pp, n, "y", 0);
+
+    astra_genus_t genus = genus_ex_nomine(ison_pares_s(pp, n, "genus"));
+    double mag   = ison_pares_f(pp, n, "magnitudo", 5.0);
+    double temp  = ison_pares_f(pp, n, "temperatura", 5000);
+    double phase = ison_pares_f(pp, n, "phase", 0);
+    double ang   = ison_pares_f(pp, n, "angulus_phase", 0);
 
     astra_sidus_t sidus = {genus, mag, temp, phase, ang};
 
@@ -697,28 +767,28 @@ astra_campus_t *astra_ex_isonl_reddere(const char *via_isonl,
 
     isonl_ctx_t ctx;
     memset(&ctx, 0, sizeof(ctx));
-    ctx.i_spic      = (int)isonl_lege_f(instr_ison, "spiculae", 0);
-    ctx.i_spic_long = isonl_lege_f(instr_ison, "spiculae_long", 0);
-    ctx.i_spic_ang  = isonl_lege_f(instr_ison, "spiculae_ang", 0);
-    ctx.i_halo_r    = isonl_lege_f(instr_ison, "halo_radius", 0);
-    ctx.i_halo_v    = isonl_lege_f(instr_ison, "halo_vis", 0);
+    ctx.i_spic      = (int)ison_da_f(instr_ison, "spiculae", 0);
+    ctx.i_spic_long = ison_da_f(instr_ison, "spiculae_long", 0);
+    ctx.i_spic_ang  = ison_da_f(instr_ison, "spiculae_ang", 0);
+    ctx.i_halo_r    = ison_da_f(instr_ison, "halo_radius", 0);
+    ctx.i_halo_v    = ison_da_f(instr_ison, "halo_vis", 0);
 
     astra_instrumentum_t inst;
     memset(&inst, 0, sizeof(inst));
-    inst.saturatio    = isonl_lege_f(instr_ison, "saturatio", 1.0);
-    inst.aberratio    = isonl_lege_f(instr_ison, "aberratio", 0.0);
-    inst.visio        = isonl_lege_f(instr_ison, "visio", 0.0);
-    inst.scintillatio = isonl_lege_f(instr_ison, "scintillatio", 0.0);
-    inst.caeli_lumen  = isonl_lege_f(instr_ison, "caeli_lumen", 0.0);
-    inst.florescentia = isonl_lege_f(instr_ison, "florescentia", 0.0);
-    inst.acuitas      = isonl_lege_f(instr_ison, "acuitas", 0.0);
-    inst.refractio    = isonl_lege_f(instr_ison, "refractio", 0.0);
-    inst.vignetta     = isonl_lege_f(instr_ison, "vignetta", 0.0);
-    inst.distorsio    = isonl_lege_f(instr_ison, "distorsio", 0.0);
-    inst.fenestra     = isonl_lege_f(instr_ison, "fenestra", 0.0);
+    inst.saturatio    = ison_da_f(instr_ison, "saturatio", 1.0);
+    inst.aberratio    = ison_da_f(instr_ison, "aberratio", 0.0);
+    inst.visio        = ison_da_f(instr_ison, "visio", 0.0);
+    inst.scintillatio = ison_da_f(instr_ison, "scintillatio", 0.0);
+    inst.caeli_lumen  = ison_da_f(instr_ison, "caeli_lumen", 0.0);
+    inst.florescentia = ison_da_f(instr_ison, "florescentia", 0.0);
+    inst.acuitas      = ison_da_f(instr_ison, "acuitas", 0.0);
+    inst.refractio    = ison_da_f(instr_ison, "refractio", 0.0);
+    inst.vignetta     = ison_da_f(instr_ison, "vignetta", 0.0);
+    inst.distorsio    = ison_da_f(instr_ison, "distorsio", 0.0);
+    inst.fenestra     = ison_da_f(instr_ison, "fenestra", 0.0);
     free(instr_ison);
 
-    ison_pro_quaque_linea(isonl, isonl_linea_reddere, &ctx);
+    ison_pro_quaque_linea_s(isonl, isonl_linea_reddere, &ctx);
     free(isonl);
 
     if (!ctx.campus) {

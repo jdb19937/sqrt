@@ -1,21 +1,19 @@
 {
   "nomen": "Io",
   "genus": "saxosum",
-  "radius": "0.9",
-  "phase": "0.08",
-  "angulus_phase": "0.3",
-  "inclinatio": "0.04",
-  "rotatio": "2.0",
+  "radius": 0.9,
+  "inclinatio": 0.04,
+  "rotatio": 2.0,
   "semen": 50143,
 
-  "sulphur": "0.65",
-  "silicata": "0.25",
-  "ferrum": "0.10",
-  "glacies": "0.15",
+  "sulphur": 0.65,
+  "silicata": 0.25,
+  "ferrum": 0.10,
+  "glacies": 0.15,
 
-  "scala": "1.0",
-  "maria": "0.20",
-  "vulcanismus": "0.9",
+  "scala": 1.0,
+  "maria": 0.20,
+  "vulcanismus": 0.9,
 
-  "pressio_kPa": "0.0"
+  "pressio_kPa": 0.0
 }
