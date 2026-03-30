@@ -6,7 +6,7 @@
  */
 
 #include "astra.h"
-#include "ison/ison.h"
+#include "ison.h"
 
 #include <math.h>
 #include <stdio.h>

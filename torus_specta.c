@@ -24,7 +24,7 @@
 #include "helvea.h"
 #include "astra.h"
 
-#include "phantasma/phantasma.h"
+#include "phantasma.h"
 
 #include <stdio.h>
 #include <time.h>
