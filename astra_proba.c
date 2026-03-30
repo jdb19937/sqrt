@@ -72,6 +72,13 @@ int main(void)
         {"neutronium",       {SIDUS_NEUTRONIUM,    1.0, 500000,  0, 0}, &instr_nulla},
         {"crystallinum",     {SIDUS_CRYSTALLINUM,  0.5, 8000,    0, 0}, &instr_nulla},
         {"magnetar",         {SIDUS_MAGNETAR,      0.5, 5000000, 0, 0}, &instr_nulla},
+        {"magnetar_2",       {SIDUS_MAGNETAR,      1.2, 5000000, 0, 0}, &instr_nulla},
+        {"gal_elliptica",    {SIDUS_GALAXIA,       4.0, 8000,    GALAXIA_ELLIPTICA, 0.5}, &instr_nulla},
+        {"gal_spiralis",     {SIDUS_GALAXIA,       3.5, 7000,    GALAXIA_SPIRALIS, 1.2}, &instr_nulla},
+        {"gal_barrata",      {SIDUS_GALAXIA,       4.2, 5000,    GALAXIA_SPIRALIS_BARRATA, 2.8}, &instr_nulla},
+        {"gal_lenticularis", {SIDUS_GALAXIA,       4.5, 6000,    GALAXIA_LENTICULARIS, 0.8}, &instr_nulla},
+        {"gal_irregularis",  {SIDUS_GALAXIA,       4.0, 9000,    GALAXIA_IRREGULARIS, 3.5}, &instr_nulla},
+        {"gal_edge_on",      {SIDUS_GALAXIA,       3.8, 500,     GALAXIA_SPIRALIS, 0.0}, &instr_nulla},
         {"planeta_plenus",   {SIDUS_PLANETA,       1.0, 5500,    0.0, 0.5}, &instr_nulla},
         {"planeta_falcatus", {SIDUS_PLANETA,       1.5, 4500,    0.35, 0.8}, &instr_nulla},
     };

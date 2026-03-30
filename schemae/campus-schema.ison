@@ -16,7 +16,9 @@
     "max_exotica":          {"type": "integer"},
     "numerus_planetarum":   {"type": "integer"},
     "planetae_temp_min":    {"type": "string"},
-    "planetae_temp_max":    {"type": "string"}
+    "planetae_temp_max":    {"type": "string"},
+    "numerus_galaxiarum":   {"type": "integer"},
+    "max_galaxiae":         {"type": "integer"}
   },
   "required": ["latitudo", "altitudo", "numerus_stellarum", "semen"]
 }

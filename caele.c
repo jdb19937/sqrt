@@ -104,6 +104,8 @@ int main(int argc, char **argv)
     int num_planet      = (int)lege_n(ison, "numerus_planetarum", 0);
     double pl_tmin      = lege_f(ison, "planetae_temp_min", 4000);
     double pl_tmax      = lege_f(ison, "planetae_temp_max", 6000);
+    int num_galaxiarum  = (int)lege_n(ison, "numerus_galaxiarum", 0);
+    int max_galaxiae    = (int)lege_n(ison, "max_galaxiae", 0);
 
     /* meta linea — parametri campi pro redditore */
     {
@@ -200,6 +202,56 @@ int main(int argc, char **argv)
         }
 
         sidus_emittere(genus, mag, temp, (int)fx, (int)fy, 0, 0);
+    }
+
+    /* --- galaxiae distantes --- */
+    {
+        int n_gal = 0;
+        for (int i = 0; i < num_galaxiarum; i++) {
+            if (max_galaxiae > 0 && n_gal >= max_galaxiae) break;
+
+            double r_mag = alea_f();
+            double mag = 3.0 + 3.0 * (1.0 - pow(r_mag, 0.4));
+
+            const char *morph_s;
+            int morph_id;
+            double mr = alea_f();
+            if (mr < 0.15)       { morph_s = "elliptica";  morph_id = 0; }
+            else if (mr < 0.50)  { morph_s = "spiralis";   morph_id = 1; }
+            else if (mr < 0.75)  { morph_s = "barrata";    morph_id = 2; }
+            else if (mr < 0.90)  { morph_s = "lenticularis"; morph_id = 3; }
+            else                 { morph_s = "irregularis"; morph_id = 4; }
+
+            double cos_incl = alea_f();
+            double temp_code = cos_incl * 10000.0;
+            double ang = alea_f() * ASTRA_DUO_PI;
+            int px = (int)(alea_f() * latitudo);
+            int py = (int)(alea_f() * altitudo);
+
+            /* emittere galaxiam cum proprietatibus additis */
+            {
+                ison_scriptor_t *js = ison_scriptor_crea();
+                char buf[64];
+                ison_scriptor_adde(js, "genus", "galaxia");
+                snprintf(buf, sizeof(buf), "%.3f", mag);
+                ison_scriptor_adde_crudum(js, "magnitudo", buf);
+                snprintf(buf, sizeof(buf), "%.1f", temp_code);
+                ison_scriptor_adde_crudum(js, "temperatura", buf);
+                snprintf(buf, sizeof(buf), "%d", px);
+                ison_scriptor_adde_crudum(js, "x", buf);
+                snprintf(buf, sizeof(buf), "%d", py);
+                ison_scriptor_adde_crudum(js, "y", buf);
+                snprintf(buf, sizeof(buf), "%d", morph_id);
+                ison_scriptor_adde_crudum(js, "phase", buf);
+                snprintf(buf, sizeof(buf), "%.3f", ang);
+                ison_scriptor_adde_crudum(js, "angulus_phase", buf);
+                ison_scriptor_adde(js, "morphologia", morph_s);
+                char *linea = ison_scriptor_fini(js);
+                puts(linea);
+                free(linea);
+            }
+            n_gal++;
+        }
     }
 
     for (int i = 0; i < num_planet; i++) {

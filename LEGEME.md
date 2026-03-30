@@ -68,13 +68,17 @@ Redditio per rasterizationem triangulorum cum coordinatis barycentricis, z-buffe
 
 ## Sidera
 
-Genera siderum: Nanum Album, Sequentia, Gigas Rubrum, Supergigas, Neutronium, Crystallinum, Magnetar, Planeta. Proprietates intrinsecae ex configuratione ISON generantur et ut ISONL emittuntur. Instrumentum opticum (in `instrumenta/`) effectus opticos applicat in redditione.
+Genera siderum: Nanum Album, Sequentia, Gigas Rubrum, Supergigas, Neutronium, Crystallinum, Magnetar, Galaxia, Planeta. Proprietates intrinsecae ex configuratione ISON generantur et ut ISONL emittuntur. Instrumentum opticum (in `instrumenta/`) effectus opticos applicat in redditione.
+
+### Galaxiae
+
+Galaxiae distantes ut objecta extendida redduntur cum quinque morphologiis (classificatio Hubble 1926): Elliptica (profilo de Vaucouleurs), Spiralis (brachia logarithmica cum pitch variabili), Spiralis Barrata (cum barra centrali), Lenticularis (discus sine brachiis), Irregularis (nodi starburst stochastici). Inclinatio, angulus positionis, et color per galaxiam variant. Distributio magnitudinis Schechter (1976) sequitur: pleraeque parvae et debiles, raro lucidae.
 
 ## Plicae
 
 ```
 helvea.c/h          bibliotheca communis tori (superficies, camera, illuminatio, rasterizatio)
-astra.c/h           bibliotheca stellarum (genera, generatio, redditio)
+astra.c/h           bibliotheca stellarum et galaxiarum (genera, generatio, redditio)
 torus_planus.c      imago singularis tori corrugati (1920×1080)
 torus_animare.c     animatio camerae rotantis (640×480, PPM series)
 torus_specta.c      spectator interactivus phantasma

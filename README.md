@@ -1,6 +1,6 @@
 # sqrt
 
-**Isometric embeddings of the flat torus in three-dimensional Euclidean space, procedural starfield generation, and a real-time interactive viewer — all in 3,300 lines of zero-dependency C99.**
+**Isometric embeddings of the flat torus in three-dimensional Euclidean space, procedural starfield and galaxy generation, and a real-time interactive viewer — all in zero-dependency C99.**
 
 ## What This Is
 
@@ -25,7 +25,9 @@ Phong illumination with three directional lights, Fresnel effects, gamma correct
 
 ## Starfields
 
-A procedural starfield generator creates toroidal skies populated with physically-typed stellar objects — white dwarfs, main sequence stars, red giants, supergiants, neutron stars, crystalline stars, magnetars, and planets. Star properties are generated from ISON configuration files and emitted as ISONL; a separate renderer applies optical instrument models and produces the final image.
+A procedural starfield generator creates toroidal skies populated with physically-typed stellar objects — white dwarfs, main sequence stars, red giants, supergiants, neutron stars, crystalline stars, magnetars, distant galaxies, and planets. Star properties are generated from ISON configuration files and emitted as ISONL; a separate renderer applies optical instrument models and produces the final image.
+
+Distant galaxies are rendered as extended objects with five Hubble (1926) morphological types: elliptical (de Vaucouleurs 1948 R¹ᐟ⁴ profile), spiral (Lin & Shu 1964 density wave theory, logarithmic arms per Ringermacher & Mead 2009), barred spiral (Athanassoula 2003 orbital resonance model), lenticular, and irregular (Hunter & Elmegreen 2004 stochastic star formation). Morphological fractions follow Galaxy Zoo (Lintott+ 2008). Spiral arm pitch angles follow Kennicutt (1981), disk profiles follow Freeman (1970), and edge-on dust lanes follow van der Kruit & Searle (1981). Inclination, position angle, and color vary per galaxy. The magnitude distribution follows the Schechter (1976) luminosity function — most galaxies are small and faint, with only occasional bright ones like Andromeda. Flat rotation curves (Rubin & Ford 1970) imply the dark matter halos that make all of this possible.
 
 ```bash
 ./caele campi/terra.ison > caelae/terra.isonl

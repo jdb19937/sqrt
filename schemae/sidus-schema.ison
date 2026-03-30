@@ -7,7 +7,8 @@
     "x":              {"type": "integer"},
     "y":              {"type": "integer"},
     "phase":          {"type": "string"},
-    "angulus_phase":  {"type": "string"}
+    "angulus_phase":  {"type": "string"},
+    "morphologia":    {"type": "string"}
   },
   "required": ["genus", "magnitudo", "temperatura", "x", "y"]
 }

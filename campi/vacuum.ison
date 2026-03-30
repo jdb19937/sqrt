@@ -14,5 +14,7 @@
   "max_exotica": 0,
   "numerus_planetarum": 0,
   "planetae_temp_min": "0",
-  "planetae_temp_max": "0"
+  "planetae_temp_max": "0",
+  "numerus_galaxiarum": 30,
+  "max_galaxiae": 0
 }
