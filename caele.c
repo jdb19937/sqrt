@@ -10,6 +10,7 @@
  */
 
 #include "astra.h"
+#include "vectores.h"
 #include "ison.h"
 
 #include <math.h>

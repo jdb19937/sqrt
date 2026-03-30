@@ -1,0 +1,22 @@
+{
+  "nomen": "Vulcanus",
+  "genus": "saxosum",
+  "radius": "0.9",
+  "phase": "0.12",
+  "angulus_phase": "0.35",
+  "inclinatio": "0.15",
+  "rotatio": "3.5",
+  "semen": 70537,
+
+  "ferrum": "0.30",
+  "carbo": "0.40",
+  "silicata": "0.30",
+
+  "scala": "1.0",
+  "vulcanismus": "0.70",
+  "craterae": "0.10",
+
+  "pressio_kPa": "8.0",
+  "co2": "0.70",
+  "pulvis": "0.5"
+}

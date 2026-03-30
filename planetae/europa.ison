@@ -1,0 +1,19 @@
+{
+  "nomen": "Europa",
+  "genus": "saxosum",
+  "radius": "0.9",
+  "phase": "0.08",
+  "angulus_phase": "0.3",
+  "inclinatio": "0.04",
+  "rotatio": "1.8",
+  "semen": 50247,
+
+  "glacies": "0.85",
+  "silicata": "0.10",
+  "ferrum": "0.05",
+
+  "scala": "1.0",
+  "craterae": "0.05",
+
+  "pressio_kPa": "0.0"
+}

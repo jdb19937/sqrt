@@ -85,8 +85,8 @@ int main(void)
         {"gal_lenticularis", {SIDUS_GALAXIA,       4.5, 6000,    GALAXIA_LENTICULARIS, 0.8}, &instr_nulla},
         {"gal_irregularis",  {SIDUS_GALAXIA,       4.0, 9000,    GALAXIA_IRREGULARIS, 3.5}, &instr_nulla},
         {"gal_edge_on",      {SIDUS_GALAXIA,       3.8, 500,     GALAXIA_SPIRALIS, 0.0}, &instr_nulla},
-        {"planeta_plenus",   {SIDUS_PLANETA,       1.0, 5500,    0.0, 0.5}, &instr_nulla},
-        {"planeta_falcatus", {SIDUS_PLANETA,       1.5, 4500,    0.35, 0.8}, &instr_nulla},
+        {"planeta_plenus",   {SIDUS_VAGANS,       1.0, 5500,    0.0, 0.5}, &instr_nulla},
+        {"planeta_falcatus", {SIDUS_VAGANS,       1.5, 4500,    0.35, 0.8}, &instr_nulla},
     };
 
     int n_spec = (int)(sizeof(specimina) / sizeof(specimina[0]));

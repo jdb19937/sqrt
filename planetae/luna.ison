@@ -1,0 +1,20 @@
+{
+  "nomen": "Luna",
+  "genus": "saxosum",
+  "radius": "0.9",
+  "phase": "0.18",
+  "angulus_phase": "0.4",
+  "inclinatio": "0.117",
+  "rotatio": "2.8",
+  "semen": 40173,
+
+  "silicata": "0.70",
+  "ferrum": "0.08",
+  "carbo": "0.05",
+
+  "scala": "1.0",
+  "craterae": "0.75",
+  "maria": "0.31",
+
+  "pressio_kPa": "0.0"
+}

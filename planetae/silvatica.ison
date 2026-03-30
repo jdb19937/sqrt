@@ -1,0 +1,28 @@
+{
+  "nomen": "Silvatica",
+  "genus": "saxosum",
+  "radius": "0.9",
+  "phase": "0.12",
+  "angulus_phase": "0.4",
+  "inclinatio": "0.35",
+  "rotatio": "4.2",
+  "semen": 70759,
+
+  "malachita": "0.45",
+  "silicata": "0.25",
+  "ferrum": "0.05",
+
+  "aqua": "0.60",
+  "aqua_profunditas": "0.5",
+
+  "continentes": 5,
+  "scala": "1.0",
+  "tectonica": "0.85",
+
+  "pressio_kPa": "95.0",
+  "n2": "0.76",
+  "o2": "0.22",
+  "nubes": "0.55",
+
+  "polaris": "0.08"
+}
