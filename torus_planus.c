@@ -7,7 +7,7 @@
  * Fundum: campus stellarum toroidalis (parametri terrae).
  * Observator intus universum toroidale T² sedet,
  * immersionem concretam eiusdem topologiae spectans.
- * Vide commentarium in helvea.h:helvea_fundum_implere.
+ * Vide commentarium in helvea.h:fundum_implere.
  */
 
 #include "helvea.h"
@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     }
 
     size_t n_pix = (size_t)LATITUDO_IMG * ALTITUDO_IMG;
-    helvea_tabula_t tab;
+    tabula_t tab;
     tab.latitudo = LATITUDO_IMG;
     tab.altitudo = ALTITUDO_IMG;
     tab.bytes_pixel = 3;
@@ -72,22 +72,22 @@ int main(int argc, char **argv)
     /* cameram constituere */
     vec3_t positio_camerae = vec3(2.6, -2.0, 1.5);
     vec3_t scopus          = vec3(0.0, 0.0, -0.05);
-    camera_t cam = helvea_cameram_constituere(positio_camerae, scopus);
+    camera_t cam = cameram_constituere(positio_camerae, scopus);
 
     /* fundum stellarum — translatio ex angulo camerae */
     double angulus_cam = atan2(positio_camerae.y, positio_camerae.x);
     int delta_x = (int)(angulus_cam / DUO_PI * campus->latitudo);
     int delta_y = (int)(positio_camerae.z / 4.0 * campus->altitudo);
 
-    helvea_tabulam_purgare(&tab);
-    helvea_fundum_implere(&tab, campus->pixels,
+    tabulam_purgare(&tab);
+    fundum_implere(&tab, campus->pixels,
                           campus->latitudo, campus->altitudo,
                           delta_x, delta_y);
 
     /* scaenam reddere */
     fprintf(stderr, "Triangula reddens...\n");
-    helvea_scaenam_reddere(&tab, puncta, normae, GRADUS_U, GRADUS_V,
-                           &cam, helvea_illuminare, helvea_pixel_rgb);
+    scaenam_reddere(&tab, puncta, normae, GRADUS_U, GRADUS_V,
+                           &cam, helvea_illuminare, pixel_rgb);
 
     /* PPM scribere */
     const char *via_ppm = "torus_planus.ppm";

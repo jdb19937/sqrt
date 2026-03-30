@@ -31,21 +31,11 @@
 #ifndef ASTRA_H
 #define ASTRA_H
 
+#include "vectores.h"
+#include "color.h"
+
 #include <math.h>
-
-/* ================================================================
- * constantes
- * ================================================================ */
-
-#define ASTRA_PI        3.14159265358979323846
-#define ASTRA_DUO_PI   (2.0 * ASTRA_PI)
 #define ASTRA_FENESTRA  64      /* latitudo et altitudo fenestrae sideris */
-
-/* ================================================================
- * typi
- * ================================================================ */
-
-typedef struct { double r, g, b, a; } astra_color_t;
 
 /*
  * Genus sideris — ex diagrammate Hertzsprung-Russell (1911).
@@ -556,7 +546,7 @@ void astra_sidus_reddere(unsigned char *fenestra,
  * ================================================================ */
 
 /* colorem ex temperatura (Kelvin) per Planck approximare */
-astra_color_t astra_temperatura_ad_colorem(double kelvin);
+color_t astra_temperatura_ad_colorem(double kelvin);
 
 /* pixel in campum toroidalem scribere (coordinatae modulantur) */
 void astra_pixel_scribere(astra_campus_t *c, int x, int y,

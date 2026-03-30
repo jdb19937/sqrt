@@ -287,40 +287,6 @@ void helvea_superficiem_computare(vec3_t *puncta, vec3_t *normae,
 }
 
 /* ================================================================
- * camera perspectiva
- * ================================================================ */
-
-camera_t helvea_cameram_constituere(vec3_t positio, vec3_t scopus)
-{
-    camera_t cam;
-    cam.positio = positio;
-    cam.ante    = normalizare(differentia(scopus, positio));
-
-    vec3_t mundi_sursum = vec3(0.0, 0.0, 1.0);
-    cam.dextrum = normalizare(productum_vectoriale(cam.ante, mundi_sursum));
-    cam.sursum  = productum_vectoriale(cam.dextrum, cam.ante);
-    cam.focalis = 1.6;
-    return cam;
-}
-
-int helvea_proicere(const camera_t *cam, vec3_t p,
-                    double *scr_x, double *scr_y, double *prof,
-                    int latitudo, int altitudo)
-{
-    vec3_t d = differentia(p, cam->positio);
-    double z = productum_scalare(d, cam->ante);
-    if (z < 0.05) return 0;
-
-    double f = cam->focalis / z;
-    double scala = altitudo * 0.5;
-
-    *scr_x = latitudo * 0.5 + productum_scalare(d, cam->dextrum) * f * scala;
-    *scr_y = altitudo * 0.5 - productum_scalare(d, cam->sursum)  * f * scala;
-    *prof  = z;
-    return 1;
-}
-
-/* ================================================================
  * illuminatio simplex (Blinn-Phong, aurum)
  * ================================================================ */
 
@@ -332,13 +298,13 @@ color_t helvea_illuminare(vec3_t punct, vec3_t norm, vec3_t oculus)
         { 0.2, -1.0, -0.2}
     };
     static const color_t lux_intens[3] = {
-        {0.90, 0.80, 0.65},
-        {0.20, 0.30, 0.55},
-        {0.12, 0.10, 0.08}
+        {0.90, 0.80, 0.65, 1.0},
+        {0.20, 0.30, 0.55, 1.0},
+        {0.12, 0.10, 0.08, 1.0}
     };
 
     double mat_r = 0.78, mat_g = 0.55, mat_b = 0.28;
-    color_t res = {mat_r * 0.06, mat_g * 0.06, mat_b * 0.06};
+    color_t res = {mat_r * 0.06, mat_g * 0.06, mat_b * 0.06, 1.0};
 
     vec3_t ad_oculum = normalizare(differentia(oculus, punct));
     if (productum_scalare(norm, ad_oculum) < 0.0)
@@ -374,102 +340,102 @@ color_t helvea_illuminare(vec3_t punct, vec3_t norm, vec3_t oculus)
 
 int helvea_index_thematis = 0;
 
-#define RAMPA_NUL {{0,0,0},{0,0,0},{0,0,0},{0,0,0}}
+#define RAMPA_NUL {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}}
 
 const int helvea_numerus_thematum = 16;
 
 const helvea_thema_t helvea_themata[16] = {
     /* --- iridescentes --- */
     { "Oleum", LUX_IRIDESCENS, HELVEA_PFX_NULLUS,
-        4.0, {0.0, 2.1, 4.2}, 0.75,
-        {0.15, 0.12, 0.18}, {0.40, 0.50, 0.70}, 0.55,
+        4.0, {0.0, 2.1, 4.2, 1.0}, 0.75,
+        {0.15, 0.12, 0.18, 1.0}, {0.40, 0.50, 0.70, 1.0}, 0.55,
         50.0, 0.40, 0.03, 0, 0, RAMPA_NUL
     },
     { "Pavo", LUX_IRIDESCENS, HELVEA_PFX_NULLUS,
-        3.0, {3.8, 0.0, 1.2}, 0.70,
-        {0.05, 0.18, 0.12}, {0.20, 0.65, 0.40}, 0.50,
+        3.0, {3.8, 0.0, 1.2, 1.0}, 0.70,
+        {0.05, 0.18, 0.12, 1.0}, {0.20, 0.65, 0.40, 1.0}, 0.50,
         70.0, 0.50, 0.03, 0, 0, RAMPA_NUL
     },
     { "Concha", LUX_IRIDESCENS, HELVEA_PFX_NULLUS,
-        2.5, {0.8, 2.6, 4.8}, 0.55,
-        {0.75, 0.72, 0.78}, {0.85, 0.75, 0.90}, 0.60,
+        2.5, {0.8, 2.6, 4.8, 1.0}, 0.55,
+        {0.75, 0.72, 0.78, 1.0}, {0.85, 0.75, 0.90, 1.0}, 0.60,
         90.0, 0.55, 0.06, 0, 0, RAMPA_NUL
     },
     { "Scarabaeus", LUX_IRIDESCENS, HELVEA_PFX_NULLUS,
-        5.0, {2.8, 0.5, 4.0}, 0.80,
-        {0.08, 0.10, 0.04}, {0.30, 0.50, 0.15}, 0.45,
+        5.0, {2.8, 0.5, 4.0, 1.0}, 0.80,
+        {0.08, 0.10, 0.04, 1.0}, {0.30, 0.50, 0.15, 1.0}, 0.45,
         60.0, 0.45, 0.02, 0, 0, RAMPA_NUL
     },
     { "Nebula", LUX_IRIDESCENS, HELVEA_PFX_NIGRESCO,
-        3.5, {4.5, 1.5, 0.0}, 0.70,
-        {0.06, 0.04, 0.14}, {0.50, 0.30, 0.90}, 0.60,
+        3.5, {4.5, 1.5, 0.0, 1.0}, 0.70,
+        {0.06, 0.04, 0.14, 1.0}, {0.50, 0.30, 0.90, 1.0}, 0.60,
         45.0, 0.50, 0.02, 0, 0, RAMPA_NUL
     },
     { "Opalis", LUX_IRIDESCENS, HELVEA_PFX_NULLUS,
-        6.0, {0.0, 1.5, 3.5}, 0.50,
-        {0.82, 0.80, 0.85}, {0.90, 0.85, 0.95}, 0.55,
+        6.0, {0.0, 1.5, 3.5, 1.0}, 0.50,
+        {0.82, 0.80, 0.85, 1.0}, {0.90, 0.85, 0.95, 1.0}, 0.55,
         100.0, 0.60, 0.07, 0, 0, RAMPA_NUL
     },
     { "Petroleum", LUX_IRIDESCENS, HELVEA_PFX_GRANUM,
-        3.2, {3.5, 0.8, 2.0}, 0.85,
-        {0.03, 0.03, 0.05}, {0.25, 0.60, 0.55}, 0.65,
+        3.2, {3.5, 0.8, 2.0, 1.0}, 0.85,
+        {0.03, 0.03, 0.05, 1.0}, {0.25, 0.60, 0.55, 1.0}, 0.65,
         40.0, 0.35, 0.01, 0, 0, RAMPA_NUL
     },
     { "Bulla", LUX_IRIDESCENS, HELVEA_PFX_NULLUS,
-        7.0, {0.0, 2.1, 4.2}, 0.60,
-        {0.50, 0.50, 0.55}, {0.80, 0.85, 1.00}, 0.70,
+        7.0, {0.0, 2.1, 4.2, 1.0}, 0.60,
+        {0.50, 0.50, 0.55, 1.0}, {0.80, 0.85, 1.00, 1.0}, 0.70,
         120.0, 0.65, 0.05, 0, 0, RAMPA_NUL
     },
     /* --- rampa --- */
     { "Ignis", LUX_RAMPA, HELVEA_PFX_NULLUS,
-        0, {0,0,0}, 0,
-        {0,0,0}, {0.95, 0.70, 0.30}, 0.30,
+        0, {0,0,0, 1.0}, 0,
+        {0,0,0, 1.0}, {0.95, 0.70, 0.30, 1.0}, 0.30,
         0, 0, 0.0, 0, 0,
-        {{0.15, 0.02, 0.20}, {0.90, 0.15, 0.05},
-         {1.00, 0.65, 0.00}, {1.00, 1.00, 0.70}}
+        {{0.15, 0.02, 0.20, 1.0}, {0.90, 0.15, 0.05, 1.0},
+         {1.00, 0.65, 0.00, 1.0}, {1.00, 1.00, 0.70, 1.0}}
     },
     { "Oceanus", LUX_RAMPA, HELVEA_PFX_NULLUS,
-        0, {0,0,0}, 0,
-        {0,0,0}, {0.60, 0.85, 0.95}, 0.35,
+        0, {0,0,0, 1.0}, 0,
+        {0,0,0, 1.0}, {0.60, 0.85, 0.95, 1.0}, 0.35,
         0, 0, 0.0, 0, 0,
-        {{0.05, 0.02, 0.15}, {0.00, 0.20, 0.55},
-         {0.10, 0.75, 0.60}, {0.85, 0.95, 0.70}}
+        {{0.05, 0.02, 0.15, 1.0}, {0.00, 0.20, 0.55, 1.0},
+         {0.10, 0.75, 0.60, 1.0}, {0.85, 0.95, 0.70, 1.0}}
     },
     { "Autumnus", LUX_RAMPA, HELVEA_PFX_GRANUM,
-        0, {0,0,0}, 0,
-        {0,0,0}, {0.50, 0.35, 0.20}, 0.20,
+        0, {0,0,0, 1.0}, 0,
+        {0,0,0, 1.0}, {0.50, 0.35, 0.20, 1.0}, 0.20,
         0, 0, 0.0, 0, 0,
-        {{0.20, 0.05, 0.15}, {0.80, 0.25, 0.05},
-         {0.95, 0.60, 0.10}, {0.40, 0.75, 0.15}}
+        {{0.20, 0.05, 0.15, 1.0}, {0.80, 0.25, 0.05, 1.0},
+         {0.95, 0.60, 0.10, 1.0}, {0.40, 0.75, 0.15, 1.0}}
     },
     { "Glacialis", LUX_RAMPA, HELVEA_PFX_NIGRESCO,
-        0, {0,0,0}, 0,
-        {0,0,0}, {0.80, 0.90, 1.00}, 0.45,
+        0, {0,0,0, 1.0}, 0,
+        {0,0,0, 1.0}, {0.80, 0.90, 1.00, 1.0}, 0.45,
         0, 0, 0.0, 0, 0,
-        {{0.05, 0.00, 0.20}, {0.15, 0.30, 0.70},
-         {0.50, 0.80, 0.95}, {0.95, 0.95, 1.00}}
+        {{0.05, 0.00, 0.20, 1.0}, {0.15, 0.30, 0.70, 1.0},
+         {0.50, 0.80, 0.95, 1.0}, {0.95, 0.95, 1.00, 1.0}}
     },
     /* --- cel / tabulata --- */
     { "Pictura", LUX_TABULATA, HELVEA_PFX_LINEAE | HELVEA_PFX_POSTERIZA,
-        0, {0,0,0}, 0,
-        {0.95, 0.45, 0.15}, {0.10, 0.08, 0.15}, 0.20,
+        0, {0,0,0, 1.0}, 0,
+        {0.95, 0.45, 0.15, 1.0}, {0.10, 0.08, 0.15, 1.0}, 0.20,
         20.0, 0.25, 0.08, 4, 6, RAMPA_NUL
     },
     { "Manga", LUX_TABULATA, HELVEA_PFX_LINEAE,
-        0, {0,0,0}, 0,
-        {0.90, 0.30, 0.50}, {0.15, 0.10, 0.20}, 0.25,
+        0, {0,0,0, 1.0}, 0,
+        {0.90, 0.30, 0.50, 1.0}, {0.15, 0.10, 0.20, 1.0}, 0.25,
         30.0, 0.20, 0.06, 3, 0, RAMPA_NUL
     },
     /* --- mixta --- */
     { "Vitrum", LUX_IRIDESCENS, HELVEA_PFX_LINEAE | HELVEA_PFX_NIGRESCO,
-        4.5, {1.0, 3.0, 5.0}, 0.65,
-        {0.30, 0.30, 0.35}, {0.70, 0.75, 0.90}, 0.60,
+        4.5, {1.0, 3.0, 5.0, 1.0}, 0.65,
+        {0.30, 0.30, 0.35, 1.0}, {0.70, 0.75, 0.90, 1.0}, 0.60,
         80.0, 0.55, 0.04, 0, 0, RAMPA_NUL
     },
     { "Somnium", LUX_IRIDESCENS,
         HELVEA_PFX_POSTERIZA | HELVEA_PFX_NIGRESCO | HELVEA_PFX_GRANUM,
-        2.0, {0.5, 2.5, 4.0}, 0.60,
-        {0.20, 0.15, 0.30}, {0.55, 0.40, 0.70}, 0.50,
+        2.0, {0.5, 2.5, 4.0, 1.0}, 0.60,
+        {0.20, 0.15, 0.30, 1.0}, {0.55, 0.40, 0.70, 1.0}, 0.50,
         35.0, 0.30, 0.03, 0, 5, RAMPA_NUL
     }
 };
@@ -481,9 +447,9 @@ static const vec3_t lux_cruda[3] = {
     { 0.2, -1.0, -0.2}
 };
 static const color_t lux_intens_th[3] = {
-    {0.95, 0.90, 0.75},
-    {0.25, 0.35, 0.60},
-    {0.15, 0.12, 0.10}
+    {0.95, 0.90, 0.75, 1.0},
+    {0.25, 0.35, 0.60, 1.0},
+    {0.15, 0.12, 0.10, 1.0}
 };
 
 static color_t iridescentia(double t, const helvea_thema_t *th)
@@ -492,7 +458,8 @@ static color_t iridescentia(double t, const helvea_thema_t *th)
     return (color_t){
         0.5 + 0.5 * cos(phase + th->ir_phase.r),
         0.5 + 0.5 * cos(phase + th->ir_phase.g),
-        0.5 + 0.5 * cos(phase + th->ir_phase.b)
+        0.5 + 0.5 * cos(phase + th->ir_phase.b),
+        1.0
     };
 }
 
@@ -548,7 +515,7 @@ color_t helvea_illuminare_thema(vec3_t punct, vec3_t norm, vec3_t oculus)
         return res;
     }
 
-    color_t res = {mat.r * th->ambiens, mat.g * th->ambiens, mat.b * th->ambiens};
+    color_t res = {mat.r * th->ambiens, mat.g * th->ambiens, mat.b * th->ambiens, 1.0};
 
     for (int i = 0; i < 3; i++) {
         vec3_t ld = normalizare(lux_cruda[i]);
@@ -584,205 +551,3 @@ color_t helvea_illuminare_thema(vec3_t punct, vec3_t norm, vec3_t oculus)
     return res;
 }
 
-/* ================================================================
- * tabula imaginis
- * ================================================================ */
-
-void helvea_tabulam_purgare(helvea_tabula_t *t)
-{
-    size_t n_pix = (size_t)t->latitudo * t->altitudo;
-
-    for (size_t i = 0; i < n_pix; i++)
-        t->profunditatis[i] = 1e30;
-
-    if (t->bytes_pixel == 4) {
-        for (size_t i = 0; i < n_pix; i++) {
-            size_t base = i * 4;
-            t->imaginis[base + 0] = 14;   /* B */
-            t->imaginis[base + 1] = 8;    /* G */
-            t->imaginis[base + 2] = 8;    /* R */
-            t->imaginis[base + 3] = 255;  /* A */
-        }
-    } else {
-        for (size_t i = 0; i < n_pix; i++) {
-            size_t base = i * 3;
-            t->imaginis[base + 0] = 8;
-            t->imaginis[base + 1] = 8;
-            t->imaginis[base + 2] = 14;
-        }
-    }
-}
-
-void helvea_pixel_rgb(helvea_tabula_t *t, int x, int y,
-                      double prof, color_t c)
-{
-    if (x < 0 || x >= t->latitudo || y < 0 || y >= t->altitudo) return;
-    int idx = y * t->latitudo + x;
-    if (prof >= t->profunditatis[idx]) return;
-    t->profunditatis[idx] = prof;
-
-    int base = idx * 3;
-    t->imaginis[base + 0] = gamma_corrigere(c.r);
-    t->imaginis[base + 1] = gamma_corrigere(c.g);
-    t->imaginis[base + 2] = gamma_corrigere(c.b);
-}
-
-void helvea_pixel_bgra(helvea_tabula_t *t, int x, int y,
-                       double prof, color_t c)
-{
-    if (x < 0 || x >= t->latitudo || y < 0 || y >= t->altitudo) return;
-    int idx = y * t->latitudo + x;
-    if (prof >= t->profunditatis[idx]) return;
-    t->profunditatis[idx] = prof;
-
-    int base = idx * 4;
-    t->imaginis[base + 0] = gamma_corrigere(c.b);
-    t->imaginis[base + 1] = gamma_corrigere(c.g);
-    t->imaginis[base + 2] = gamma_corrigere(c.r);
-    t->imaginis[base + 3] = 255;
-}
-
-/* ================================================================
- * fundum bitmap toroidale
- * ================================================================ */
-
-void helvea_fundum_implere(helvea_tabula_t *t,
-                           const unsigned char *bitmap,
-                           int bm_latitudo, int bm_altitudo,
-                           int delta_x, int delta_y)
-{
-    /* delta in [0, bm) normalizare */
-    delta_x = ((delta_x % bm_latitudo) + bm_latitudo) % bm_latitudo;
-    delta_y = ((delta_y % bm_altitudo) + bm_altitudo) % bm_altitudo;
-
-    for (int y = 0; y < t->altitudo; y++) {
-        int by = (y + delta_y) % bm_altitudo;
-        for (int x = 0; x < t->latitudo; x++) {
-            int bx = (x + delta_x) % bm_latitudo;
-            int bm_idx = (by * bm_latitudo + bx) * 3;
-            unsigned char r = bitmap[bm_idx + 0];
-            unsigned char g = bitmap[bm_idx + 1];
-            unsigned char b = bitmap[bm_idx + 2];
-
-            size_t idx = (size_t)y * t->latitudo + x;
-            if (t->bytes_pixel == 4) {
-                size_t base = idx * 4;
-                t->imaginis[base + 0] = b;
-                t->imaginis[base + 1] = g;
-                t->imaginis[base + 2] = r;
-                t->imaginis[base + 3] = 255;
-            } else {
-                size_t base = idx * 3;
-                t->imaginis[base + 0] = r;
-                t->imaginis[base + 1] = g;
-                t->imaginis[base + 2] = b;
-            }
-        }
-    }
-}
-
-/* ================================================================
- * rasterizatio triangulorum
- * ================================================================ */
-
-void helvea_triangulum_reddere(
-    helvea_tabula_t *t,
-    double sx0, double sy0, double sz0, vec3_t p0, vec3_t n0,
-    double sx1, double sy1, double sz1, vec3_t p1, vec3_t n1,
-    double sx2, double sy2, double sz2, vec3_t p2, vec3_t n2,
-    vec3_t oculus,
-    helvea_illuminare_fn illum_fn,
-    helvea_pixel_fn pixel_fn)
-{
-    double area = (sx1 - sx0) * (sy2 - sy0) - (sx2 - sx0) * (sy1 - sy0);
-    if (fabs(area) < 0.5) return;
-    /* backface culling */
-    if (area > 0.0) return;
-    double inv_area = 1.0 / area;
-
-    int min_x = (int)floor(fmin(fmin(sx0, sx1), sx2));
-    int max_x = (int)ceil (fmax(fmax(sx0, sx1), sx2));
-    int min_y = (int)floor(fmin(fmin(sy0, sy1), sy2));
-    int max_y = (int)ceil (fmax(fmax(sy0, sy1), sy2));
-
-    if (min_x < 0) min_x = 0;
-    if (max_x >= t->latitudo) max_x = t->latitudo - 1;
-    if (min_y < 0) min_y = 0;
-    if (max_y >= t->altitudo) max_y = t->altitudo - 1;
-
-    for (int y = min_y; y <= max_y; y++) {
-        double py = y + 0.5;
-        for (int x = min_x; x <= max_x; x++) {
-            double px = x + 0.5;
-
-            double w0 = ((sx1 - px) * (sy2 - py) - (sx2 - px) * (sy1 - py))
-                        * inv_area;
-            double w1 = ((sx2 - px) * (sy0 - py) - (sx0 - px) * (sy2 - py))
-                        * inv_area;
-            double w2 = 1.0 - w0 - w1;
-
-            if (w0 < -0.001 || w1 < -0.001 || w2 < -0.001) continue;
-
-            double z = w0 * sz0 + w1 * sz1 + w2 * sz2;
-
-            vec3_t punct = summa(summa(multiplicare(p0, w0),
-                                     multiplicare(p1, w1)),
-                               multiplicare(p2, w2));
-            vec3_t norm  = normalizare(
-                         summa(summa(multiplicare(n0, w0),
-                                     multiplicare(n1, w1)),
-                               multiplicare(n2, w2)));
-
-            color_t c = illum_fn(punct, norm, oculus);
-            pixel_fn(t, x, y, z, c);
-        }
-    }
-}
-
-/* ================================================================
- * scaenam reddere
- * ================================================================ */
-
-void helvea_scaenam_reddere(
-    helvea_tabula_t *t,
-    const vec3_t *puncta, const vec3_t *normae,
-    int gradus_u, int gradus_v,
-    const camera_t *cam,
-    helvea_illuminare_fn illum_fn,
-    helvea_pixel_fn pixel_fn)
-{
-    for (int i = 0; i < gradus_u; i++) {
-        for (int j = 0; j < gradus_v; j++) {
-            size_t vi[4] = {
-                (size_t)i       * (gradus_v + 1) + j,
-                (size_t)(i + 1) * (gradus_v + 1) + j,
-                (size_t)(i + 1) * (gradus_v + 1) + (j + 1),
-                (size_t)i       * (gradus_v + 1) + (j + 1)
-            };
-
-            double sx[4], sy[4], sz[4];
-            int omnes_visibiles = 1;
-            for (int k = 0; k < 4; k++) {
-                if (!helvea_proicere(cam, puncta[vi[k]],
-                                     &sx[k], &sy[k], &sz[k],
-                                     t->latitudo, t->altitudo)) {
-                    omnes_visibiles = 0;
-                    break;
-                }
-            }
-            if (!omnes_visibiles) continue;
-
-            helvea_triangulum_reddere(t,
-                sx[0], sy[0], sz[0], puncta[vi[0]], normae[vi[0]],
-                sx[1], sy[1], sz[1], puncta[vi[1]], normae[vi[1]],
-                sx[2], sy[2], sz[2], puncta[vi[2]], normae[vi[2]],
-                cam->positio, illum_fn, pixel_fn);
-
-            helvea_triangulum_reddere(t,
-                sx[0], sy[0], sz[0], puncta[vi[0]], normae[vi[0]],
-                sx[2], sy[2], sz[2], puncta[vi[2]], normae[vi[2]],
-                sx[3], sy[3], sz[3], puncta[vi[3]], normae[vi[3]],
-                cam->positio, illum_fn, pixel_fn);
-        }
-    }
-}

@@ -144,7 +144,7 @@ int main(int argc, char **argv)
          * quia sin(0) = sin(2π). */
         double tx = fx / latitudo;  /* [0,1) */
         double ty = fy / altitudo;  /* [0,1) */
-        double y_fascia = 0.5 + (inc_gal / 3.0) * sin(ASTRA_DUO_PI * tx);
+        double y_fascia = 0.5 + (inc_gal / 3.0) * sin(DUO_PI * tx);
         double dy = ty - y_fascia;
         /* toroidale: minima distantia */
         if (dy > 0.5) dy -= 1.0;
@@ -224,7 +224,7 @@ int main(int argc, char **argv)
 
             double cos_incl = alea_f();
             double temp_code = cos_incl * 10000.0;
-            double ang = alea_f() * ASTRA_DUO_PI;
+            double ang = alea_f() * DUO_PI;
             int px = (int)(alea_f() * latitudo);
             int py = (int)(alea_f() * altitudo);
 
@@ -258,7 +258,7 @@ int main(int argc, char **argv)
         double temp = pl_tmin + alea_f() * (pl_tmax - pl_tmin);
         double mag = 1.0 + alea_f() * 3.0;
         double phase = alea_f() * 0.45;
-        double ang = alea_f() * ASTRA_DUO_PI;
+        double ang = alea_f() * DUO_PI;
         int px = (int)(alea_f() * latitudo);
         int py = (int)(alea_f() * altitudo);
 

@@ -63,7 +63,7 @@ static double alea_gauss(void)
  * temperatura ad colorem (approximatio Planck)
  * ================================================================ */
 
-astra_color_t astra_temperatura_ad_colorem(double kelvin)
+color_t astra_temperatura_ad_colorem(double kelvin)
 {
     /* Approximatio Tanner Helland (2012) functionis Planckianae
      * per CIE 1931 2° standard observer.
@@ -94,7 +94,7 @@ astra_color_t astra_temperatura_ad_colorem(double kelvin)
         if (b < 0) b = 0; if (b > 255) b = 255;
     }
 
-    return (astra_color_t){r / 255.0, g / 255.0, b / 255.0, 1.0};
+    return (color_t){r / 255.0, g / 255.0, b / 255.0, 1.0};
 }
 
 /* ================================================================
@@ -485,7 +485,7 @@ void astra_campum_generare(astra_campus_t *c, const astra_parametri_t *p,
 
 /* punctum Gaussianum in fenestra scribere */
 static void fen_punctum(unsigned char *fen, double cx, double cy,
-                        double radius, astra_color_t col, double intensitas)
+                        double radius, color_t col, double intensitas)
 {
     int r0 = (int)(cy - radius * 3) - 1;
     int r1 = (int)(cy + radius * 3) + 2;
@@ -532,7 +532,7 @@ static void fen_punctum(unsigned char *fen, double cx, double cy,
  */
 static void fen_spicula(unsigned char *fen, double cx, double cy,
                         double angulus, double longitudo, double latitudo,
-                        astra_color_t col, double intensitas)
+                        color_t col, double intensitas)
 {
     double dx = cos(angulus);
     double dy = sin(angulus);
@@ -563,7 +563,7 @@ static void reddere_nanum_album(unsigned char *fen,
                                 const astra_sidus_t *s,
                                 const astra_instrumentum_t *instr)
 {
-    astra_color_t col = astra_temperatura_ad_colorem(s->temperatura);
+    color_t col = astra_temperatura_ad_colorem(s->temperatura);
 
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.0;
 
@@ -571,7 +571,7 @@ static void reddere_nanum_album(unsigned char *fen,
     fen_punctum(fen, SEMI, SEMI, 0.6, col, luciditas * 1.5);
 
     /* halo tenuis caeruleus */
-    astra_color_t halo_col = {col.r * 0.6, col.g * 0.7, col.b * 1.0, 1.0};
+    color_t halo_col = {col.r * 0.6, col.g * 0.7, col.b * 1.0, 1.0};
     fen_punctum(fen, SEMI, SEMI, 2.5, halo_col, luciditas * 0.3);
 
     (void)instr;
@@ -581,7 +581,7 @@ static void reddere_sequentia(unsigned char *fen,
                               const astra_sidus_t *s,
                               const astra_instrumentum_t *instr)
 {
-    astra_color_t col = astra_temperatura_ad_colorem(s->temperatura);
+    color_t col = astra_temperatura_ad_colorem(s->temperatura);
 
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.0;
 
@@ -615,7 +615,7 @@ static void reddere_gigas_rubrum(unsigned char *fen,
                                  const astra_sidus_t *s,
                                  const astra_instrumentum_t *instr)
 {
-    astra_color_t col = astra_temperatura_ad_colorem(s->temperatura);
+    color_t col = astra_temperatura_ad_colorem(s->temperatura);
 
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.5;
 
@@ -628,7 +628,7 @@ static void reddere_gigas_rubrum(unsigned char *fen,
     /* discus latus */
     fen_punctum(fen, SEMI, SEMI, r_disc, col, luciditas * 0.5);
     /* halo rubrum */
-    astra_color_t halo = {col.r, col.g * 0.5, col.b * 0.3, 1.0};
+    color_t halo = {col.r, col.g * 0.5, col.b * 0.3, 1.0};
     fen_punctum(fen, SEMI, SEMI, r_disc * 2.0, halo, luciditas * 0.06);
 
     /* spiculae */
@@ -647,7 +647,7 @@ static void reddere_supergigas(unsigned char *fen,
                                const astra_sidus_t *s,
                                const astra_instrumentum_t *instr)
 {
-    astra_color_t col = astra_temperatura_ad_colorem(s->temperatura);
+    color_t col = astra_temperatura_ad_colorem(s->temperatura);
 
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 4.0;
 
@@ -666,7 +666,7 @@ static void reddere_supergigas(unsigned char *fen,
         double my = SEMI + alea_gauss() * r_disc * 0.4;
         double dx = mx - SEMI, dy = my - SEMI;
         if (dx * dx + dy * dy > r_disc * r_disc * 0.6) continue;
-        astra_color_t mc = {col.r * 0.7, col.g * 0.6, col.b * 0.5, 1.0};
+        color_t mc = {col.r * 0.7, col.g * 0.6, col.b * 0.5, 1.0};
         fen_punctum(fen, mx, my, r_disc * 0.2, mc, luciditas * 0.15);
     }
 
@@ -694,11 +694,11 @@ static void reddere_neutronium(unsigned char *fen,
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 3.0;
 
     /* punctum album intensissimum */
-    astra_color_t album = {1.0, 1.0, 1.0, 1.0};
+    color_t album = {1.0, 1.0, 1.0, 1.0};
     fen_punctum(fen, SEMI, SEMI, 0.4, album, luciditas * 2.0);
 
     /* annuli pulsantes — duae tenues fasciae */
-    astra_color_t cyan = {0.3, 0.7, 1.0, 1.0};
+    color_t cyan = {0.3, 0.7, 1.0, 1.0};
     double r1 = 2.0 + luciditas;
     double r2 = 4.0 + luciditas * 2.0;
 
@@ -729,7 +729,7 @@ static void reddere_neutronium(unsigned char *fen,
 
     /* bipolar jets — duae spiculae oppositae */
     double ang_jet = alea_f() * PI_GRAECUM;
-    astra_color_t jet_col = {0.5, 0.6, 1.0, 1.0};
+    color_t jet_col = {0.5, 0.6, 1.0, 1.0};
     fen_spicula(fen, SEMI, SEMI, ang_jet, 12.0 * luciditas, 0.3,
                 jet_col, luciditas * 0.3);
     fen_spicula(fen, SEMI, SEMI, ang_jet + PI_GRAECUM, 12.0 * luciditas, 0.3,
@@ -746,10 +746,10 @@ static void reddere_crystallinum(unsigned char *fen,
     /* stella crystallina: globus Koosh — multa filamenta recta
      * ex centro irradiantia, diversis coloribus spectralibus */
 
-    astra_color_t col = astra_temperatura_ad_colorem(s->temperatura);
+    color_t col = astra_temperatura_ad_colorem(s->temperatura);
 
     /* nucleus album intensum */
-    astra_color_t album = {1.0, 1.0, 1.0, 1.0};
+    color_t album = {1.0, 1.0, 1.0, 1.0};
     fen_punctum(fen, SEMI, SEMI, 1.2, album, luciditas * 1.0);
     fen_punctum(fen, SEMI, SEMI, 0.5, album, luciditas * 1.5);
 
@@ -759,7 +759,7 @@ static void reddere_crystallinum(unsigned char *fen,
     if (n_fil > 60) n_fil = 60;
 
     /* 6 colores spectrales discreti */
-    astra_color_t spectra[6] = {
+    color_t spectra[6] = {
         {1.0, 0.15, 0.1, 1.0},   /* rubrum */
         {1.0, 0.6, 0.05, 1.0},   /* aurantiacum */
         {0.9, 1.0, 0.1, 1.0},    /* flavum */
@@ -778,7 +778,7 @@ static void reddere_crystallinum(unsigned char *fen,
         if (len > 26.0) len = 26.0;
 
         /* color spectrale — unum ex 6 */
-        astra_color_t fc = spectra[alea() % 6];
+        color_t fc = spectra[alea() % 6];
 
         /* intensitas decrescens ab centro */
         int n_steps = (int)(len * 3);
@@ -841,7 +841,7 @@ static void reddere_magnetar(unsigned char *fen,
     double halo_long = 2.0 + alea_f() * 3.0;     /* elongatio hali */
 
     /* nucleus: album intensum cum halo asymmetrico (birefringentia) */
-    astra_color_t album = {1.0, 1.0, 1.0, 1.0};
+    color_t album = {1.0, 1.0, 1.0, 1.0};
     fen_punctum(fen, SEMI, SEMI, 0.5, album, luciditas * 2.0);
 
     /* halo elongatum per axem magneticum (birefringentia vacui).
@@ -858,7 +858,7 @@ static void reddere_magnetar(unsigned char *fen,
         double px = SEMI + t * halo_long * ax;
         double py = SEMI + t * halo_long * ay;
         double f = luciditas * 0.5 * exp(-t * t * 2.0);
-        astra_color_t hc = {0.7, 0.8, 1.0, 1.0};
+        color_t hc = {0.7, 0.8, 1.0, 1.0};
         fen_punctum(fen, px, py, 1.0, hc, f);
     }
 
@@ -878,7 +878,7 @@ static void reddere_magnetar(unsigned char *fen,
      *
      * collimatio: jets magnetaris typice apertura ~5°-30°
      * (Granot+ 2017), strictiores quam jets AGN (~15°-60°). */
-    astra_color_t jet_colores[4] = {
+    color_t jet_colores[4] = {
         {0.4, 0.6, 1.0, 1.0},    /* synchrotron caeruleum */
         {0.7, 0.5, 1.0, 1.0},    /* violaceum */
         {0.3, 0.9, 0.9, 1.0},    /* cyaneum (Compton inversus) */
@@ -890,7 +890,7 @@ static void reddere_magnetar(unsigned char *fen,
 
         for (int fil = 0; fil < jet_fil; fil++) {
             double phase_offset = DUO_PI * fil / (double)jet_fil;
-            astra_color_t jc = jet_colores[fil % 4];
+            color_t jc = jet_colores[fil % 4];
 
             int n_steps = 120;
             for (int j = 0; j <= n_steps; j++) {
@@ -1053,28 +1053,28 @@ static void reddere_galaxia(unsigned char *fen,
      *   metalicitas alta, [Fe/H] ~ 0 ad +0.3 (Thomas+ 2005).
      * spirales: nucleus aureus, brachia caerulea (O/B stellae).
      * irregulares: caerulescentes (formatio stellarum activa). */
-    astra_color_t col_nuc, col_ext;
+    color_t col_nuc, col_ext;
     switch (morph) {
     case GALAXIA_ELLIPTICA:
-        col_nuc = (astra_color_t){1.0, 0.85, 0.6, 1.0};  /* aureum */
-        col_ext = (astra_color_t){0.9, 0.75, 0.55, 1.0};
+        col_nuc = (color_t){1.0, 0.85, 0.6, 1.0};  /* aureum */
+        col_ext = (color_t){0.9, 0.75, 0.55, 1.0};
         break;
     case GALAXIA_LENTICULARIS:
-        col_nuc = (astra_color_t){1.0, 0.88, 0.65, 1.0};
-        col_ext = (astra_color_t){0.85, 0.78, 0.6, 1.0};
+        col_nuc = (color_t){1.0, 0.88, 0.65, 1.0};
+        col_ext = (color_t){0.85, 0.78, 0.6, 1.0};
         break;
     case GALAXIA_SPIRALIS:
     case GALAXIA_SPIRALIS_BARRATA:
-        col_nuc = (astra_color_t){1.0, 0.9, 0.65, 1.0};  /* nucleus aureus */
-        col_ext = (astra_color_t){0.6, 0.75, 1.0, 1.0};  /* brachia caerulea */
+        col_nuc = (color_t){1.0, 0.9, 0.65, 1.0};  /* nucleus aureus */
+        col_ext = (color_t){0.6, 0.75, 1.0, 1.0};  /* brachia caerulea */
         break;
     case GALAXIA_IRREGULARIS:
-        col_nuc = (astra_color_t){0.7, 0.8, 1.0, 1.0};   /* caerulea */
-        col_ext = (astra_color_t){0.6, 0.7, 1.0, 1.0};
+        col_nuc = (color_t){0.7, 0.8, 1.0, 1.0};   /* caerulea */
+        col_ext = (color_t){0.6, 0.7, 1.0, 1.0};
         break;
     default:
-        col_nuc = (astra_color_t){1.0, 0.9, 0.7, 1.0};
-        col_ext = (astra_color_t){0.8, 0.8, 0.8, 1.0};
+        col_nuc = (color_t){1.0, 0.9, 0.7, 1.0};
+        col_ext = (color_t){0.8, 0.8, 0.8, 1.0};
         break;
     }
 
@@ -1107,7 +1107,7 @@ static void reddere_galaxia(unsigned char *fen,
                 double f = luciditas * sersic;
                 if (f < 0.002) continue;
                 /* color: gradiens ab aureo (centrum) ad rubescente (extra) */
-                astra_color_t c;
+                color_t c;
                 double t = r / 3.0; if (t > 1.0) t = 1.0;
                 c.r = col_nuc.r * (1.0 - t) + col_ext.r * t;
                 c.g = col_nuc.g * (1.0 - t) + col_ext.g * t;
@@ -1197,7 +1197,7 @@ static void reddere_galaxia(unsigned char *fen,
                 double f = luciditas * disc;
                 if (f < 0.002) continue;
                 double t = r / (r_eff * 2.5); if (t > 1.0) t = 1.0;
-                astra_color_t c;
+                color_t c;
                 c.r = col_nuc.r * (1.0 - t) + col_ext.r * t;
                 c.g = col_nuc.g * (1.0 - t) + col_ext.g * t;
                 c.b = col_nuc.b * (1.0 - t) + col_ext.b * t;
@@ -1244,7 +1244,7 @@ static void reddere_galaxia(unsigned char *fen,
                 double f = luciditas * disc;
                 if (f < 0.002) continue;
                 double t = r / (r_eff * 2.0); if (t > 1.0) t = 1.0;
-                astra_color_t c;
+                color_t c;
                 c.r = col_nuc.r * (1.0 - t) + col_ext.r * t;
                 c.g = col_nuc.g * (1.0 - t) + col_ext.g * t;
                 c.b = col_nuc.b * (1.0 - t) + col_ext.b * t;
@@ -1282,11 +1282,11 @@ static void reddere_galaxia(unsigned char *fen,
             double nr = 0.5 + alea_f() * 1.5;
             double nf = luciditas * (0.3 + alea_f() * 0.5);
             /* colores: caerulei (formatio stellarum) vel rosei (Hα) */
-            astra_color_t nc;
+            color_t nc;
             if (alea_f() < 0.6)
-                nc = (astra_color_t){0.5, 0.7, 1.0, 1.0};  /* OB stellae */
+                nc = (color_t){0.5, 0.7, 1.0, 1.0};  /* OB stellae */
             else
-                nc = (astra_color_t){1.0, 0.5, 0.6, 1.0};  /* HII Hα */
+                nc = (color_t){1.0, 0.5, 0.6, 1.0};  /* HII Hα */
             fen_punctum(fen, SEMI + nx, SEMI + ny, nr, nc, nf);
         }
     }
@@ -1297,7 +1297,7 @@ static void reddere_planeta(unsigned char *fen,
                             const astra_instrumentum_t *instr)
 {
     (void)instr;
-    astra_color_t col = astra_temperatura_ad_colorem(s->temperatura);
+    color_t col = astra_temperatura_ad_colorem(s->temperatura);
 
     /* planeta: discus maior, matte, cum falce (phase) */
     double radius = 8.0 + pow(10.0, -s->magnitudo * 0.4) * 6.0;

@@ -11,7 +11,7 @@ CAELAE = caelae/terra.isonl caelae/hubble.isonl caelae/jwst.isonl \
          caelae/nuclei.isonl caelae/vacuum.isonl caelae/mortis.isonl \
          caelae/binarium.isonl
 
-omnia: torus_planus torus_animare torus_specta astra_proba caele redde astra_animare
+omnia: torus_planus torus_animare torus_specta astra_proba caele redde astra_animare proba
 
 omnia: $(NOMEN)
 
@@ -55,20 +55,26 @@ $(LIBISON):
 $(LIBPHANTASMA):
 	$(FACE) -C $(APOTHECA)/phantasma
 
-helvea.o: helvea.c helvea.h
+pictura.o: pictura.c pictura.h vectores.h color.h
+	$(CC) $(CFLAGS) -c -o pictura.o pictura.c
+
+helvea.o: helvea.c helvea.h pictura.h vectores.h color.h
 	$(CC) $(CFLAGS) -c -o helvea.o helvea.c
 
-astra.o: astra.c astra.h
+astra.o: astra.c astra.h vectores.h color.h
 	$(CC) $(CFLAGS) -c -o astra.o astra.c
 
-torus_planus: torus_planus.c helvea.o astra.o helvea.h astra.h $(LIBISON)
-	$(CC) $(CFLAGS) -o $@ torus_planus.c helvea.o astra.o $(LIBISON) $(LDFLAGS)
+torus_planus: torus_planus.c pictura.o helvea.o astra.o helvea.h pictura.h astra.h $(LIBISON)
+	$(CC) $(CFLAGS) -o $@ torus_planus.c pictura.o helvea.o astra.o $(LIBISON) $(LDFLAGS)
 
-torus_animare: torus_animare.c helvea.o astra.o helvea.h astra.h $(LIBISON)
-	$(CC) $(CFLAGS) -o $@ torus_animare.c helvea.o astra.o $(LIBISON) $(LDFLAGS)
+torus_animare: torus_animare.c pictura.o helvea.o astra.o helvea.h pictura.h astra.h $(LIBISON)
+	$(CC) $(CFLAGS) -o $@ torus_animare.c pictura.o helvea.o astra.o $(LIBISON) $(LDFLAGS)
 
-torus_specta: torus_specta.c helvea.o astra.o helvea.h astra.h $(LIBISON) $(LIBPHANTASMA)
-	$(CC) $(CFLAGS) -o $@ torus_specta.c helvea.o astra.o $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
+torus_specta: torus_specta.c pictura.o helvea.o astra.o helvea.h pictura.h astra.h $(LIBISON) $(LIBPHANTASMA)
+	$(CC) $(CFLAGS) -o $@ torus_specta.c pictura.o helvea.o astra.o $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
+
+proba: proba.c vectores.h color.h
+	$(CC) $(CFLAGS) -o $@ proba.c -lm
 
 astra_proba: astra_proba.c astra.o astra.h $(LIBISON)
 	$(CC) $(CFLAGS) -o $@ astra_proba.c astra.o $(LIBISON) $(LDFLAGS)
@@ -83,7 +89,7 @@ astra_animare: astra_animare.c astra.o astra.h $(LIBISON) $(LIBPHANTASMA)
 	$(CC) $(CFLAGS) -o $@ astra_animare.c astra.o $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
 purga:
-	rm -f torus_planus torus_animare torus_specta astra_proba caele redde astra_animare helvea.o astra.o caele.o redde.o
+	rm -f torus_planus torus_animare torus_specta astra_proba caele redde astra_animare proba pictura.o helvea.o astra.o caele.o redde.o
 	rm -f caelae/*.ppm caelae/*.isonl
 
 .PHONY: omnia purga caelae lude

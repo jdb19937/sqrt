@@ -35,30 +35,6 @@
 #define GRADUS_V      150
 
 
-/* ================================================================
- * rotatio punctorum circa axem
- * ================================================================ */
-
-static vec3_t rotare_x(vec3_t p, double a)
-{
-    double ca = cos(a), sa = sin(a);
-    return vec3(p.x, p.y * ca - p.z * sa, p.y * sa + p.z * ca);
-}
-
-static vec3_t rotare_y(vec3_t p, double a)
-{
-    double ca = cos(a), sa = sin(a);
-    return vec3(p.x * ca + p.z * sa, p.y, -p.x * sa + p.z * ca);
-}
-
-static vec3_t rotare_z(vec3_t p, double a)
-{
-    double ca = cos(a), sa = sin(a);
-    return vec3(p.x * ca - p.y * sa, p.x * sa + p.y * ca, p.z);
-}
-
-typedef vec3_t (*functio_rotandi)(vec3_t, double);
-
 /* themata et illuminatio thematica nunc in helvea.h/c */
 
 /* ================================================================
@@ -74,7 +50,7 @@ static inline unsigned int aleatorium(void)
     return semen_pfx;
 }
 
-static void pfx_applicare(helvea_tabula_t *t, int pfx, int posteriza_niv)
+static void pfx_applicare(tabula_t *t, int pfx, int posteriza_niv)
 {
     if (pfx == HELVEA_PFX_NULLUS) return;
 
@@ -202,7 +178,7 @@ int main(int argc, char **argv)
     fprintf(stderr, "Campus stellarum paratus.\n");
 
     size_t n_pix = (size_t)LATITUDO_IMG * ALTITUDO_IMG;
-    helvea_tabula_t tab;
+    tabula_t tab;
     tab.latitudo = LATITUDO_IMG;
     tab.altitudo = ALTITUDO_IMG;
     tab.bytes_pixel = 4;
@@ -545,16 +521,16 @@ int main(int argc, char **argv)
         cam.focalis = 1.6;
 
         /* fundum stellarum — toroidaliter volvitur cum (theta, phi) */
-        helvea_tabulam_purgare(&tab);
+        tabulam_purgare(&tab);
         int delta_x = (int)(theta / DUO_PI * campus->latitudo);
         int delta_y = (int)(phi   / DUO_PI * campus->altitudo);
-        helvea_fundum_implere(&tab, campus->pixels,
+        fundum_implere(&tab, campus->pixels,
                               campus->latitudo, campus->altitudo,
                               delta_x, delta_y);
 
-        helvea_scaenam_reddere(&tab, puncta_rot, normae_rot,
+        scaenam_reddere(&tab, puncta_rot, normae_rot,
                                GRADUS_U, GRADUS_V, &cam,
-                               helvea_illuminare_thema, helvea_pixel_bgra);
+                               helvea_illuminare_thema, pixel_bgra);
 
         pfx_applicare(&tab, helvea_themata[helvea_index_thematis].pfx,
                        helvea_themata[helvea_index_thematis].posteriza_niv);

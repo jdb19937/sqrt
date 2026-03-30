@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     }
 
     size_t n_pix = (size_t)LATITUDO_IMG * ALTITUDO_IMG;
-    helvea_tabula_t tab;
+    tabula_t tab;
     tab.latitudo = LATITUDO_IMG;
     tab.altitudo = ALTITUDO_IMG;
     tab.bytes_pixel = 3;
@@ -79,19 +79,19 @@ int main(int argc, char **argv)
                             dist_cam * sin(angulus),
                             alt_cam);
         vec3_t scopus = vec3(0.0, 0.0, -0.05);
-        camera_t cam = helvea_cameram_constituere(pos_cam, scopus);
+        camera_t cam = cameram_constituere(pos_cam, scopus);
 
         /* fundum stellarum — toroidaliter volvitur cum camera */
         int delta_x = (int)(angulus / DUO_PI * campus->latitudo);
         int delta_y = (int)(alt_cam / 4.0 * campus->altitudo);
 
-        helvea_tabulam_purgare(&tab);
-        helvea_fundum_implere(&tab, campus->pixels,
+        tabulam_purgare(&tab);
+        fundum_implere(&tab, campus->pixels,
                               campus->latitudo, campus->altitudo,
                               delta_x, delta_y);
 
-        helvea_scaenam_reddere(&tab, puncta, normae, GRADUS_U, GRADUS_V,
-                               &cam, helvea_illuminare, helvea_pixel_rgb);
+        scaenam_reddere(&tab, puncta, normae, GRADUS_U, GRADUS_V,
+                               &cam, helvea_illuminare, pixel_rgb);
 
         char nomen[256];
         snprintf(nomen, sizeof(nomen), "tabulae/imago_%04d.ppm", f);

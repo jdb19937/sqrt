@@ -108,7 +108,7 @@ int main(void)
     fprintf(stderr, "\nTemperatura ad colorem:\n");
     double tempp[] = {2500, 5800, 10000, 25000, 40000};
     for (int i = 0; i < 5; i++) {
-        astra_color_t col = astra_temperatura_ad_colorem(tempp[i]);
+        color_t col = astra_temperatura_ad_colorem(tempp[i]);
         fprintf(stderr, "  %7.0fK → R=%.2f G=%.2f B=%.2f\n",
                 tempp[i], col.r, col.g, col.b);
     }
