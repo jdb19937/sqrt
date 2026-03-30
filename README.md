@@ -25,11 +25,11 @@ Phong illumination with three directional lights, Fresnel effects, gamma correct
 
 ## Starfields
 
-A procedural starfield generator creates toroidal skies populated with physically-typed stellar objects — white dwarfs, main sequence stars, red giants, supergiants, neutron stars, crystalline stars, magnetars, and planets. Star properties are generated from JSON configuration files and emitted as JSONL; a separate renderer applies optical instrument models and produces the final image.
+A procedural starfield generator creates toroidal skies populated with physically-typed stellar objects — white dwarfs, main sequence stars, red giants, supergiants, neutron stars, crystalline stars, magnetars, and planets. Star properties are generated from ISON configuration files and emitted as ISONL; a separate renderer applies optical instrument models and produces the final image.
 
 ```bash
-./caele caelae/terra.json > caelae/terra.jsonl
-./redde caelae/terra.jsonl caelae/instrumentum.json output.ppm
+./caele campi/terra.ison > caelae/terra.isonl
+./redde caelae/terra.isonl instrumenta/oculus.ison imago.ppm
 ```
 
 ## Programs
@@ -38,9 +38,9 @@ A procedural starfield generator creates toroidal skies populated with physicall
 |---|---|
 | `torus_planus` | Renders a single 1920×1080 image of the corrugated torus |
 | `torus_animare` | Renders a camera-rotation animation sequence (640×480 PPM series) |
-| `torus_specta` | Interactive SDL2 viewer with real-time rotation, multiple themes, and MP4 recording |
-| `caele` | Generates starfield data from JSON configuration |
-| `redde` | Renders starfield JSONL through an optical instrument model to PPM |
+| `torus_specta` | Interactive phantasma viewer with real-time rotation, multiple themes, and MP4 recording |
+| `caele` | Generates starfield data from ISON configuration |
+| `redde` | Renders starfield ISONL through an optical instrument model to PPM |
 
 ## Building
 
@@ -48,7 +48,7 @@ A procedural starfield generator creates toroidal skies populated with physicall
 make
 ```
 
-No external dependencies. C99 and libm. The interactive viewer (`torus_specta`) additionally requires SDL2.
+No external dependencies. C99 and libm. The interactive viewer (`torus_specta`) additionally requires phantasma.
 
 ## Usage
 

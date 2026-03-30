@@ -10,7 +10,7 @@ Immersio isometrica C1 tori plani in spatium Euclideum R3, generatio camporum st
 face
 ```
 
-Nullae dependentiae externae. Solum compilator C99 et libm. Spectator interactivus (`torus_specta`) SDL2 requirit.
+Nullae dependentiae externae. Solum compilator C99 et libm. Spectator interactivus (`torus_specta`) phantasma requirit.
 
 Pendet ab ison (ut submodulum) pro configuratione camporum stellarum.
 
@@ -20,7 +20,7 @@ Pendet ab ison (ut submodulum) pro configuratione camporum stellarum.
 |---|---|
 | `torus_planus` | Una imago 1920×1080 tori corrugati ad `torus_planus.ppm` |
 | `torus_animare` | Series imaginum 640×480, camera rotante. Defaltum 72 imagines |
-| `torus_specta` | Spectator interactivus SDL2 cum rotatione, thematibus, et inscriptione MP4 |
+| `torus_specta` | Spectator interactivus phantasma cum rotatione, thematibus, et inscriptione MP4 |
 | `caele` | Generat campum stellarum ex configuratione ISON, emittit ISONL |
 | `redde` | Reddit campum stellarum ISONL per instrumentum opticum ad PPM |
 
@@ -77,7 +77,7 @@ helvea.c/h          bibliotheca communis tori (superficies, camera, illuminatio,
 astra.c/h           bibliotheca stellarum (genera, generatio, redditio)
 torus_planus.c      imago singularis tori corrugati (1920×1080)
 torus_animare.c     animatio camerae rotantis (640×480, PPM series)
-torus_specta.c      spectator interactivus SDL2
+torus_specta.c      spectator interactivus phantasma
 caele.c             generator camporum stellarum ex ISON ad ISONL
 redde.c             redditor camporum stellarum ex ISONL ad PPM
 astra_proba.c       probationes stellarum
@@ -89,4 +89,4 @@ ison/               submodulum: bibliotheca ISON
 
 ## Dependentiae
 
-Nullae externae. C99 et libm. SDL2 pro `torus_specta` solum.
+Nullae externae. C99 et libm. phantasma pro `torus_specta` solum.
