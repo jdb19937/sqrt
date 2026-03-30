@@ -23,6 +23,7 @@ Pendet ab ison (ut submodulum) pro configuratione camporum stellarum.
 | `torus_specta` | Spectator interactivus phantasma cum rotatione, thematibus, et inscriptione MP4 |
 | `caele` | Generat campum stellarum ex configuratione ISON, emittit ISONL |
 | `redde` | Reddit campum stellarum ISONL per instrumentum opticum ad PPM |
+| `astra_animare` | Animatio campi stellarum cum effectibus dynamicis ad MP4/GIF |
 
 ## Usus
 
@@ -70,6 +71,22 @@ Redditio per rasterizationem triangulorum cum coordinatis barycentricis, z-buffe
 
 Genera siderum: Nanum Album, Sequentia, Gigas Rubrum, Supergigas, Neutronium, Crystallinum, Magnetar, Galaxia, Planeta. Proprietates intrinsecae ex configuratione ISON generantur et ut ISONL emittuntur. Instrumentum opticum (in `instrumenta/`) effectus opticos applicat in redditione.
 
+### Instrumenta
+
+Septem instrumenta optica praesto sunt, unumquodque cum effectibus propriis:
+
+| Instrumentum | Descriptio |
+|---|---|
+| `hst.ison` | Hubble: 4 spiculae, saturatio 1.8 |
+| `jwst.ison` | JWST: 6 spiculae, saturatio 2.0 |
+| `oculus.ison` | Refractor: nullae spiculae, halo debile |
+| `refractor.ison` | Refractor classicus: aberratio chromatica |
+| `terrestre.ison` | Observatorium terrestre: seeing, scintillatio, pollutio luminosa |
+| `navis.ison` | Fenestra navis: vignetta, distorsio, lens toroidalis |
+| `astrophoto.ison` | Astrophotographia: florescentia, acuitas, saturatio alta |
+
+Effectus post-processandi: visio atmosphaerica (blur Gaussianus), scintillatio, refractio atmosphaerica (dislocatio spatiosa localis), caeli lumen (pollutio luminosa), florescentia (bloom), acuitas (unsharp masking), aberratio chromatica, distorsio (lens gravitationalis / barilis), saturatio, vignetta, lens toroidalis. Effectus dynamici (scintillatio, refractio) per `astra_animare` animari possunt.
+
 ### Galaxiae
 
 Galaxiae distantes ut objecta extendida redduntur cum quinque morphologiis (classificatio Hubble 1926): Elliptica (profilo de Vaucouleurs), Spiralis (brachia logarithmica cum pitch variabili), Spiralis Barrata (cum barra centrali), Lenticularis (discus sine brachiis), Irregularis (nodi starburst stochastici). Inclinatio, angulus positionis, et color per galaxiam variant. Distributio magnitudinis Schechter (1976) sequitur: pleraeque parvae et debiles, raro lucidae.
@@ -85,6 +102,7 @@ torus_specta.c      spectator interactivus phantasma
 caele.c             generator camporum stellarum ex ISON ad ISONL
 redde.c             redditor camporum stellarum ex ISONL ad PPM
 astra_proba.c       probationes stellarum
+astra_animare.c     animatio campi stellarum (MP4/GIF)
 caelae/             configurationes camporum stellarum (ISON)
 instrumenta/        configurationes instrumentorum opticorum (ISON)
 schemae/            schemata ISON pro validatione
@@ -93,4 +111,4 @@ ison/               submodulum: bibliotheca ISON
 
 ## Dependentiae
 
-Nullae externae. C99 et libm. phantasma pro `torus_specta` solum.
+Nullae externae. C99 et libm. phantasma pro `torus_specta` et `astra_animare`.

@@ -38,7 +38,10 @@ int main(void)
         .latitudo_galaxiae = 0.12,
         .semen = 42
     };
-    astra_instrumentum_t instr_campus = {0, 0, 0, 3.0, 0.08, 1.0, 1.4, 0};
+    astra_instrumentum_t instr_campus = {
+        .halo_radius = 3.0, .halo_vis = 0.08,
+        .saturatio = 1.4
+    };
     astra_campum_generare(campus, &par, &instr_campus);
 
     /* probatio: aliqui pixels non nigri */
@@ -57,8 +60,11 @@ int main(void)
     /* --- singula genera siderum --- */
     fprintf(stderr, "\nSpecimina generum:\n");
 
-    astra_instrumentum_t instr_lucida = {6, 12.0, 0.15, 5.0, 0.2, 1.0, 1.0, 0};
-    astra_instrumentum_t instr_nulla = {0, 0, 0, 0, 0, 1.0, 1.0, 0};
+    astra_instrumentum_t instr_lucida = {
+        .spiculae = 6, .spiculae_long = 12.0, .spiculae_ang = 0.15,
+        .halo_radius = 5.0, .halo_vis = 0.2, .saturatio = 1.0
+    };
+    astra_instrumentum_t instr_nulla = {.saturatio = 1.0};
 
     struct {
         const char *nomen;

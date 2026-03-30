@@ -1,7 +1,7 @@
 APOTHECA ?= .
 
 CC      ?= cc
-CFLAGS  ?= -Wall -Wextra -pedantic -std=c99 -O2
+CFLAGS  ?= -Wall -Wextra -pedantic -std=c99 -O2 -I$(APOTHECA)/ison -I$(APOTHECA)/phantasma
 LDFLAGS = -lm `cat $(APOTHECA)/phantasma/nexus_phantasma`
 
 LIBISON = $(APOTHECA)/ison/libison.a
@@ -11,7 +11,7 @@ CAELAE = caelae/terra.isonl caelae/hubble.isonl caelae/jwst.isonl \
          caelae/nuclei.isonl caelae/vacuum.isonl caelae/mortis.isonl \
          caelae/binarium.isonl
 
-omnia: torus_planus torus_animare torus_specta astra_proba caele redde
+omnia: torus_planus torus_animare torus_specta astra_proba caele redde astra_animare
 
 omnia: $(NOMEN)
 
@@ -74,13 +74,16 @@ astra_proba: astra_proba.c astra.o astra.h $(LIBISON)
 	$(CC) $(CFLAGS) -o $@ astra_proba.c astra.o $(LIBISON) $(LDFLAGS)
 
 caele: caele.c astra.o astra.h $(LIBISON)
-	$(CC) $(CFLAGS) -I ison -o $@ caele.c astra.o $(LIBISON) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ caele.c astra.o $(LIBISON) $(LDFLAGS)
 
 redde: redde.c astra.o astra.h $(LIBISON)
-	$(CC) $(CFLAGS) -I ison -o $@ redde.c astra.o $(LIBISON) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ redde.c astra.o $(LIBISON) $(LDFLAGS)
+
+astra_animare: astra_animare.c astra.o astra.h $(LIBISON) $(LIBPHANTASMA)
+	$(CC) $(CFLAGS) -o $@ astra_animare.c astra.o $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
 purga:
-	rm -f torus_planus torus_animare torus_specta astra_proba caele redde helvea.o astra.o caele.o redde.o
+	rm -f torus_planus torus_animare torus_specta astra_proba caele redde astra_animare helvea.o astra.o caele.o redde.o
 	rm -f caelae/*.ppm caelae/*.isonl
 
 .PHONY: omnia purga caelae lude

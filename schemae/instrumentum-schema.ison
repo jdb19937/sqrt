@@ -8,7 +8,16 @@
     "halo_vis":       {"type": "string"},
     "amplificatio":   {"type": "string"},
     "saturatio":      {"type": "string"},
-    "aberratio":      {"type": "string"}
+    "aberratio":      {"type": "string"},
+    "visio":          {"type": "string"},
+    "scintillatio":   {"type": "string"},
+    "caeli_lumen":    {"type": "string"},
+    "refractio":      {"type": "string"},
+    "florescentia":   {"type": "string"},
+    "acuitas":        {"type": "string"},
+    "vignetta":       {"type": "string"},
+    "distorsio":      {"type": "string"},
+    "fenestra":       {"type": "string"}
   },
   "required": []
 }

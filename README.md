@@ -34,6 +34,22 @@ Distant galaxies are rendered as extended objects with five Hubble (1926) morpho
 ./redde caelae/terra.isonl instrumenta/oculus.ison imago.ppm
 ```
 
+### Optical Instruments
+
+Seven instrument models with ten post-processing effects applied in physically-motivated order:
+
+| Instrument | Character |
+|---|---|
+| `hst` | Hubble Space Telescope — 4 diffraction spikes, enhanced saturation |
+| `jwst` | James Webb — 6 spikes from hexagonal segments, deep color boost |
+| `oculus` | Ideal refractor — no spikes, minimal halo, clean image |
+| `refractor` | Classical refractor — chromatic aberration (Cauchy dispersion) |
+| `terrestre` | Ground observatory — atmospheric seeing (Kolmogorov 1941, Fried 1966), scintillation (Tatarskii 1961, Dravins+ 1997), light pollution (Garstang 1986, Bortle 2001) |
+| `navis` | Spacecraft window — vignetting (cos⁴ law, Slater 1959), barrel distortion (Brown 1966), toroidal lens (Borrelli+ 2012 Nash-Kuiper curvature concentration, window distortion per Lewis & Stenfors 1998) |
+| `astrophoto` | Astrophotography — bloom (Janesick 2001 CCD saturation), unsharp masking (Malin 1977), aggressive saturation |
+
+Post-processing pipeline: atmospheric blur → scintillation → atmospheric refraction (Roddier 1981, Fried 1966 local displacement with Kolmogorov spatial coherence) → sky glow → bloom → sharpening → chromatic aberration → gravitational lensing / barrel distortion (Bartelmann & Schneider 2001) → color saturation → vignetting → toroidal lens (Borrelli+ 2012). All coordinate transforms wrap toroidally. Dynamic effects (scintillation, refraction) can be animated via `astra_animare`, producing seamlessly looping GIFs with toroidal wrap-around translation (`-wx`/`-wy`).
+
 ## Programs
 
 | Program | What It Does |
@@ -43,6 +59,7 @@ Distant galaxies are rendered as extended objects with five Hubble (1926) morpho
 | `torus_specta` | Interactive phantasma viewer with real-time rotation, multiple themes, and MP4 recording |
 | `caele` | Generates starfield data from ISON configuration |
 | `redde` | Renders starfield ISONL through an optical instrument model to PPM |
+| `astra_animare` | Animated starfield with dynamic atmospheric effects to MP4/GIF |
 
 ## Building
 
@@ -50,7 +67,7 @@ Distant galaxies are rendered as extended objects with five Hubble (1926) morpho
 make
 ```
 
-No external dependencies. C99 and libm. The interactive viewer (`torus_specta`) additionally requires phantasma.
+No external dependencies. C99 and libm. The interactive viewer (`torus_specta`) and starfield animator (`astra_animare`) additionally require phantasma.
 
 ## Usage
 

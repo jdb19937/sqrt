@@ -1,0 +1,14 @@
+{
+  "spiculae": 4,
+  "spiculae_long": "12.0",
+  "spiculae_ang": "0.785",
+  "halo_radius": "5.0",
+  "halo_vis": "0.15",
+  "amplificatio": "1.0",
+  "saturatio": "1.5",
+  "aberratio": "0",
+  "visio": "0.8",
+  "caeli_lumen": "0.04",
+  "scintillatio": "0.10",
+  "refractio": "1.5"
+}
