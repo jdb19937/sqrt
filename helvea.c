@@ -6,20 +6,40 @@
  */
 
 #include "helvea.h"
+#include "bessel.h"
 
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 /* ================================================================
- * superficies tori Hevea — quattuor methodi
+ * superficies tori Hevea — tres methodi
  * ================================================================ */
 
 const char *helvea_nomina_methodorum[HELVEA_NUMERUS_METHODORUM] = {
-    "Corrugata", "Iterata", "Spiralis", "Normalis"
+    "Borrelli", "Borrelliᵀ", "Planus"
 };
 
-/* --- torus sine corrugationis (basis) --- */
+int helvea_strata = 0; /* 0 = praefinitum per methodum */
+
+/* --- torus revolutionis ordinarius (basis omnium methodorum) ---
+ *
+ * Parametrizatio canonica:
+ *   f(u,v) = ((R + r cos v) cos u, (R + r cos v) sin u, r sin v)
+ *
+ * ubi u ∈ [0,2π) est angulus toroidalis (circa circulum magnum
+ * radii R) et v ∈ [0,2π) est angulus poloidalis (circa tubum
+ * radii r).
+ *
+ * Metricum inductum (prima forma fundamentalis):
+ *   g_uu = (R + r cos v)²,  g_uv = 0,  g_vv = r²
+ *
+ * Hoc NON est isometricum toro plano [0,L)×[0,L) cum metrico
+ * Euclidiano ds² = dx² + dy². Error metricus principalis est in
+ * directione u: g_uu variat cum v, dum isometria g_uu = constans
+ * requirit. Circa equatorem (v=0) torus "nimis longus" est;
+ * circa interiorem (v=π) "nimis brevis".
+ */
 
 static vec3_t torus_basis(double u, double v,
                         double radius_maior, double radius_minor)
@@ -33,188 +53,209 @@ static vec3_t torus_basis(double u, double v,
     };
 }
 
-/* --- methodus 0: corrugata (originalis) --- */
-
-static vec3_t superficies_corrugata(double u, double v,
-                                  double R, double r)
-{
-    double corrugatio = 0.0;
-    double perturb_u = 0.0, perturb_v = 0.0;
-    double amp_scala = r / HELVEA_RADIUS_MINOR;
-
-    for (int k = 0; k < HELVEA_STRATA_CORRUG; k++) {
-        double freq = 7.0 * pow(2.8, (double)k);
-        double amp  = 0.035 * amp_scala / pow(1.8, (double)k);
-
-        if (k % 2 == 0) {
-            corrugatio += amp * sin(freq * u + 0.5 * k);
-            perturb_v  += amp * 0.15 * cos(freq * u + 0.5 * k);
-        } else {
-            corrugatio += amp * sin(freq * v + 0.8 * k);
-            perturb_u  += amp * 0.15 * cos(freq * v + 0.8 * k);
-        }
-
-        double amp2 = amp * 0.3;
-        corrugatio += amp2 * sin(freq * u + 1.3 * k)
-                           * sin(freq * v + 0.9 * k);
-    }
-
-    double uu = u + perturb_u;
-    double vv = v + perturb_v;
-    double r_eff = r + corrugatio;
-
-    return (vec3_t){
-        (R + r_eff * cos(vv)) * cos(uu),
-        (R + r_eff * cos(vv)) * sin(uu),
-        r_eff * sin(vv)
-    };
-}
-
-/* --- methodus 1: iterata (Borrelli — integrationes convexae) ---
+/* ================================================================
+ * methodus Borrelli — approximatio immersionis Nash-Kuiper
  *
- * Incipit cum toro ordinario. Per iterationes errorem metricum
- * computat et corrugationes addit quae errorem minuunt.
- * Unaquaeque iteratio frequentiam duplicat et amplitudinem
- * ex errore metricum derivat.
- */
-
-static vec3_t superficies_iterata(double u, double v,
-                                double R, double r)
-{
-    /* torus basalis */
-    double cu = cos(u), su = sin(u);
-    double cv = cos(v), sv = sin(v);
-
-    double px = (R + r * cv) * cu;
-    double py = (R + r * cv) * su;
-    double pz = r * sv;
-
-    /* metricum tori: g_uu = (R + r cos v)^2, g_vv = r^2
-     * metricum planum: g_uu = r^2, g_vv = r^2
-     * error in directione u: (R + r cos v)^2 - r^2 */
-
-    double amp_scala = r / HELVEA_RADIUS_MINOR;
-
-    for (int iter = 0; iter < HELVEA_STRATA_CORRUG; iter++) {
-        /* frequentia geometrice crescens */
-        double freq = 8.0 * pow(3.0, (double)iter);
-        double inv_freq = 1.0 / freq;
-
-        /* error metricus in directione u ad hanc scalam */
-        double g_uu = (R + r * cv) * (R + r * cv);
-        double g_target = r * r;
-        double error = g_uu - g_target;
-        if (error < 0) error = 0;
-
-        /* amplitudo ex errore derivata */
-        double amp = 0.5 * sqrt(error) * inv_freq * amp_scala * 0.15;
-
-        /* corrugatio in directione u (toroidali) */
-        double corr_u = amp * sin(freq * u);
-
-        /* corrugatio in directione v (poloidali) — minor */
-        double amp_v = amp * 0.6;
-        double corr_v = amp_v * sin(freq * v + 1.5 * iter);
-
-        /* normam localem approximare */
-        double nx = cv * cu;
-        double ny = cv * su;
-        double nz = sv;
-
-        /* punctum per normam perturbere */
-        double delta = corr_u + corr_v;
-        px += delta * nx;
-        py += delta * ny;
-        pz += delta * nz;
-    }
-
-    return (vec3_t){px, py, pz};
-}
-
-/* --- methodus 2: spiralis ---
+ * Referentiae:
  *
- * Corrugatio per lineas spirales (u + αv) currit.
- * Character minus graticula, magis organicus.
- */
-
-static vec3_t superficies_spiralis(double u, double v,
-                                 double R, double r)
-{
-    double corrugatio = 0.0;
-    double perturb_u = 0.0, perturb_v = 0.0;
-    double amp_scala = r / HELVEA_RADIUS_MINOR;
-
-    /* ratio aurea pro angulo spiralis */
-    static const double phi = 1.6180339887;
-
-    for (int k = 0; k < HELVEA_STRATA_CORRUG; k++) {
-        double freq = 7.0 * pow(2.8, (double)k);
-        double amp  = 0.035 * amp_scala / pow(1.8, (double)k);
-
-        /* duae spirales: una dexter, altera sinister */
-        double theta_d = freq * (u + phi * v) + 0.7 * k;
-        double theta_s = freq * (u - phi * v) + 1.1 * k;
-
-        corrugatio += amp * 0.5 * sin(theta_d);
-        corrugatio += amp * 0.5 * sin(theta_s);
-
-        /* perturbatio tangentialis per derivatas spiralium */
-        perturb_u += amp * 0.08 * cos(theta_d);
-        perturb_v += amp * 0.08 * phi * cos(theta_d);
-        perturb_u += amp * 0.08 * cos(theta_s);
-        perturb_v -= amp * 0.08 * phi * cos(theta_s);
-
-        /* compositio transversa */
-        double amp2 = amp * 0.25;
-        corrugatio += amp2 * sin(freq * 0.7 * (u + v) + 1.3 * k)
-                           * sin(freq * 0.7 * (u - v) + 0.9 * k);
-    }
-
-    double uu = u + perturb_u;
-    double vv = v + perturb_v;
-    double r_eff = r + corrugatio;
-
-    return (vec3_t){
-        (R + r_eff * cos(vv)) * cos(uu),
-        (R + r_eff * cos(vv)) * sin(uu),
-        r_eff * sin(vv)
-    };
-}
-
-/* --- methodus 3: normalis ---
+ *   Nash, J. (1954). "C¹ isometric imbeddings."
+ *     Annals of Mathematics 60(3):383-396. doi:10.2307/1969840
+ *     Demonstravit omnem varietatem Riemannianam brevem in Rⁿ
+ *     isometrice immergi posse per immersionem C¹ dummodo n
+ *     sufficiat. Resultatum paradoxale: superficies cum metrico
+ *     arbitrario in spatium parvo immergi potest.
  *
- * Incipit cum toro basali, perturbat puncta per normam
- * superficiei. Geometrice mundius — triangula minus deformat.
- */
+ *   Kuiper, N.H. (1955). "On C¹-isometric imbeddings. I, II."
+ *     Indag. Math. 17:545-556, 683-689.
+ *     Extendit Nash ad codimensionem 1: sufficit R³ pro
+ *     superficie. Ergo torus planus T² in R³ immergi potest
+ *     — sed constructio non-explicita.
+ *
+ *   Gromov, M. (1986). "Partial Differential Relations."
+ *     Springer. Introduxit integrationem convexam ut
+ *     framework generalem pro h-principio: relationes
+ *     differentialium partialium sub-determinatae saepe
+ *     solutiones habent dummodo conditiones topologicae
+ *     satisfiant.
+ *
+ *   Borrelli, V.; Jabrane, S.; Lazarus, F.; Thibert, B. (2012).
+ *     "Flat tori in three-dimensional space and convex
+ *     integration." PNAS 109(19):7218-7223.
+ *     doi:10.1073/pnas.1118478109
+ *     Prima visualizatio concreta immersionis Nash-Kuiper
+ *     tori plani. Convertunt integrationem convexam in
+ *     algorithmum explicitum. Codex: hevea-project.fr
+ *
+ * Fundamenta mathematica:
+ *
+ *   EMBEDDING BREVIS vs ISOMETRICA:
+ *     Embedding f: M → R³ est "brevis" si |df(v)| < |v| pro
+ *     omni v — distantias comprimit. Est "isometrica" si
+ *     |df(v)| = |v| — distantias conservat. Nash-Kuiper
+ *     demonstrat: si embedding brevis existit, embedding
+ *     isometrica C¹ etiam existit (sed non C²!).
+ *
+ *   C¹ vs C²:
+ *     Immersio C² tori plani in R³ impossibilis est: tensor
+ *     curvaturaee est invarians isometricus C² varietatum
+ *     Riemannianum (Theorema Egregium Gauss). Torus planus
+ *     curvaturam K=0 ubique habet, sed superficies clausa
+ *     in R³ puncta curaturae positivae habere debet. Ergo
+ *     nulla immersio C² existit. Sed in regularitate C¹
+ *     curvatura sensum amittit — vector normalis fractale
+ *     exhibet et Gauss obstructio evanescit.
+ *
+ *   INTEGRATIO CONVEXA (algorithmus):
+ *     Error metricus Δ = g_planum - f*g_Euclid decomponitur:
+ *       Δ = Σⱼ ρⱼ lⱼ⊗lⱼ    (ρⱼ > 0)
+ *     ubi lⱼ sunt 1-formae lineares quae conum positivum
+ *     formarum bilinearium symmetricarum generant. Sufficiunt
+ *     tres: S=3 per totum processum (Borrelli §2).
+ *
+ *     Pro unaquaque directione lⱼ, embedding corrugatur:
+ *     punctum novum computatur per integrationem ODE cuius
+ *     integrandus est:
+ *
+ *       h(s,t) = r · (cos(θ)·t + sin(θ)·n)
+ *
+ *     ubi θ(q,t) = α(q)·cos(2πNt) et:
+ *       t = df(W)/|df(W)| — directio tangentialis normalizata
+ *       n — normalis superficiei
+ *       W = U + ζV — directio orthogonalizata
+ *       r = √(|df(W)|² + ρⱼ/(V·V)) — radius corrugationis
+ *       α = J₀⁻¹(|df(W)|/r) — angulus per inversam Bessel
+ *
+ *   CUR J₀:
+ *     Post integrationem per unam periodum, derivata directio-
+ *     nalis fit: df_new(W) = r·J₀(α)·t (Borrelli Thm 1 ii).
+ *     Hoc quia ∫₀¹ cos(α·cos(2πt)) dt = J₀(α). Angulus α
+ *     eligitur per J₀⁻¹ ut |df_new(W)| valorem desideratum
+ *     attingat — errorem metricum in directione lⱼ corrigens.
+ *
+ *   FREQUENTIAE (ex codice Hevea et charta):
+ *     N₁=12, N₂=80, N₃=500. Quarta N₄=9000 (charta §3).
+ *     Frequentia crescens: C⁰ proximitas ‖f-f₀‖ ≤ C/N
+ *     (Lemma 1). Amplitudo decrescit cum frequentia crescit.
+ *     Quinta corrugatio amplitudines tam parvas habet ut
+ *     invisibiles sint (hevea-project.fr).
+ *
+ *   CONVERGENTIA:
+ *     Error Δₖ → 0 exponentialiter per δₖ = 1 - e⁻ᵞᵏ.
+ *     In limite: embedding isometrica C¹. Vector normalis
+ *     "fractale" exhibet — auto-similitudinem asymptoticam
+ *     per producta infinita matricum rotationis (Borrelli §3).
+ *
+ *   DIRECTIONES in codice Hevea:
+ *     l₁=(1,0), l₂=(1/√5,2/√5), l₃=(1/√5,-2/√5)
+ *     cum nucleis V₁=(0,1), V₂=(-2,1), V₃=(2,1).
+ *     (Charta descriptionem generalem dat cum directionibus
+ *     U⁽¹⁾=(1,1), U⁽²⁾=(1,-1), U⁽³⁾=(0,√3); codex
+ *     implementationem specifice optimatam adhibet.)
+ *
+ * Haec implementatio:
+ *
+ *   Approximatio closed-form — non integrat ODE sed
+ *   dislocatio-nem per normam superficiei directe computat.
+ *   Character essentialis servatur:
+ *   - tres phasae in tribus directionibus (cyclantes ultra 3)
+ *   - forma undae per J₀⁻¹ (non purus sinus)
+ *   - amplitudo modulata per errorem metricum localem
+ *   - frequentiae ex codice originali
+ *
+ *   Differentia a vero algorithmo: amplitudines calibratae
+ *   sunt visualiter, non ex ODE integratione derivatae.
+ *   Superficies non est vere isometrica sed characterem
+ *   visibilem corrugationis Nash-Kuiper reddit.
+ *
+ * Transposita (HELVEA_BORRELLI_T):
+ *
+ *   Codex Hevea parametros (x,y) = (poloidalis, toroidalis)
+ *   adhibet. Nostrum systema: u = toroidalis, v = poloidalis.
+ *   HELVEA_BORRELLI transponit directiones ut cum imaginibus
+ *   publicatis concordet. HELVEA_BORRELLI_T adhibet directiones
+ *   non transpositas — orientatio altera, aeque valida.
+ * ================================================================ */
 
-static vec3_t superficies_normalis(double u, double v,
-                                 double R, double r)
+static vec3_t superficies_borrelli(double u, double v,
+                                   double R, double r,
+                                   int transpone)
 {
     vec3_t p = torus_basis(u, v, R, r);
 
-    /* norma tori basalis */
     double cu = cos(u), su = sin(u);
     double cv = cos(v), sv = sin(v);
     vec3_t n = vec3(cv * cu, cv * su, sv);
 
-    double amp_scala = r / HELVEA_RADIUS_MINOR;
+    /*
+     * Error metricus tori revolutionis:
+     * g_uu = (R + r cos v)², g_vv = r², g_uv = 0
+     * Metricum planum (target): g_uu = g_vv = constans
+     * Error principalis in directione u: (R + r cos v)² - r²
+     *
+     * In vero algorithmum, h = r·(cos(α·β)·z + sin(α·β)·n)
+     * est integrandus (derivata embedding). Integratio per
+     * unam periodum producit oscillationem amplitudinis ~r/(2πN).
+     * Hic approximamus displacementum directe.
+     */
+
+    /* tres directiones corrugationis (in spatio parametrico [0,2π]²)
+     *
+     * Hevea codex parametros (x,y) = (poloidalis, toroidalis) adhibet.
+     * Nostrum systema: u = toroidalis, v = poloidalis.
+     * Ergo directiones transponendae: Hevea (a,b) → nostrum (b,a).
+     *
+     * Hevea: l₁=(1,0), l₂=(1/√5,2/√5), l₃=(1/√5,-2/√5)
+     * Nostrum: l₁=(0,1), l₂=(2/√5,1/√5), l₃=(-2/√5,1/√5)
+     */
+    /* orientatio Hevea (transpone=0) vel transposita (transpone=1) */
+    static const double hevea_u[3] = { 0.0,   2.0 / 2.236, -2.0 / 2.236 };
+    static const double hevea_v[3] = { 1.0,   1.0 / 2.236,  1.0 / 2.236 };
+    static const double trans_u[3] = { 1.0,   1.0 / 2.236,  1.0 / 2.236 };
+    static const double trans_v[3] = { 0.0,   2.0 / 2.236, -2.0 / 2.236 };
+    const double *dir_u = transpone ? trans_u : hevea_u;
+    const double *dir_v = transpone ? trans_v : hevea_v;
+
+    /* oscillationes per phasam.
+     * Primae tres ex codice originali (12, 80, 500).
+     * Ulteriores geometrice crescunt (×6.5 per phasam). */
+    static const double N_oscil[HELVEA_STRATA_MAX] = {
+        12.0, 80.0, 500.0, 9000.0, 60000.0, 400000.0, 2600000.0
+    };
+
+    /* amplitudo per phasam — decrescens */
+    static const double amp_basis[HELVEA_STRATA_MAX] = {
+        0.15, 0.025, 0.004, 0.0007, 0.00012, 0.00002, 0.0000035
+    };
+
+    int strata = helvea_strata > 0 ? helvea_strata : 3;
+    if (strata > HELVEA_STRATA_MAX) strata = HELVEA_STRATA_MAX;
+
     double dislocatio = 0.0;
 
-    for (int k = 0; k < HELVEA_STRATA_CORRUG; k++) {
-        double freq = 7.0 * pow(2.8, (double)k);
-        double amp  = 0.035 * amp_scala / pow(1.8, (double)k);
+    for (int phase = 0; phase < strata; phase++) {
+        double lu = dir_u[phase % 3];
+        double lv = dir_v[phase % 3];
+        double N = N_oscil[phase];
 
-        /* corrugationes in ambabus directionibus */
-        if (k % 2 == 0) {
-            dislocatio += amp * sin(freq * u + 0.5 * k);
-        } else {
-            dislocatio += amp * sin(freq * v + 0.8 * k);
-        }
+        /* parameter per directionem corrugationis */
+        double t = lu * u + lv * v;
 
-        /* compositio transversa */
-        double amp2 = amp * 0.3;
-        dislocatio += amp2 * sin(freq * u + 1.3 * k)
-                           * sin(freq * v + 0.9 * k);
+        /* error metricus modulat amplitudinem localiter:
+         * corrugatio fortior ubi torus ab isometria magis deviat
+         * (circa equatorem, ubi R + r cos v maximus) */
+        double stretch = (R + r * cv) / (R + r);
+        double amp = amp_basis[phase] * r * (0.3 + 0.7 * stretch);
+
+        /* angulus per inversam Bessel J₀:
+         * determinat formam undae — non purus sinus sed
+         * "corrugatio truncata" characteristica Borrelli.
+         * Ratio |z|/r_corr ex errore metrico. */
+        double rho = stretch * stretch;
+        double alpha = bessel_j0_inversa(0.3 + 0.6 * rho);
+
+        /* oscillatio */
+        double beta = cos(N * t);
+        dislocatio += amp * sin(alpha * beta);
     }
 
     return summa(p, multiplicare(n, dislocatio));
@@ -229,16 +270,14 @@ vec3_t helvea_superficies(double u, double v,
                         helvea_methodus_t methodus)
 {
     switch (methodus) {
-    case HELVEA_CORRUGATA:
-        return superficies_corrugata(u, v, radius_maior, radius_minor);
-    case HELVEA_ITERATA:
-        return superficies_iterata(u, v, radius_maior, radius_minor);
-    case HELVEA_SPIRALIS:
-        return superficies_spiralis(u, v, radius_maior, radius_minor);
-    case HELVEA_NORMALIS:
-        return superficies_normalis(u, v, radius_maior, radius_minor);
+    case HELVEA_BORRELLI:
+        return superficies_borrelli(u, v, radius_maior, radius_minor, 0);
+    case HELVEA_BORRELLI_T:
+        return superficies_borrelli(u, v, radius_maior, radius_minor, 1);
+    case HELVEA_PLANUS:
+        return torus_basis(u, v, radius_maior, radius_minor);
     }
-    return superficies_corrugata(u, v, radius_maior, radius_minor);
+    return torus_basis(u, v, radius_maior, radius_minor);
 }
 
 vec3_t helvea_norma(double u, double v,
@@ -345,6 +384,12 @@ int helvea_index_thematis = 0;
 const int helvea_numerus_thematum = 16;
 
 const helvea_thema_t helvea_themata[16] = {
+    /* --- mixta (primum) --- */
+    { "Vitrum", LUX_IRIDESCENS, HELVEA_PFX_LINEAE | HELVEA_PFX_NIGRESCO,
+        4.5, {1.0, 3.0, 5.0, 1.0}, 0.65,
+        {0.30, 0.30, 0.35, 1.0}, {0.70, 0.75, 0.90, 1.0}, 0.60,
+        80.0, 0.55, 0.04, 0, 0, RAMPA_NUL
+    },
     /* --- iridescentes --- */
     { "Oleum", LUX_IRIDESCENS, HELVEA_PFX_NULLUS,
         4.0, {0.0, 2.1, 4.2, 1.0}, 0.75,
@@ -427,11 +472,6 @@ const helvea_thema_t helvea_themata[16] = {
         30.0, 0.20, 0.06, 3, 0, RAMPA_NUL
     },
     /* --- mixta --- */
-    { "Vitrum", LUX_IRIDESCENS, HELVEA_PFX_LINEAE | HELVEA_PFX_NIGRESCO,
-        4.5, {1.0, 3.0, 5.0, 1.0}, 0.65,
-        {0.30, 0.30, 0.35, 1.0}, {0.70, 0.75, 0.90, 1.0}, 0.60,
-        80.0, 0.55, 0.04, 0, 0, RAMPA_NUL
-    },
     { "Somnium", LUX_IRIDESCENS,
         HELVEA_PFX_POSTERIZA | HELVEA_PFX_NIGRESCO | HELVEA_PFX_GRANUM,
         2.0, {0.5, 2.5, 4.0, 1.0}, 0.60,

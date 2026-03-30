@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 
     helvea_superficiem_computare(puncta, normae, GRADUS_U, GRADUS_V,
                                  HELVEA_RADIUS_MAIOR, HELVEA_RADIUS_MINOR,
-                                 HELVEA_CORRUGATA);
+                                 HELVEA_BORRELLI);
 
     fprintf(stderr, "Animationem reddens: %d imagines\n", numerus_imaginum);
 

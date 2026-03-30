@@ -58,7 +58,7 @@ $(LIBPHANTASMA):
 pictura.o: pictura.c pictura.h vectores.h color.h
 	$(CC) $(CFLAGS) -c -o pictura.o pictura.c
 
-helvea.o: helvea.c helvea.h pictura.h vectores.h color.h
+helvea.o: helvea.c helvea.h pictura.h vectores.h color.h bessel.h
 	$(CC) $(CFLAGS) -c -o helvea.o helvea.c
 
 astra.o: astra.c astra.h vectores.h color.h
@@ -73,7 +73,7 @@ torus_animare: torus_animare.c pictura.o helvea.o astra.o helvea.h pictura.h ast
 torus_specta: torus_specta.c pictura.o helvea.o astra.o helvea.h pictura.h astra.h $(LIBISON) $(LIBPHANTASMA)
 	$(CC) $(CFLAGS) -o $@ torus_specta.c pictura.o helvea.o astra.o $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
-proba: proba.c vectores.h color.h
+proba: proba.c vectores.h color.h bessel.h
 	$(CC) $(CFLAGS) -o $@ proba.c -lm
 
 astra_proba: astra_proba.c astra.o astra.h $(LIBISON)

@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 
     helvea_superficiem_computare(puncta, normae, GRADUS_U, GRADUS_V,
                                  HELVEA_RADIUS_MAIOR, HELVEA_RADIUS_MINOR,
-                                 HELVEA_CORRUGATA);
+                                 HELVEA_BORRELLI);
 
     /* cameram constituere */
     vec3_t positio_camerae = vec3(2.6, -2.0, 1.5);

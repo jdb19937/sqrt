@@ -10,22 +10,26 @@
 
 #include "pictura.h"
 
-#define HELVEA_STRATA_CORRUG    5
+#define HELVEA_STRATA_MAX       7
 #define HELVEA_RADIUS_MAIOR     1.0
 #define HELVEA_RADIUS_MINOR     0.42
+
+/* profunditas detalli — numerus phasium corrugationis Borrelli.
+ * 1..HELVEA_STRATA_MAX. Originale Borrelli: 3 phasae.
+ * Programmata hunc valorem mutant pro UI. */
+extern int helvea_strata;
 
 /* ================================================================
  * superficies tori Hevea
  * ================================================================ */
 
 typedef enum {
-    HELVEA_CORRUGATA,   /* corrugatio multi-scalaris originalis */
-    HELVEA_ITERATA,     /* integrationes convexae iteratae (Borrelli) */
-    HELVEA_SPIRALIS,    /* corrugatio spiralis */
-    HELVEA_NORMALIS     /* corrugatio per normam superficiei */
+    HELVEA_BORRELLI,    /* approximatio Nash-Kuiper (Borrelli 2012) */
+    HELVEA_BORRELLI_T,  /* Borrelli transposita (orientatio altera) */
+    HELVEA_PLANUS       /* torus revolutionis ordinarius (sine corrugationibus) */
 } helvea_methodus_t;
 
-#define HELVEA_NUMERUS_METHODORUM 4
+#define HELVEA_NUMERUS_METHODORUM 3
 
 extern const char *helvea_nomina_methodorum[HELVEA_NUMERUS_METHODORUM];
 

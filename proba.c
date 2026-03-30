@@ -1,12 +1,13 @@
 /*
  * proba.c — probationes operationum communium
  *
- * Probat vectores.h (operationes vectoriales, rotationes)
- * et color.h (color_t, gamma_corrigere).
+ * Probat vectores.h (operationes vectoriales, rotationes),
+ * color.h (color_t, gamma_corrigere), et bessel.h (J₀, J₁, J₀⁻¹).
  */
 
 #include "vectores.h"
 #include "color.h"
+#include "bessel.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -180,18 +181,85 @@ static void proba_color_structura(void)
 }
 
 /* ================================================================
+ * functiones Bessel
+ * ================================================================ */
+
+static void proba_bessel(void)
+{
+    fprintf(stderr, "bessel_j0:\n");
+
+    /* J₀(0) = 1 */
+    expecta_prope("J0(0)", bessel_j0(0.0), 1.0, 1e-7);
+
+    /* J₀(2.4048) ≈ 0 (prima radix) */
+    expecta_prope("J0(2.4048)", bessel_j0(2.404825557695773), 0.0, 1e-6);
+
+    /* J₀(1.0) ≈ 0.7651976866 */
+    expecta_prope("J0(1.0)", bessel_j0(1.0), 0.7651976866, 1e-6);
+
+    /* J₀(5.0) ≈ -0.1775967713 */
+    expecta_prope("J0(5.0)", bessel_j0(5.0), -0.1775967713, 1e-6);
+
+    fprintf(stderr, "  BENE\n");
+
+    fprintf(stderr, "bessel_j1:\n");
+
+    /* J₁(0) = 0 */
+    expecta_prope("J1(0)", bessel_j1(0.0), 0.0, 1e-7);
+
+    /* J₁(1.0) ≈ 0.4400505857 */
+    expecta_prope("J1(1.0)", bessel_j1(1.0), 0.4400505857, 1e-6);
+
+    /* J₁ antisymmetrica: J₁(-x) = -J₁(x) */
+    expecta_prope("J1(-3.0)", bessel_j1(-3.0), -bessel_j1(3.0), 1e-12);
+
+    fprintf(stderr, "  BENE\n");
+
+    fprintf(stderr, "bessel_j0_inversa:\n");
+
+    /* J₀⁻¹(1) = 0 */
+    expecta_prope("J0inv(1)", bessel_j0_inversa(1.0), 0.0, 1e-7);
+
+    /* J₀⁻¹(0) ≈ 2.4048 */
+    expecta_prope("J0inv(0)", bessel_j0_inversa(0.0), 2.404825557695773, 1e-6);
+
+    /* inversio: J₀(J₀⁻¹(x)) = x */
+    double vals[] = {0.1, 0.3, 0.5, 0.7, 0.9};
+    for (int i = 0; i < 5; i++) {
+        double x = vals[i];
+        double y = bessel_j0_inversa(x);
+        char nomen[32];
+        snprintf(nomen, sizeof(nomen), "J0(J0inv(%.1f))", x);
+        expecta_prope(nomen, bessel_j0(y), x, 1e-6);
+    }
+
+    /* monotonia: J₀⁻¹ decrescens */
+    double inv25 = bessel_j0_inversa(0.25);
+    double inv50 = bessel_j0_inversa(0.50);
+    double inv75 = bessel_j0_inversa(0.75);
+    if (!(inv25 > inv50 && inv50 > inv75)) {
+        fprintf(stderr, "  MALUM: monotonia J0inv %.4f, %.4f, %.4f\n",
+                inv25, inv50, inv75);
+        errores++;
+    }
+
+    fprintf(stderr, "  BENE\n");
+}
+
+/* ================================================================
  * principale
  * ================================================================ */
 
 int main(void)
 {
-    fprintf(stderr, "=== PROBA: vectores.h + color.h ===\n\n");
+    fprintf(stderr, "=== PROBA: vectores.h + color.h + bessel.h ===\n\n");
 
     proba_vec3_fundamenta();
     proba_magnitudo();
     proba_rotationes();
     proba_gamma();
     proba_color_structura();
+    proba_bessel();
 
     fprintf(stderr, "\n%s\n", errores == 0 ? "Omnes probationes praeterierunt."
                                             : "ERRORES inventi!");

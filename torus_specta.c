@@ -31,8 +31,10 @@
 
 #define LATITUDO_IMG  768
 #define ALTITUDO_IMG  768
-#define GRADUS_U      300
-#define GRADUS_V      150
+#define GRADUS_U_INIT 300
+#define GRADUS_V_INIT 150
+#define GRADUS_MIN    40
+#define GRADUS_MAX    2000
 
 
 /* themata et illuminatio thematica nunc in helvea.h/c */
@@ -147,13 +149,18 @@ int main(int argc, char **argv)
 
     double radius_maior = HELVEA_RADIUS_MAIOR;
     double radius_minor = HELVEA_RADIUS_MINOR;
-    helvea_methodus_t methodus = HELVEA_CORRUGATA;
+    helvea_methodus_t methodus = HELVEA_BORRELLI;
+    helvea_strata = 5;
+    int gradus = 6;
+    #define GRADUS_U(g) (10 * (1 << (g)))
+    #define GRADUS_V(g) (5 * (1 << (g)))
 
-    size_t n_vert = (size_t)(GRADUS_U + 1) * (GRADUS_V + 1);
+    size_t n_vert = (size_t)(GRADUS_U(gradus) + 1) * (GRADUS_V(gradus) + 1);
     vec3_t *puncta_orig = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
     vec3_t *normae_orig = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
     vec3_t *puncta_rot  = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
     vec3_t *normae_rot  = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
+    int gradus_mutatus = 0;
 
     if (!puncta_orig || !normae_orig || !puncta_rot || !normae_rot) {
         fprintf(stderr, "ERROR: memoria insufficiens!\n");
@@ -161,7 +168,7 @@ int main(int argc, char **argv)
     }
 
     helvea_superficiem_computare(puncta_orig, normae_orig,
-                                 GRADUS_U, GRADUS_V,
+                                 GRADUS_U(gradus), GRADUS_V(gradus),
                                  radius_maior, radius_minor, methodus);
     int superficies_obsoleta = 0;
     fprintf(stderr, "Superficies parata: %zu vertices.\n", n_vert);
@@ -225,8 +232,8 @@ int main(int argc, char **argv)
     double phi         = 0.4;    /* poloidalis (verticalis) */
     double distantia   = 3.2;
     double angulus_rot  = 0.0;
-    double celeritas    = 0.12;
-    int    axis_index   = 2;
+    double celeritas    = 0.36;
+    int    axis_index   = 1;
     int    rotatio_activa = 1;
 
     functio_rotandi rotationes[3] = { rotare_x, rotare_y, rotare_z };
@@ -392,9 +399,30 @@ int main(int argc, char **argv)
                 case 'm':
                     methodus = (methodus + 1) % HELVEA_NUMERUS_METHODORUM;
                     superficies_obsoleta = 1;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "Methodus [%d]: %s",
-                             methodus, helvea_nomina_methodorum[methodus]);
+                    break;
+                case PFR_CL_5:
+                    helvea_strata--;
+                    if (helvea_strata < 1) helvea_strata = 1;
+                    superficies_obsoleta = 1;
+                    break;
+                case PFR_CL_6:
+                    helvea_strata++;
+                    if (helvea_strata > HELVEA_STRATA_MAX) helvea_strata = HELVEA_STRATA_MAX;
+                    superficies_obsoleta = 1;
+                    break;
+                case PFR_CL_7:
+                    if (gradus > 1) {
+                        gradus--;
+                        gradus_mutatus = 1;
+                        superficies_obsoleta = 1;
+                    }
+                    break;
+                case PFR_CL_8:
+                    if (gradus < 7) {
+                        gradus++;
+                        gradus_mutatus = 1;
+                        superficies_obsoleta = 1;
+                    }
                     break;
                 case 'c':
                     if (!inscr_mp4) {
@@ -453,10 +481,10 @@ int main(int argc, char **argv)
                     rotatio_activa = 1;
                     if (radius_maior != HELVEA_RADIUS_MAIOR ||
                         radius_minor != HELVEA_RADIUS_MINOR ||
-                        methodus != HELVEA_CORRUGATA) {
+                        methodus != HELVEA_BORRELLI) {
                         radius_maior = HELVEA_RADIUS_MAIOR;
                         radius_minor = HELVEA_RADIUS_MINOR;
-                        methodus = HELVEA_CORRUGATA;
+                        methodus = HELVEA_BORRELLI;
                         superficies_obsoleta = 1;
                     }
                     snprintf(status_nuntius, sizeof(status_nuntius),
@@ -489,9 +517,18 @@ int main(int argc, char **argv)
         if (rotatio_activa)
             angulus_rot += celeritas * dt;
 
+        if (gradus_mutatus) {
+            n_vert = (size_t)(GRADUS_U(gradus) + 1) * (GRADUS_V(gradus) + 1);
+            puncta_orig = (vec3_t *)realloc(puncta_orig, n_vert * sizeof(vec3_t));
+            normae_orig = (vec3_t *)realloc(normae_orig, n_vert * sizeof(vec3_t));
+            puncta_rot  = (vec3_t *)realloc(puncta_rot,  n_vert * sizeof(vec3_t));
+            normae_rot  = (vec3_t *)realloc(normae_rot,  n_vert * sizeof(vec3_t));
+            gradus_mutatus = 0;
+        }
+
         if (superficies_obsoleta) {
             helvea_superficiem_computare(puncta_orig, normae_orig,
-                                         GRADUS_U, GRADUS_V,
+                                         GRADUS_U(gradus), GRADUS_V(gradus),
                                          radius_maior, radius_minor, methodus);
             superficies_obsoleta = 0;
         }
@@ -529,7 +566,7 @@ int main(int argc, char **argv)
                               delta_x, delta_y);
 
         scaenam_reddere(&tab, puncta_rot, normae_rot,
-                               GRADUS_U, GRADUS_V, &cam,
+                               GRADUS_U(gradus), GRADUS_V(gradus), &cam,
                                helvea_illuminare_thema, pixel_bgra);
 
         pfx_applicare(&tab, helvea_themata[helvea_index_thematis].pfx,
@@ -601,10 +638,12 @@ int main(int argc, char **argv)
         pfr_u32 intervallum_fps = tempus_nunc_fps - tempus_fps;
         if (intervallum_fps >= 1000) {
             double fps = tabulae_fps * 1000.0 / intervallum_fps;
-            fprintf(stderr, "\r\033[K%.0f fps | %s | %s | %s | %.2f rad/s",
+            fprintf(stderr, "\r\033[K%3.0f fps | %-12s | %-10s s%d g%d | %s | %4.2f rad/s",
                     fps,
                     helvea_themata[helvea_index_thematis].nomen,
                     helvea_nomina_methodorum[methodus],
+                    helvea_strata,
+                    gradus,
                     nomina_axium[axis_index],
                     celeritas);
             if (status_nuntius[0]) {
