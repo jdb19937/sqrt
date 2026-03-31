@@ -1485,7 +1485,7 @@ planeta_t planeta_ex_ison(const char *ison)
  * ================================================================ */
 
 void planeta_instrumentum_applicare(const planeta_t *planeta,
-                                    astra_instrumentum_t *instr)
+                                    instrumentum_t *instr)
 {
     double a = fmin(1.0, planeta->pressio_kPa / 101.0);
     if (a < 0.005) return;

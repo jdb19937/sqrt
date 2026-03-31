@@ -15,10 +15,10 @@
 #define PI_GRAECUM 3.14159265358979323846
 #define DUO_PI     (2.0 * PI_GRAECUM)
 
-#define FEN ASTRA_FENESTRA
+#define FEN SIDUS_FENESTRA
 #define SEMI (FEN / 2)
 
-const char *astra_nomina_generum[SIDUS_NUMERUS] = {
+const char *sidus_nomina_generum[SIDUS_NUMERUS] = {
     "Nanum Album",
     "Sequentia",
     "Gigas Rubrum",
@@ -62,7 +62,7 @@ static double alea_gauss(void)
  * temperatura ad colorem (approximatio Planck)
  * ================================================================ */
 
-color_t astra_temperatura_ad_colorem(double kelvin)
+color_t sidus_temperatura_ad_colorem(double kelvin)
 {
     /* Approximatio Tanner Helland (2012) functionis Planckianae
      * per CIE 1931 2° standard observer.
@@ -177,10 +177,10 @@ static void fen_spicula(unsigned char *fen, double cx, double cy,
  * ================================================================ */
 
 static void reddere_nanum_album(unsigned char *fen,
-                                const astra_sidus_t *s,
-                                const astra_instrumentum_t *instr)
+                                const sidus_t *s,
+                                const instrumentum_t *instr)
 {
-    color_t col = astra_temperatura_ad_colorem(s->temperatura);
+    color_t col = sidus_temperatura_ad_colorem(s->temperatura);
 
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.0;
 
@@ -195,10 +195,10 @@ static void reddere_nanum_album(unsigned char *fen,
 }
 
 static void reddere_sequentia(unsigned char *fen,
-                              const astra_sidus_t *s,
-                              const astra_instrumentum_t *instr)
+                              const sidus_t *s,
+                              const instrumentum_t *instr)
 {
-    color_t col = astra_temperatura_ad_colorem(s->temperatura);
+    color_t col = sidus_temperatura_ad_colorem(s->temperatura);
 
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.0;
 
@@ -229,10 +229,10 @@ static void reddere_sequentia(unsigned char *fen,
 }
 
 static void reddere_gigas_rubrum(unsigned char *fen,
-                                 const astra_sidus_t *s,
-                                 const astra_instrumentum_t *instr)
+                                 const sidus_t *s,
+                                 const instrumentum_t *instr)
 {
-    color_t col = astra_temperatura_ad_colorem(s->temperatura);
+    color_t col = sidus_temperatura_ad_colorem(s->temperatura);
 
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.5;
 
@@ -261,10 +261,10 @@ static void reddere_gigas_rubrum(unsigned char *fen,
 }
 
 static void reddere_supergigas(unsigned char *fen,
-                               const astra_sidus_t *s,
-                               const astra_instrumentum_t *instr)
+                               const sidus_t *s,
+                               const instrumentum_t *instr)
 {
-    color_t col = astra_temperatura_ad_colorem(s->temperatura);
+    color_t col = sidus_temperatura_ad_colorem(s->temperatura);
 
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 4.0;
 
@@ -304,8 +304,8 @@ static void reddere_supergigas(unsigned char *fen,
 }
 
 static void reddere_neutronium(unsigned char *fen,
-                               const astra_sidus_t *s,
-                               const astra_instrumentum_t *instr)
+                               const sidus_t *s,
+                               const instrumentum_t *instr)
 {
     (void)instr;
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 3.0;
@@ -354,8 +354,8 @@ static void reddere_neutronium(unsigned char *fen,
 }
 
 static void reddere_crystallinum(unsigned char *fen,
-                                 const astra_sidus_t *s,
-                                 const astra_instrumentum_t *instr)
+                                 const sidus_t *s,
+                                 const instrumentum_t *instr)
 {
     (void)instr;
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.5;
@@ -363,7 +363,7 @@ static void reddere_crystallinum(unsigned char *fen,
     /* stella crystallina: globus Koosh — multa filamenta recta
      * ex centro irradiantia, diversis coloribus spectralibus */
 
-    color_t col = astra_temperatura_ad_colorem(s->temperatura);
+    color_t col = sidus_temperatura_ad_colorem(s->temperatura);
 
     /* nucleus album intensum */
     color_t album = {1.0, 1.0, 1.0, 1.0};
@@ -425,8 +425,8 @@ static void reddere_crystallinum(unsigned char *fen,
  * Halo birefringens: vacuum QED prope B_Schwinger lucem
  * in duos modos polares separat (Heisenberg-Euler 1936). */
 static void reddere_magnetar(unsigned char *fen,
-                              const astra_sidus_t *s,
-                              const astra_instrumentum_t *instr)
+                              const sidus_t *s,
+                              const instrumentum_t *instr)
 {
     (void)instr;
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 3.0;
@@ -619,8 +619,8 @@ static void reddere_magnetar(unsigned char *fen,
  *   ubi r uniformis — pleraeque debiles, paucae lucidae.
  */
 static void reddere_galaxia(unsigned char *fen,
-                             const astra_sidus_t *s,
-                             const astra_instrumentum_t *instr)
+                             const sidus_t *s,
+                             const instrumentum_t *instr)
 {
     (void)instr;
 
@@ -910,11 +910,11 @@ static void reddere_galaxia(unsigned char *fen,
 }
 
 static void reddere_vagans(unsigned char *fen,
-                            const astra_sidus_t *s,
-                            const astra_instrumentum_t *instr)
+                            const sidus_t *s,
+                            const instrumentum_t *instr)
 {
     (void)instr;
-    color_t col = astra_temperatura_ad_colorem(s->temperatura);
+    color_t col = sidus_temperatura_ad_colorem(s->temperatura);
 
     /* vagans: discus maior, matte, cum falce (phase) */
     double radius = 8.0 + pow(10.0, -s->magnitudo * 0.4) * 6.0;
@@ -978,9 +978,9 @@ static void reddere_vagans(unsigned char *fen,
  * dispatcher
  * ================================================================ */
 
-void astra_sidus_reddere(unsigned char *fenestra,
-                         const astra_sidus_t *sidus,
-                         const astra_instrumentum_t *instrumentum)
+void sidus_reddere(unsigned char *fenestra,
+                         const sidus_t *sidus,
+                         const instrumentum_t *instrumentum)
 {
     memset(fenestra, 0, FEN * FEN * 4);
 

@@ -1,0 +1,9 @@
+{
+  "nomen": "Andromeda",
+  "phylum": "sidus",
+  "genus": "galaxia",
+  "magnitudo": 3.44,
+  "temperatura": 6500,
+  "phase": 1,
+  "angulus_phase": 0.6
+}

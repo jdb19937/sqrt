@@ -11,7 +11,7 @@ typedef struct {
     unsigned char *pixels;   /* RGB, latitudo * altitudo * 3 */
     int            latitudo;
     int            altitudo;
-} astra_campus_t;
+} campus_t;
 
 #include "sidus.h"
 #include "instrumentum.h"
@@ -89,29 +89,29 @@ typedef struct {
     /* galaxiae distantes */
     int    numerus_galaxiarum;    /* galaxiae totales tentandae */
     int    max_galaxiae;          /* maximum galaxiarum positarum (0 = illimitatum) */
-} astra_parametri_t;
+} campus_parametri_t;
 
 /* campum creare et destruere */
-astra_campus_t *astra_campum_creare(int latitudo, int altitudo);
-void astra_campum_destruere(astra_campus_t *c);
+campus_t *campus_creare(int latitudo, int altitudo);
+void campus_destruere(campus_t *c);
 
 /* campum stellarum generare — instrumentum separatum a campo */
-void astra_campum_generare(astra_campus_t *c, const astra_parametri_t *p,
-                           const astra_instrumentum_t *instrumentum);
+void campus_generare(campus_t *c, const campus_parametri_t *p,
+                           const instrumentum_t *instrumentum);
 
 /* pixel in campum toroidalem scribere (coordinatae modulantur) */
-void astra_pixel_scribere(astra_campus_t *c, int x, int y,
+void campus_pixel_scribere(campus_t *c, int x, int y,
                           unsigned char r, unsigned char g, unsigned char b);
 
 /*
- * astra_regio_vacua — inspicit an regio circa (cx,cy) satis obscura sit.
+ * campus_regio_vacua — inspicit an regio circa (cx,cy) satis obscura sit.
  * radius: distantia minimalis in pixelis.
  * reddit 1 si regio vacua, 0 si iam stella praesens.
  */
-int astra_regio_vacua(const astra_campus_t *c, int cx, int cy, int radius);
+int campus_regio_vacua(const campus_t *c, int cx, int cy, int radius);
 
 /* sidus (64×64) in campum inserere ad positionem (x,y) — toroidale */
-void astra_sidus_in_campum(astra_campus_t *c, int cx, int cy,
+void sidus_in_campum(campus_t *c, int cx, int cy,
                            const unsigned char *fenestra);
 
 /*
@@ -119,25 +119,25 @@ void astra_sidus_in_campum(astra_campus_t *c, int cx, int cy,
  * scala: fractio magnitudinis (1.0 = 256px, 0.5 = 128px).
  * Planetae redduntur ultimi quia proximi sunt observatori.
  */
-void planeta_in_campum(astra_campus_t *c, int cx, int cy,
+void planeta_in_campum(campus_t *c, int cx, int cy,
                        const unsigned char *fenestra, double scala);
 
 /*
- * astra_ex_isonl_reddere — campum stellarum ex ISONL et instrumento reddit.
+ * campus_ex_isonl_reddere — campum stellarum ex ISONL et instrumento reddit.
  * Legit ISONL (stellae fixae ex caele), applicat instrumentum opticum,
- * reddit campum paratum. Vocans campum per astra_campum_destruere liberet.
+ * reddit campum paratum. Vocans campum per campus_destruere liberet.
  * Reddit NULL si error.
  */
-astra_campus_t *astra_ex_isonl_reddere(const char *via_isonl,
+campus_t *campus_ex_isonl_reddere(const char *via_isonl,
                                         const char *via_instrumentum);
 
 /* post-processare: effectus instrumenti applicare ad campum */
-void isonl_post_processare(astra_campus_t *c,
-                            const astra_instrumentum_t *inst);
+void isonl_post_processare(campus_t *c,
+                            const instrumentum_t *inst);
 
 /* tabula dynamica: campum cum effectibus temporalibus reddere */
-astra_campus_t *astra_tabulam_dynamicam(const astra_campus_t *basis,
-                                         const astra_instrumentum_t *inst,
+campus_t *campus_tabulam_dynamicam(const campus_t *basis,
+                                         const instrumentum_t *inst,
                                          int tabula,
                                          int scala,
                                          double dx, double dy);

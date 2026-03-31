@@ -24,7 +24,7 @@ static unsigned int semen_g = 1;
  * effectus post-processationis
  * ================================================================ */
 
-static void pp_visio(astra_campus_t *c, double radius,
+static void pp_visio(campus_t *c, double radius,
                      unsigned char *copia)
 {
     int L = c->latitudo, A = c->altitudo;
@@ -88,7 +88,7 @@ static void pp_visio(astra_campus_t *c, double radius,
 /* scintillatio — variatio pseudo-aleatoriae intensitatis per pixel.
  * Tatarskii (1961): σ²_I ∝ C_n² ∫ Φ_n(κ) dκ.
  * simplificamus ad rumorem multiplicativum. */
-static void pp_scintillatio(astra_campus_t *c, double amplitudo)
+static void pp_scintillatio(campus_t *c, double amplitudo)
 {
     int L = c->latitudo, A = c->altitudo;
     unsigned char *px = c->pixels;
@@ -116,7 +116,7 @@ static void pp_scintillatio(astra_campus_t *c, double amplitudo)
  * distantiam parvam. coherentia spatiosa per hash de (x/s, y/s)
  * ubi s = scala cellulae turbulentiae (Kolmogorov inner scale).
  * Fried (1966): σ_θ ≈ 0.42 λ/r_0. toroidale involutum. */
-static void pp_refractio(astra_campus_t *c, double amplitudo,
+static void pp_refractio(campus_t *c, double amplitudo,
                          unsigned char *copia)
 {
     int L = c->latitudo, A = c->altitudo;
@@ -173,7 +173,7 @@ static void pp_refractio(astra_campus_t *c, double amplitudo,
 /* caeli lumen — glow additivum uniformem (pollutio luminosa).
  * color calidus aurantiacus ex sodii lampade (Garstang 1986)
  * cum componente caerulea ex dispersione Rayleigh. */
-static void pp_caeli_lumen(astra_campus_t *c, double intensitas)
+static void pp_caeli_lumen(campus_t *c, double intensitas)
 {
     int L = c->latitudo, A = c->altitudo;
     unsigned char *px = c->pixels;
@@ -195,7 +195,7 @@ static void pp_caeli_lumen(astra_campus_t *c, double intensitas)
 /* florescentia — bloom: regiones lucidae halo diffusum emittunt.
  * extractio supra limen, blur Gaussianus, additio.
  * Janesick (2001): CCD blooming ex saturatione pixelorum. */
-static void pp_florescentia(astra_campus_t *c, double radius,
+static void pp_florescentia(campus_t *c, double radius,
                             unsigned char *copia)
 {
     int L = c->latitudo, A = c->altitudo;
@@ -292,7 +292,7 @@ static void pp_florescentia(astra_campus_t *c, double radius,
 
 /* acuitas — unsharp masking (Malin 1977).
  * I_acuta = I + α(I - I_blur). α > 0 acuit, α < 0 lenit. */
-static void pp_acuitas(astra_campus_t *c, double factor,
+static void pp_acuitas(campus_t *c, double factor,
                        unsigned char *copia)
 {
     int L = c->latitudo, A = c->altitudo;
@@ -324,7 +324,7 @@ static void pp_acuitas(astra_campus_t *c, double factor,
 
 /* aberratio chromatica — separatio canalium R et B radialis.
  * Cauchy: n(λ) = A + B/λ². Toroidale involutum. */
-static void pp_aberratio(astra_campus_t *c, double aberratio,
+static void pp_aberratio(campus_t *c, double aberratio,
                          unsigned char *copia)
 {
     int L = c->latitudo, A = c->altitudo;
@@ -361,7 +361,7 @@ static void pp_aberratio(astra_campus_t *c, double aberratio,
  *   shear γ = γ₁ + iγ₂ (deformatio elliptica)
  * hic simplificamus ad distorsionem radialem symmetricam.
  * omnes coordinatae toroidaliter involutae. */
-static void pp_distorsio(astra_campus_t *c, double coeff,
+static void pp_distorsio(campus_t *c, double coeff,
                          unsigned char *copia)
 {
     int L = c->latitudo, A = c->altitudo;
@@ -388,7 +388,7 @@ static void pp_distorsio(astra_campus_t *c, double coeff,
 }
 
 /* saturatio coloris — CIE 1931 luminantia preservata. */
-static void pp_saturatio(astra_campus_t *c, double saturatio)
+static void pp_saturatio(campus_t *c, double saturatio)
 {
     int L = c->latitudo, A = c->altitudo;
     unsigned char *px = c->pixels;
@@ -412,7 +412,7 @@ static void pp_saturatio(astra_campus_t *c, double saturatio)
 
 /* vignetta — obscuratio marginalis cos⁴(θ) (Slater 1959).
  * distantia toroidalis a centro imaginis. */
-static void pp_vignetta(astra_campus_t *c, double fortitudo)
+static void pp_vignetta(campus_t *c, double fortitudo)
 {
     int L = c->latitudo, A = c->altitudo;
     unsigned char *px = c->pixels;
@@ -459,7 +459,7 @@ static void pp_vignetta(astra_campus_t *c, double fortitudo)
  * (Conti, De Lellis & Székelyhidi 2012) inventa.
  *
  * fenestra = 0: nulla. >0: fortitudo effectus. */
-static void pp_fenestra(astra_campus_t *c, double fortitudo,
+static void pp_fenestra(campus_t *c, double fortitudo,
                         unsigned char *copia)
 {
     int L = c->latitudo, A = c->altitudo;
@@ -511,8 +511,8 @@ static void pp_fenestra(astra_campus_t *c, double fortitudo,
 }
 
 /* pipeline post-processationis — omnes effectus in ordine physico */
-void isonl_post_processare(astra_campus_t *c,
-                            const astra_instrumentum_t *inst)
+void isonl_post_processare(campus_t *c,
+                            const instrumentum_t *inst)
 {
     size_t n = (size_t)c->latitudo * c->altitudo * 3;
 
@@ -565,8 +565,8 @@ void isonl_post_processare(astra_campus_t *c,
  * In campo 360°, una revolutio = 24h = 86400 tabulae ad 1/s.
  * ================================================================ */
 
-astra_campus_t *astra_tabulam_dynamicam(const astra_campus_t *basis,
-                                         const astra_instrumentum_t *inst,
+campus_t *campus_tabulam_dynamicam(const campus_t *basis,
+                                         const instrumentum_t *inst,
                                          int tabula,
                                          int scala,
                                          double dx, double dy)
@@ -576,7 +576,7 @@ astra_campus_t *astra_tabulam_dynamicam(const astra_campus_t *basis,
     if (oL < 1) oL = 1;
     if (oA < 1) oA = 1;
 
-    astra_campus_t *out = astra_campum_creare(oL, oA);
+    campus_t *out = campus_creare(oL, oA);
     int off_x = (int)(dx + 0.5);
     int off_y = (int)(dy + 0.5);
 
@@ -603,7 +603,7 @@ astra_campus_t *astra_tabulam_dynamicam(const astra_campus_t *basis,
     }
 
     /* effectus dynamici — semen mutatur per tabulam */
-    astra_instrumentum_t dyn;
+    instrumentum_t dyn;
     memset(&dyn, 0, sizeof(dyn));
     dyn.saturatio = 1.0;
 

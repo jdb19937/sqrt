@@ -1,5 +1,5 @@
 /*
- * astra_proba.c — probatio bibliothecae astrorum
+ * proba_astra.c — probatio bibliothecae astrorum
  *
  * Probat generationem campi et redditionem siderum in memoria.
  * Nullas plicas scribit.
@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define FEN ASTRA_FENESTRA
+#define FEN SIDUS_FENESTRA
 
 /* numerum pixelorum non nigrorum in fenestra computare */
 static int pixels_activos(const unsigned char *rgba, int n_pix)
@@ -32,19 +32,19 @@ int main(void)
 
     /* --- campum stellarum --- */
     fprintf(stderr, "Campum generans (256x128)...\n");
-    astra_campus_t *campus = astra_campum_creare(256, 128);
-    astra_parametri_t par = {
+    campus_t *campus = campus_creare(256, 128);
+    campus_parametri_t par = {
         .numerus_stellarum = 2000,
         .densitas_galaxiae = 0.7,
         .inclinatio_galaxiae = 0.3,
         .latitudo_galaxiae = 0.12,
         .semen = 42
     };
-    astra_instrumentum_t instr_campus = {
+    instrumentum_t instr_campus = {
         .halo_radius = 3.0, .halo_vis = 0.08,
         .saturatio = 1.4
     };
-    astra_campum_generare(campus, &par, &instr_campus);
+    campus_generare(campus, &par, &instr_campus);
 
     /* probatio: aliqui pixels non nigri */
     int activi = 0;
@@ -57,21 +57,21 @@ int main(void)
         fprintf(stderr, "  campus: nullus pixel activus — MALUM\n");
         errores++;
     }
-    astra_campum_destruere(campus);
+    campus_destruere(campus);
 
     /* --- singula genera siderum --- */
     fprintf(stderr, "\nSpecimina generum:\n");
 
-    astra_instrumentum_t instr_lucida = {
+    instrumentum_t instr_lucida = {
         .spiculae = 6, .spiculae_long = 12.0, .spiculae_ang = 0.15,
         .halo_radius = 5.0, .halo_vis = 0.2, .saturatio = 1.0
     };
-    astra_instrumentum_t instr_nulla = {.saturatio = 1.0};
+    instrumentum_t instr_nulla = {.saturatio = 1.0};
 
     struct {
         const char *nomen;
-        astra_sidus_t sidus;
-        astra_instrumentum_t *instr;
+        sidus_t sidus;
+        instrumentum_t *instr;
     } specimina[] = {
         {"nanum_album",      {SIDUS_NANUM_ALBUM,  1.0, 25000,   0, 0}, &instr_lucida},
         {"sequentia",        {SIDUS_SEQUENTIA,     0.5, 5800,    0, 0}, &instr_lucida},
@@ -87,15 +87,15 @@ int main(void)
         {"gal_lenticularis", {SIDUS_GALAXIA,       4.5, 6000,    GALAXIA_LENTICULARIS, 0.8}, &instr_nulla},
         {"gal_irregularis",  {SIDUS_GALAXIA,       4.0, 9000,    GALAXIA_IRREGULARIS, 3.5}, &instr_nulla},
         {"gal_edge_on",      {SIDUS_GALAXIA,       3.8, 500,     GALAXIA_SPIRALIS, 0.0}, &instr_nulla},
-        {"planeta_plenus",   {SIDUS_VAGANS,       1.0, 5500,    0.0, 0.5}, &instr_nulla},
-        {"planeta_falcatus", {SIDUS_VAGANS,       1.5, 4500,    0.35, 0.8}, &instr_nulla},
+        {"planeta_plenus",   {SIDUS_VAGANS,        1.0, 5500,    0.0, 0.5}, &instr_nulla},
+        {"planeta_falcatus", {SIDUS_VAGANS,        1.5, 4500,    0.35, 0.8}, &instr_nulla},
     };
 
     int n_spec = (int)(sizeof(specimina) / sizeof(specimina[0]));
     unsigned char fen[FEN * FEN * 4];
 
     for (int i = 0; i < n_spec; i++) {
-        astra_sidus_reddere(fen, &specimina[i].sidus, specimina[i].instr);
+        sidus_reddere(fen, &specimina[i].sidus, specimina[i].instr);
         int px = pixels_activos(fen, FEN * FEN);
 
         if (px > 0) {
@@ -110,7 +110,7 @@ int main(void)
     fprintf(stderr, "\nTemperatura ad colorem:\n");
     double tempp[] = {2500, 5800, 10000, 25000, 40000};
     for (int i = 0; i < 5; i++) {
-        color_t col = astra_temperatura_ad_colorem(tempp[i]);
+        color_t col = sidus_temperatura_ad_colorem(tempp[i]);
         fprintf(stderr, "  %7.0fK → R=%.2f G=%.2f B=%.2f\n",
                 tempp[i], col.r, col.g, col.b);
     }

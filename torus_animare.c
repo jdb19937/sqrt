@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 
     /* campum stellarum ex ISONL reddere */
     fprintf(stderr, "Campum stellarum reddens: %s + %s\n", via_isonl, via_instr);
-    astra_campus_t *campus = astra_ex_isonl_reddere(via_isonl, via_instr);
+    campus_t *campus = campus_ex_isonl_reddere(via_isonl, via_instr);
     if (!campus) {
         fprintf(stderr, "ERROR: campus stellarum reddere non possum!\n");
         return 1;
@@ -107,7 +107,7 @@ int main(int argc, char **argv)
         fclose(fas);
     }
 
-    astra_campum_destruere(campus);
+    campus_destruere(campus);
     free(tab.imaginis);
     free(tab.profunditatis);
     free(puncta);

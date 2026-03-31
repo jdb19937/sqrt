@@ -1,12 +1,12 @@
 /*
- * caelae_proba.c — probatio pipeline: caele → isonl → reddit
+ * proba_caelae.c — probatio pipeline: caele → isonl → reddit
  *
  * Pro quaque plica .isonl in caelae/ directorio:
- *   1. legit campum stellarum via astra_ex_isonl_reddere()
+ *   1. legit campum stellarum via campus_ex_isonl_reddere()
  *   2. scribit PPM in proba_caelae/
  *   3. numerat pixels non nigros
  *
- * Usus: ./caelae_proba [instrumentum.ison]
+ * Usus: ./proba_caelae [instrumentum.ison]
  *   (praefinitum: instrumenta/jwst.ison)
  */
 
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 #else
     {
         char cmd[64];
-        snprintf(cmd, sizeof(cmd), "mkdir -p proba_caelae");
+        snprintf(cmd, sizeof(cmd), "mkdir -p probae/caelae");
         (void)system(cmd);
     }
 #endif
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
         char via_isonl[256];
         snprintf(via_isonl, sizeof(via_isonl), "caelae/%s", nomen);
 
-        astra_campus_t *campus = astra_ex_isonl_reddere(via_isonl, via_instr);
+        campus_t *campus = campus_ex_isonl_reddere(via_isonl, via_instr);
         if (!campus) {
             fprintf(stderr, "  MALUM: %s reddere non possum\n", via_isonl);
             n_mala++;
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
         basis[blen] = '\0';
 
         char via_ppm[256];
-        snprintf(via_ppm, sizeof(via_ppm), "proba_caelae/%s.ppm", basis);
+        snprintf(via_ppm, sizeof(via_ppm), "probae/caelae/%s.ppm", basis);
 
         scribe_ppm(via_ppm, campus->pixels, campus->latitudo, campus->altitudo);
 
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
 
         if (px > 0) n_bona++; else { fprintf(stderr, "    MALUM: nullus pixel\n"); n_mala++; }
 
-        astra_campum_destruere(campus);
+        campus_destruere(campus);
     }
     closedir(dir);
 

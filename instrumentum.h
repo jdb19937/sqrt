@@ -193,6 +193,6 @@ typedef struct {
     double vignetta;         /* obscuratio marginalis cos⁴ (0 = nulla) */
     double distorsio;        /* lens gravitationalis / barilis toroidale (0 = nulla) */
     double fenestra;         /* maschera superelliptica fractio (0 = nulla) */
-} astra_instrumentum_t;
+} instrumentum_t;
 
 #endif /* INSTRUMENTUM_H */

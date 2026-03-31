@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     }
 
     fprintf(stderr, "Stellas reddens: %s + %s\n", argv[1], argv[2]);
-    astra_campus_t *campus = astra_ex_isonl_reddere(argv[1], argv[2]);
+    campus_t *campus = campus_ex_isonl_reddere(argv[1], argv[2]);
     if (!campus) {
         fprintf(stderr, "ERROR: campus reddere non possum\n");
         return 1;
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 
     if (f != stdout) fclose(f);
 
-    astra_campum_destruere(campus);
+    campus_destruere(campus);
 
     fprintf(stderr, "Opus perfectum est.\n");
     return 0;

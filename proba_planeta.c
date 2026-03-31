@@ -1,8 +1,8 @@
 /*
- * planeta_proba.c — reddit omnes planetas in PPM
+ * proba_planeta.c — reddit omnes planetas in PPM
  *
- * Legit omnes .ison plicas ex planetae/ directorio,
- * reddit unumquemque in 256×256 imaginem.
+ * Legit omnes .ison plicas ex astrae/planetae/ directorio,
+ * reddit unumquemque in 512×512 imaginem.
  */
 
 #include "planeta.h"
@@ -38,8 +38,8 @@ int main(void)
     unsigned char *fen = (unsigned char *)calloc(PLANETA_FENESTRA * PLANETA_FENESTRA * 4, 1);
     if (!fen) { fprintf(stderr, "ERROR: memoria\n"); return 1; }
 
-    DIR *dir = opendir("planetae");
-    if (!dir) { fprintf(stderr, "ERROR: planetae/ aperire non possum\n"); return 1; }
+    DIR *dir = opendir("astrae/planetae");
+    if (!dir) { fprintf(stderr, "ERROR: astrae/planetae/ aperire non possum\n"); return 1; }
 
     struct dirent *ent;
     int n = 0;
@@ -50,7 +50,7 @@ int main(void)
         if (len < 6 || strcmp(nomen + len - 5, ".ison") != 0) continue;
 
         char via_ison[256];
-        snprintf(via_ison, sizeof(via_ison), "planetae/%s", nomen);
+        snprintf(via_ison, sizeof(via_ison), "astrae/planetae/%s", nomen);
 
         char *ison = ison_lege_plicam(via_ison);
         if (!ison) {
@@ -74,7 +74,7 @@ int main(void)
         basis[len - 5] = '\0';
 
         char via_ppm[256];
-        snprintf(via_ppm, sizeof(via_ppm), "proba_planetae/%s.ppm", basis);
+        snprintf(via_ppm, sizeof(via_ppm), "probae/planetae/%s.ppm", basis);
 
         scribe_ppm(via_ppm, fen, PLANETA_FENESTRA, PLANETA_FENESTRA);
         fprintf(stderr, "  %-20s → %s\n", nomen, via_ppm);

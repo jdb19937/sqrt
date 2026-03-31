@@ -179,7 +179,7 @@ int main(int argc, char **argv)
     const char *via_isonl = "caelae/terra.isonl";
     const char *via_instr = "instrumenta/oculus.ison";
     fprintf(stderr, "Campum stellarum reddens: %s + %s\n", via_isonl, via_instr);
-    astra_campus_t *campus = astra_ex_isonl_reddere(via_isonl, via_instr);
+    campus_t *campus = campus_ex_isonl_reddere(via_isonl, via_instr);
     if (!campus) {
         fprintf(stderr, "ERROR: campus stellarum reddere non possum!\n");
         return 1;
@@ -699,7 +699,7 @@ int main(int argc, char **argv)
         pfr_gif_fini(orbita_gif);
     }
 
-    astra_campum_destruere(campus);
+    campus_destruere(campus);
     free(puncta_orig);
     free(normae_orig);
     free(puncta_rot);

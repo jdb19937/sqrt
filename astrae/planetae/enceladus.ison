@@ -1,0 +1,16 @@
+{
+  "nomen": "Enceladus",
+  "genus": "parvum",
+  "radius": 0.9,
+  "inclinatio": 0.03,
+  "rotatio": 1.6,
+  "semen": 60251,
+
+  "glacies": 0.95,
+  "silicata": 0.05,
+
+  "scala": 1.0,
+  "craterae": 0.15,
+
+  "pressio_kPa": 0.0
+}

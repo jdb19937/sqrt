@@ -1,0 +1,21 @@
+{
+  "nomen": "Venus",
+  "genus": "saxosum",
+  "radius": 0.9,
+  "inclinatio": 0.046,
+  "rotatio": 1.2,
+  "semen": 20099,
+
+  "silicata": 0.50,
+  "ferrum": 0.20,
+
+  "scala": 1.0,
+  "tectonica": 0.5,
+  "vulcanismus": 0.4,
+
+  "pressio_kPa": 9200.0,
+  "co2": 0.965,
+  "n2": 0.035,
+  "nubes": 0.98,
+  "pulvis": 0.3
+}

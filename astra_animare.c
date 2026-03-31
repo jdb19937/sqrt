@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
     /* campum stellarum staticum reddere */
     fprintf(stderr, "Campum reddens: %s + %s\n", via_isonl, via_instr);
-    astra_campus_t *basis = astra_ex_isonl_reddere(via_isonl, via_instr);
+    campus_t *basis = campus_ex_isonl_reddere(via_isonl, via_instr);
     if (!basis) {
         fprintf(stderr, "ERROR: campus reddere non possum\n");
         return 1;
@@ -107,7 +107,7 @@ int main(int argc, char **argv)
 
     /* instrumentum legere pro effectibus dynamicis */
     char *instr_ison = ison_lege_plicam(via_instr);
-    astra_instrumentum_t inst;
+    instrumentum_t inst;
     memset(&inst, 0, sizeof(inst));
     inst.saturatio = 1.0;
     if (instr_ison) {
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
             ty = (double)wy * basis->altitudo * f / num_tab;
         }
 
-        astra_campus_t *tab = astra_tabulam_dynamicam(
+        campus_t *tab = campus_tabulam_dynamicam(
             basis, &inst, f, scala, tx, ty);
 
         rgb_ad_argb(argb, tab->pixels, oL, oA);
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
         if (mp4) pfr_mp4_tabulam_adde(mp4, argb);
         if (gif) pfr_gif_tabulam_adde(gif, argb);
 
-        astra_campum_destruere(tab);
+        campus_destruere(tab);
     }
 
     fprintf(stderr, "\n");
@@ -170,7 +170,7 @@ int main(int argc, char **argv)
     if (gif) { pfr_gif_fini(gif); fprintf(stderr, "GIF: %s\n", via_gif); }
 
     free(argb);
-    astra_campum_destruere(basis);
+    campus_destruere(basis);
 
     fprintf(stderr, "Animatio perfecta est.\n");
     return 0;

@@ -1,7 +1,7 @@
 /*
  * planeta.h — renderer planetarum et lunarum
  *
- * Reddit corpora in fenestra 256×256 pixelorum.
+ * Reddit corpora in fenestra 512×512 pixelorum.
  * Colores emergunt ex proprietatibus physicis: compositione
  * chimica superficiei, pressione atmosphaerica, etc.
  * Nullae overrides colorum — physica sola determinat apparentiam.
@@ -155,6 +155,6 @@ void planeta_reddere(unsigned char *fenestra, const planeta_t *planeta,
 planeta_t planeta_ex_ison(const char *ison);
 
 void planeta_instrumentum_applicare(const planeta_t *planeta,
-                                    astra_instrumentum_t *instr);
+                                    instrumentum_t *instr);
 
 #endif /* PLANETA_H */

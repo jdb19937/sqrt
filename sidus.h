@@ -34,7 +34,7 @@
 #include "instrumentum.h"
 
 #include <math.h>
-#define ASTRA_FENESTRA  64      /* latitudo et altitudo fenestrae sideris */
+#define SIDUS_FENESTRA  64      /* latitudo et altitudo fenestrae sideris */
 
 /*
  * Genus sideris — ex diagrammate Hertzsprung-Russell (1911).
@@ -191,9 +191,9 @@ typedef enum {
     SIDUS_GALAXIA,          /* galaxia distans */
     SIDUS_VAGANS,
     SIDUS_NUMERUS
-} astra_genus_t;
+} sidus_genus_t;
 
-extern const char *astra_nomina_generum[SIDUS_NUMERUS];
+extern const char *sidus_nomina_generum[SIDUS_NUMERUS];
 
 /*
  * Morphologia galaxiae — classificatio Hubble (1926).
@@ -215,26 +215,26 @@ typedef enum {
  *   SIDUS_GALAXIA:  phase = morphologia (galaxia_morphologia_t),
  *                   angulus_phase = angulus positionis in caelo. */
 typedef struct {
-    astra_genus_t genus;
+    sidus_genus_t genus;
     double        magnitudo;     /* magnitudo apparens (0=lucidissimum, 6=vix visibile) */
     double        temperatura;   /* temperatura coloris (Kelvin), 2000-40000 */
     double        phase;         /* phase planetae vel morphologia galaxiae */
     double        angulus_phase; /* angulus illuminationis vel positionis */
-} astra_sidus_t;
+} sidus_t;
 
 /* ================================================================
  * sidus reddere
  *
  * Reddit sidus in fenestram 64x64.
- * fenestra: RGBA buffer, ASTRA_FENESTRA * ASTRA_FENESTRA * 4 bytes.
+ * fenestra: RGBA buffer, SIDUS_FENESTRA * SIDUS_FENESTRA * 4 bytes.
  * alpha indicat quantum pixel a sidere afficitur.
  * ================================================================ */
 
-void astra_sidus_reddere(unsigned char *fenestra,
-                         const astra_sidus_t *sidus,
-                         const astra_instrumentum_t *instrumentum);
+void sidus_reddere(unsigned char *fenestra,
+                         const sidus_t *sidus,
+                         const instrumentum_t *instrumentum);
 
 /* colorem ex temperatura (Kelvin) per Planck approximare */
-color_t astra_temperatura_ad_colorem(double kelvin);
+color_t sidus_temperatura_ad_colorem(double kelvin);
 
 #endif /* SIDUS_H */

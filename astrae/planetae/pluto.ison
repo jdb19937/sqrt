@@ -1,0 +1,22 @@
+{
+  "nomen": "Pluto",
+  "genus": "parvum",
+  "radius": 0.9,
+  "inclinatio": 2.1389,
+  "rotatio": 3.0,
+  "semen": 90199,
+
+  "glacies": 0.30,
+  "ferrum": 0.15,
+  "silicata": 0.20,
+  "carbo": 0.20,
+
+  "scala": 1.0,
+  "craterae": 0.35,
+
+  "pressio_kPa": 0.001,
+  "n2": 0.90,
+  "ch4": 0.10,
+
+  "polaris": 0.10
+}
