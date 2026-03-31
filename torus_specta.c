@@ -27,6 +27,7 @@
 #include "campus.h"
 
 #include "phantasma.h"
+#include "computo.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -139,6 +140,38 @@ static void pfx_applicare(tabula_t *t, int pfx, int posteriza_niv)
     free(limbus);
 }
 
+/* rotatio N vectorum per matricem rotationis (CPU BLAS).
+ * axis: 0=x, 1=y, 2=z. Matrices R^T pro GEMM: result = src × R^T. */
+static void vertices_rotare(vec3_t *dest, vec3_t *fons,
+                             size_t n, int axis, double angulus)
+{
+    double ca = cos(angulus), sa = sin(angulus);
+    double r[9];
+
+    switch (axis) {
+    case 0: /* R_x^T */
+        r[0]=1;   r[1]=0;   r[2]=0;
+        r[3]=0;   r[4]=ca;  r[5]=sa;
+        r[6]=0;   r[7]=-sa; r[8]=ca;
+        break;
+    case 1: /* R_y^T */
+        r[0]=ca;  r[1]=0;   r[2]=-sa;
+        r[3]=0;   r[4]=1;   r[5]=0;
+        r[6]=sa;  r[7]=0;   r[8]=ca;
+        break;
+    default: /* R_z^T */
+        r[0]=ca;  r[1]=sa;  r[2]=0;
+        r[3]=-sa; r[4]=ca;  r[5]=0;
+        r[6]=0;   r[7]=0;   r[8]=1;
+        break;
+    }
+
+    pfr_matrix_d_t rot = {3,      3, r,              NULL};
+    pfr_matrix_d_t src = {(int)n, 3, (double *)fons, NULL};
+    pfr_matrix_d_t dst = {(int)n, 3, (double *)dest, NULL};
+    pfr_matmat_d(&dst, &src, &rot);
+}
+
 /* ================================================================
  * principium
  * ================================================================ */
@@ -238,7 +271,6 @@ int main(int argc, char **argv)
     int    axis_index   = 1;
     int    rotatio_activa = 1;
 
-    functio_rotandi rotationes[3] = { rotare_x, rotare_y, rotare_z };
     const char *nomina_axium[3] = { "X", "Y", "Z" };
 
     fprintf(stderr, "Spectator paratus. Claves:\n");
@@ -564,11 +596,8 @@ int main(int argc, char **argv)
             superficies_obsoleta = 0;
         }
 
-        functio_rotandi rotare = rotationes[axis_index];
-        for (size_t i = 0; i < n_vert; i++) {
-            puncta_rot[i] = rotare(puncta_orig[i], angulus_rot);
-            normae_rot[i] = rotare(normae_orig[i], angulus_rot);
-        }
+        vertices_rotare(puncta_rot, puncta_orig, n_vert, axis_index, angulus_rot);
+        vertices_rotare(normae_rot, normae_orig, n_vert, axis_index, angulus_rot);
 
         /* camera: positio ex coordinatis toroidalibus (theta, phi).
          * theta = horizontalis, phi = verticalis. ambo libere volvuntur.
