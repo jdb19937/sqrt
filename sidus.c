@@ -76,12 +76,21 @@ color_t sidus_temperatura_ad_colorem(double kelvin)
     if (t <= 66.0) {
         r = 255.0;
         g = 99.4708 * log(t) - 161.1196;
-        if (g < 0) g = 0; if (g > 255) g = 255;
+        if (g < 0)
+            g = 0;
+        if (g > 255)
+            g = 255;
     } else {
         r = 329.699 * pow(t - 60.0, -0.1332);
-        if (r < 0) r = 0; if (r > 255) r = 255;
+        if (r < 0)
+            r = 0;
+        if (r > 255)
+            r = 255;
         g = 288.122 * pow(t - 60.0, -0.0755);
-        if (g < 0) g = 0; if (g > 255) g = 255;
+        if (g < 0)
+            g = 0;
+        if (g > 255)
+            g = 255;
     }
 
     if (t >= 66.0) {
@@ -90,7 +99,10 @@ color_t sidus_temperatura_ad_colorem(double kelvin)
         b = 0.0;
     } else {
         b = 138.518 * log(t - 10.0) - 305.045;
-        if (b < 0) b = 0; if (b > 255) b = 255;
+        if (b < 0)
+            b = 0;
+        if (b > 255)
+            b = 255;
     }
 
     return (color_t){r / 255.0, g / 255.0, b / 255.0, 1.0};
@@ -101,15 +113,22 @@ color_t sidus_temperatura_ad_colorem(double kelvin)
  * ================================================================ */
 
 /* punctum Gaussianum in fenestra scribere */
-static void fen_punctum(unsigned char *fen, double cx, double cy,
-                        double radius, color_t col, double intensitas)
-{
+static void fen_punctum(
+    unsigned char *fen, double cx, double cy,
+    double radius, color_t col, double intensitas
+) {
     int r0 = (int)(cy - radius * 3) - 1;
     int r1 = (int)(cy + radius * 3) + 2;
     int c0 = (int)(cx - radius * 3) - 1;
     int c1 = (int)(cx + radius * 3) + 2;
-    if (r0 < 0) r0 = 0; if (r1 >= FEN) r1 = FEN - 1;
-    if (c0 < 0) c0 = 0; if (c1 >= FEN) c1 = FEN - 1;
+    if (r0 < 0)
+        r0 = 0;
+    if (r1 >= FEN)
+        r1 = FEN - 1;
+    if (c0 < 0)
+        c0 = 0;
+    if (c1 >= FEN)
+        c1 = FEN - 1;
 
     double inv_r2 = 1.0 / (radius * radius + 0.01);
 
@@ -117,18 +136,23 @@ static void fen_punctum(unsigned char *fen, double cx, double cy,
         for (int x = c0; x <= c1; x++) {
             double dx = x - cx, dy = y - cy;
             double d2 = dx * dx + dy * dy;
-            double f = intensitas * exp(-d2 * inv_r2 * 0.5);
-            if (f < 0.002) continue;
+            double f  = intensitas * exp(-d2 * inv_r2 * 0.5);
+            if (f < 0.002)
+                continue;
 
             int idx = (y * FEN + x) * 4;
-            int r = (int)(fen[idx + 0] + col.r * f * 255);
-            int g = (int)(fen[idx + 1] + col.g * f * 255);
-            int b = (int)(fen[idx + 2] + col.b * f * 255);
-            int a = (int)(fen[idx + 3] + f * 255);
-            if (r > 255) r = 255;
-            if (g > 255) g = 255;
-            if (b > 255) b = 255;
-            if (a > 255) a = 255;
+            int r   = (int)(fen[idx + 0] + col.r * f * 255);
+            int g   = (int)(fen[idx + 1] + col.g * f * 255);
+            int b   = (int)(fen[idx + 2] + col.b * f * 255);
+            int a   = (int)(fen[idx + 3] + f * 255);
+            if (r > 255)
+                r = 255;
+            if (g > 255)
+                g = 255;
+            if (b > 255)
+                b = 255;
+            if (a > 255)
+                a = 255;
             fen[idx + 0] = (unsigned char)r;
             fen[idx + 1] = (unsigned char)g;
             fen[idx + 2] = (unsigned char)b;
@@ -147,24 +171,27 @@ static void fen_punctum(unsigned char *fen, double cx, double cy,
  * JWST (3 bracchia segmentorum hex): 6 spiculae principales + 2 minores.
  * Intensitas spicula ∝ 1/r (non exp), cum oscillationibus Airy.
  */
-static void fen_spicula(unsigned char *fen, double cx, double cy,
-                        double angulus, double longitudo, double latitudo,
-                        color_t col, double intensitas)
-{
+static void fen_spicula(
+    unsigned char *fen, double cx, double cy,
+    double angulus, double longitudo, double latitudo,
+    color_t col, double intensitas
+) {
     double dx = cos(angulus);
     double dy = sin(angulus);
-    int n = (int)(longitudo * 3);
-    if (n < 6) n = 6;
+    int n     = (int)(longitudo * 3);
+    if (n < 6)
+        n = 6;
 
     for (int i = -n; i <= n; i++) {
-        double t = (double)i / (double)n;
+        double t    = (double)i / (double)n;
         double dist = fabs(t) * longitudo;
 
         /* profilo 1/r cum oscillationibus Airy */
-        double env = intensitas / (1.0 + dist * 0.4);
+        double env  = intensitas / (1.0 + dist * 0.4);
         double airy = 1.0 + 0.3 * cos(dist * 2.5);
-        double f = env * airy;
-        if (f < 0.002) continue;
+        double f    = env * airy;
+        if (f < 0.002)
+            continue;
 
         double px = cx + t * longitudo * dx;
         double py = cy + t * longitudo * dy;
@@ -176,10 +203,11 @@ static void fen_spicula(unsigned char *fen, double cx, double cy,
  * renderers per genus
  * ================================================================ */
 
-static void reddere_nanum_album(unsigned char *fen,
-                                const sidus_t *s,
-                                const instrumentum_t *instr)
-{
+static void reddere_nanum_album(
+    unsigned char *fen,
+    const sidus_t *s,
+    const instrumentum_t *instr
+) {
     color_t col = sidus_temperatura_ad_colorem(s->temperatura);
 
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.0;
@@ -194,17 +222,19 @@ static void reddere_nanum_album(unsigned char *fen,
     (void)instr;
 }
 
-static void reddere_sequentia(unsigned char *fen,
-                              const sidus_t *s,
-                              const instrumentum_t *instr)
-{
+static void reddere_sequentia(
+    unsigned char *fen,
+    const sidus_t *s,
+    const instrumentum_t *instr
+) {
     color_t col = sidus_temperatura_ad_colorem(s->temperatura);
 
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.0;
 
     /* nucleus */
     double r_nucl = 0.8 + luciditas * 0.3;
-    if (r_nucl > 3.0) r_nucl = 3.0;
+    if (r_nucl > 3.0)
+        r_nucl = 3.0;
     fen_punctum(fen, SEMI, SEMI, r_nucl, col, luciditas);
 
     /* halo levis */
@@ -215,30 +245,36 @@ static void reddere_sequentia(unsigned char *fen,
     if (instr->spiculae > 0 && luciditas > 0.2) {
         for (int i = 0; i < instr->spiculae; i++) {
             double ang = instr->spiculae_ang
-                       + PI_GRAECUM * (double)i / (double)instr->spiculae;
-            fen_spicula(fen, SEMI, SEMI, ang,
-                        instr->spiculae_long * luciditas,
-                        0.4, col, luciditas * 0.25);
+                + PI_GRAECUM * (double)i / (double)instr->spiculae;
+            fen_spicula(
+                fen, SEMI, SEMI, ang,
+                instr->spiculae_long * luciditas,
+                0.4, col, luciditas * 0.25
+            );
         }
     }
 
     /* halo instrumenti */
     if (instr->halo_vis > 0.01)
-        fen_punctum(fen, SEMI, SEMI, instr->halo_radius,
-                    col, instr->halo_vis * luciditas);
+        fen_punctum(
+            fen, SEMI, SEMI, instr->halo_radius,
+            col, instr->halo_vis * luciditas
+        );
 }
 
-static void reddere_gigas_rubrum(unsigned char *fen,
-                                 const sidus_t *s,
-                                 const instrumentum_t *instr)
-{
+static void reddere_gigas_rubrum(
+    unsigned char *fen,
+    const sidus_t *s,
+    const instrumentum_t *instr
+) {
     color_t col = sidus_temperatura_ad_colorem(s->temperatura);
 
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.5;
 
     /* discus maior, limbi obscuriores (limb darkening) */
     double r_disc = 2.5 + luciditas * 1.5;
-    if (r_disc > 8.0) r_disc = 8.0;
+    if (r_disc > 8.0)
+        r_disc = 8.0;
 
     /* centrum lucidum */
     fen_punctum(fen, SEMI, SEMI, r_disc * 0.4, col, luciditas * 1.2);
@@ -252,25 +288,29 @@ static void reddere_gigas_rubrum(unsigned char *fen,
     if (instr->spiculae > 0 && luciditas > 0.3) {
         for (int i = 0; i < instr->spiculae; i++) {
             double ang = instr->spiculae_ang
-                       + PI_GRAECUM * (double)i / (double)instr->spiculae;
-            fen_spicula(fen, SEMI, SEMI, ang,
-                        instr->spiculae_long * luciditas * 0.7,
-                        0.5, col, luciditas * 0.15);
+                + PI_GRAECUM * (double)i / (double)instr->spiculae;
+            fen_spicula(
+                fen, SEMI, SEMI, ang,
+                instr->spiculae_long * luciditas * 0.7,
+                0.5, col, luciditas * 0.15
+            );
         }
     }
 }
 
-static void reddere_supergigas(unsigned char *fen,
-                               const sidus_t *s,
-                               const instrumentum_t *instr)
-{
+static void reddere_supergigas(
+    unsigned char *fen,
+    const sidus_t *s,
+    const instrumentum_t *instr
+) {
     color_t col = sidus_temperatura_ad_colorem(s->temperatura);
 
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 4.0;
 
     /* discus vastus */
     double r_disc = 5.0 + luciditas * 3.0;
-    if (r_disc > 15.0) r_disc = 15.0;
+    if (r_disc > 15.0)
+        r_disc = 15.0;
 
     fen_punctum(fen, SEMI, SEMI, r_disc * 0.3, col, luciditas * 1.5);
     fen_punctum(fen, SEMI, SEMI, r_disc * 0.7, col, luciditas * 0.6);
@@ -282,7 +322,8 @@ static void reddere_supergigas(unsigned char *fen,
         double mx = SEMI + alea_gauss() * r_disc * 0.4;
         double my = SEMI + alea_gauss() * r_disc * 0.4;
         double dx = mx - SEMI, dy = my - SEMI;
-        if (dx * dx + dy * dy > r_disc * r_disc * 0.6) continue;
+        if (dx * dx + dy * dy > r_disc * r_disc * 0.6)
+            continue;
         color_t mc = {col.r * 0.7, col.g * 0.6, col.b * 0.5, 1.0};
         fen_punctum(fen, mx, my, r_disc * 0.2, mc, luciditas * 0.15);
     }
@@ -291,22 +332,27 @@ static void reddere_supergigas(unsigned char *fen,
     if (instr->spiculae > 0) {
         for (int i = 0; i < instr->spiculae; i++) {
             double ang = instr->spiculae_ang
-                       + PI_GRAECUM * (double)i / (double)instr->spiculae;
-            fen_spicula(fen, SEMI, SEMI, ang,
-                        instr->spiculae_long * luciditas * 1.5,
-                        0.6, col, luciditas * 0.2);
+                + PI_GRAECUM * (double)i / (double)instr->spiculae;
+            fen_spicula(
+                fen, SEMI, SEMI, ang,
+                instr->spiculae_long * luciditas * 1.5,
+                0.6, col, luciditas * 0.2
+            );
         }
     }
 
     if (instr->halo_vis > 0.01)
-        fen_punctum(fen, SEMI, SEMI, instr->halo_radius * 2.0,
-                    col, instr->halo_vis * luciditas * 0.5);
+        fen_punctum(
+            fen, SEMI, SEMI, instr->halo_radius * 2.0,
+            col, instr->halo_vis * luciditas * 0.5
+        );
 }
 
-static void reddere_neutronium(unsigned char *fen,
-                               const sidus_t *s,
-                               const instrumentum_t *instr)
-{
+static void reddere_neutronium(
+    unsigned char *fen,
+    const sidus_t *s,
+    const instrumentum_t *instr
+) {
     (void)instr;
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 3.0;
 
@@ -322,21 +368,26 @@ static void reddere_neutronium(unsigned char *fen,
     for (int y = 0; y < FEN; y++) {
         for (int x = 0; x < FEN; x++) {
             double dx = x - SEMI, dy = y - SEMI;
-            double d = sqrt(dx * dx + dy * dy);
+            double d  = sqrt(dx * dx + dy * dy);
             double f1 = exp(-(d - r1) * (d - r1) * 2.0) * luciditas * 0.4;
             double f2 = exp(-(d - r2) * (d - r2) * 1.0) * luciditas * 0.15;
-            double f = f1 + f2;
-            if (f < 0.002) continue;
+            double f  = f1 + f2;
+            if (f < 0.002)
+                continue;
 
             int idx = (y * FEN + x) * 4;
-            int r = (int)(fen[idx + 0] + cyan.r * f * 255);
-            int g = (int)(fen[idx + 1] + cyan.g * f * 255);
-            int b = (int)(fen[idx + 2] + cyan.b * f * 255);
-            int a = (int)(fen[idx + 3] + f * 255);
-            if (r > 255) r = 255;
-            if (g > 255) g = 255;
-            if (b > 255) b = 255;
-            if (a > 255) a = 255;
+            int r   = (int)(fen[idx + 0] + cyan.r * f * 255);
+            int g   = (int)(fen[idx + 1] + cyan.g * f * 255);
+            int b   = (int)(fen[idx + 2] + cyan.b * f * 255);
+            int a   = (int)(fen[idx + 3] + f * 255);
+            if (r > 255)
+                r = 255;
+            if (g > 255)
+                g = 255;
+            if (b > 255)
+                b = 255;
+            if (a > 255)
+                a = 255;
             fen[idx + 0] = (unsigned char)r;
             fen[idx + 1] = (unsigned char)g;
             fen[idx + 2] = (unsigned char)b;
@@ -347,16 +398,21 @@ static void reddere_neutronium(unsigned char *fen,
     /* bipolar jets — duae spiculae oppositae */
     double ang_jet = alea_f() * PI_GRAECUM;
     color_t jet_col = {0.5, 0.6, 1.0, 1.0};
-    fen_spicula(fen, SEMI, SEMI, ang_jet, 12.0 * luciditas, 0.3,
-                jet_col, luciditas * 0.3);
-    fen_spicula(fen, SEMI, SEMI, ang_jet + PI_GRAECUM, 12.0 * luciditas, 0.3,
-                jet_col, luciditas * 0.3);
+    fen_spicula(
+        fen, SEMI, SEMI, ang_jet, 12.0 * luciditas, 0.3,
+        jet_col, luciditas * 0.3
+    );
+    fen_spicula(
+        fen, SEMI, SEMI, ang_jet + PI_GRAECUM, 12.0 * luciditas, 0.3,
+        jet_col, luciditas * 0.3
+    );
 }
 
-static void reddere_crystallinum(unsigned char *fen,
-                                 const sidus_t *s,
-                                 const instrumentum_t *instr)
-{
+static void reddere_crystallinum(
+    unsigned char *fen,
+    const sidus_t *s,
+    const instrumentum_t *instr
+) {
     (void)instr;
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.5;
 
@@ -371,9 +427,10 @@ static void reddere_crystallinum(unsigned char *fen,
     fen_punctum(fen, SEMI, SEMI, 0.5, album, luciditas * 1.5);
 
     /* multa filamenta — ut globus Koosh */
-    semen_g = (unsigned int)(s->temperatura * 137);
+    semen_g   = (unsigned int)(s->temperatura * 137);
     int n_fil = 20 + (int)(luciditas * 15);
-    if (n_fil > 60) n_fil = 60;
+    if (n_fil > 60)
+        n_fil = 60;
 
     /* 6 colores spectrales discreti */
     color_t spectra[6] = {
@@ -388,21 +445,23 @@ static void reddere_crystallinum(unsigned char *fen,
     for (int i = 0; i < n_fil; i++) {
         /* angulus aleatorius — distributio uniformis */
         double ang = alea_f() * DUO_PI;
-        double dx = cos(ang), dy = sin(ang);
+        double dx  = cos(ang), dy = sin(ang);
 
         /* longitudo variat */
         double len = 3.0 + alea_f() * (8.0 + luciditas * 8.0);
-        if (len > 26.0) len = 26.0;
+        if (len > 26.0)
+            len = 26.0;
 
         /* color spectrale — unum ex 6 */
         color_t fc = spectra[alea() % 6];
 
         /* intensitas decrescens ab centro */
         int n_steps = (int)(len * 3);
-        if (n_steps < 4) n_steps = 4;
+        if (n_steps < 4)
+            n_steps = 4;
 
         for (int j = 0; j <= n_steps; j++) {
-            double t = (double)j / (double)n_steps;
+            double t  = (double)j / (double)n_steps;
             double px = SEMI + t * len * dx;
             double py = SEMI + t * len * dy;
 
@@ -424,10 +483,11 @@ static void reddere_crystallinum(unsigned char *fen,
  * Precession geodaetica causat jets spirales (Lense-Thirring).
  * Halo birefringens: vacuum QED prope B_Schwinger lucem
  * in duos modos polares separat (Heisenberg-Euler 1936). */
-static void reddere_magnetar(unsigned char *fen,
-                              const sidus_t *s,
-                              const instrumentum_t *instr)
-{
+static void reddere_magnetar(
+    unsigned char *fen,
+    const sidus_t *s,
+    const instrumentum_t *instr
+) {
     (void)instr;
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 3.0;
 
@@ -435,8 +495,10 @@ static void reddere_magnetar(unsigned char *fen,
      * antea: semen ex sola temperatura, sed magnetares omnes T=5×10⁶ K
      * habent, ergo omnes eandem orientationem reddebant.
      * nunc magnitudinem addimus ut variatio inter magnetares oriatur. */
-    semen_g = (unsigned int)(s->temperatura * 71
-            + s->magnitudo * 100003 + s->phase * 70001);
+    semen_g = (unsigned int)(
+        s->temperatura * 71
+        + s->magnitudo * 100003 + s->phase * 70001
+    );
 
     /* axis magneticus — angulus aleatorius per plenum circulum.
      * in magnetaribus veris, axis magneticus non cum axe rotationis
@@ -444,18 +506,18 @@ static void reddere_magnetar(unsigned char *fen,
      * 2009). axis proiectus in planum caeli quemlibet angulum habere
      * potest, ergo DUO_PI non PI_GRAECUM adhibemus. */
     double axis_ang = alea_f() * DUO_PI;
-    double ax = cos(axis_ang), ay = sin(axis_ang);
+    double ax       = cos(axis_ang), ay = sin(axis_ang);
 
     /* variatio individualis magnetaris:
      * campus magneticus B variat 10⁹-10¹¹ T (Duncan & Thompson 1992).
      * B fortior → jets longiores et collimatiores (Bucciantini+ 2006).
      * periodus rotationis P = 2-12 s → precession rate variat.
      * aetas τ = P/(2Ṗ) ~ 10³-10⁵ a → jets seniores latiores et debiliores. */
-    double jet_long = 16.0 + alea_f() * 20.0;    /* 16-36 pixeles */
+    double jet_long     = 16.0 + alea_f() * 20.0;    /* 16-36 pixeles */
     double jet_apertura = 3.0 + alea_f() * 6.0;  /* amplitudo spiralis */
-    double jet_freq = 8.0 + alea_f() * 10.0;     /* frequentia spiralis */
-    int    jet_fil = 2 + (int)(alea_f() * 3);     /* 2-4 filamenta */
-    double halo_long = 2.0 + alea_f() * 3.0;     /* elongatio hali */
+    double jet_freq     = 8.0 + alea_f() * 10.0;     /* frequentia spiralis */
+    int    jet_fil      = 2 + (int)(alea_f() * 3);     /* 2-4 filamenta */
+    double halo_long    = 2.0 + alea_f() * 3.0;     /* elongatio hali */
 
     /* nucleus: album intensum cum halo asymmetrico (birefringentia) */
     color_t album = {1.0, 1.0, 1.0, 1.0};
@@ -471,10 +533,10 @@ static void reddere_magnetar(unsigned char *fen,
      * consistentem cum birefringentia vacui ostendit (Mignani+ 2017,
      * confirmatio prima effectus QED in campo astronomico). */
     for (int i = -8; i <= 8; i++) {
-        double t = (double)i / 8.0;
+        double t  = (double)i / 8.0;
         double px = SEMI + t * halo_long * ax;
         double py = SEMI + t * halo_long * ay;
-        double f = luciditas * 0.5 * exp(-t * t * 2.0);
+        double f  = luciditas * 0.5 * exp(-t * t * 2.0);
         color_t hc = {0.7, 0.8, 1.0, 1.0};
         fen_punctum(fen, px, py, 1.0, hc, f);
     }
@@ -511,25 +573,30 @@ static void reddere_magnetar(unsigned char *fen,
 
             int n_steps = 120;
             for (int j = 0; j <= n_steps; j++) {
-                double t = (double)j / (double)n_steps;
+                double t    = (double)j / (double)n_steps;
                 double dist = t * jet_long;
 
                 double px_ax = SEMI + dir * dist * ax;
                 double py_ax = SEMI + dir * dist * ay;
 
-                double spiral_r = t * t * jet_apertura;
+                double spiral_r   = t * t * jet_apertura;
                 double spiral_ang = phase_offset + t * jet_freq;
-                double perp_x = -ay, perp_y = ax;
+                double perp_x     = -ay, perp_y = ax;
 
-                double sx = spiral_r * (cos(spiral_ang) * perp_x
-                          - sin(spiral_ang) * dir * ax);
-                double sy = spiral_r * (cos(spiral_ang) * perp_y
-                          - sin(spiral_ang) * dir * ay);
+                double sx = spiral_r * (
+                    cos(spiral_ang) * perp_x
+                    - sin(spiral_ang) * dir * ax
+                );
+                double sy = spiral_r * (
+                    cos(spiral_ang) * perp_y
+                    - sin(spiral_ang) * dir * ay
+                );
 
                 double px = px_ax + sx;
                 double py = py_ax + sy;
 
-                if (px < 0 || px >= FEN || py < 0 || py >= FEN) continue;
+                if (px < 0 || px >= FEN || py < 0 || py >= FEN)
+                    continue;
 
                 double f = luciditas * 0.35 * (1.0 - t) * (1.0 - t * 0.5);
                 fen_punctum(fen, px, py, 0.4 + t * 0.3, jc, f);
@@ -548,12 +615,14 @@ static void reddere_magnetar(unsigned char *fen,
     for (int pol = -1; pol <= 1; pol += 2) {
         double dir = (double)pol;
         for (int k = 0; k < n_nodi; k++) {
-            double t = 0.15 + alea_f() * 0.6;
+            double t    = 0.15 + alea_f() * 0.6;
             double dist = t * jet_long * 0.9;
-            double px = SEMI + dir * dist * ax;
-            double py = SEMI + dir * dist * ay;
-            fen_punctum(fen, px, py, 0.8 + alea_f() * 0.5, album,
-                        luciditas * (0.2 + alea_f() * 0.3));
+            double px   = SEMI + dir * dist * ax;
+            double py   = SEMI + dir * dist * ay;
+            fen_punctum(
+                fen, px, py, 0.8 + alea_f() * 0.5, album,
+                luciditas * (0.2 + alea_f() * 0.3)
+            );
         }
     }
 }
@@ -618,16 +687,19 @@ static void reddere_magnetar(unsigned char *fen,
  *   implementatio: mag = mag_min + Δmag · (1-r^0.4)
  *   ubi r uniformis — pleraeque debiles, paucae lucidae.
  */
-static void reddere_galaxia(unsigned char *fen,
-                             const sidus_t *s,
-                             const instrumentum_t *instr)
-{
+static void reddere_galaxia(
+    unsigned char *fen,
+    const sidus_t *s,
+    const instrumentum_t *instr
+) {
     (void)instr;
 
     /* semen unicum ex omnibus proprietatibus */
-    semen_g = (unsigned int)(s->temperatura * 137
-            + s->magnitudo * 100003 + s->phase * 7001
-            + s->angulus_phase * 50021);
+    semen_g = (unsigned int)(
+        s->temperatura * 137
+        + s->magnitudo * 100003 + s->phase * 7001
+        + s->angulus_phase * 50021
+    );
 
     galaxia_morphologia_t morph = (galaxia_morphologia_t)(int)s->phase;
     double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.5;
@@ -639,13 +711,16 @@ static void reddere_galaxia(unsigned char *fen,
      * in spatio 3D, Hubble 1926). ergo i = arccos(r) ubi r ∈ [0,1].
      * implementamus per "temperatura" campi: T/10000 dat cos(i). */
     double cos_incl = s->temperatura / 10000.0;
-    if (cos_incl < 0.05) cos_incl = 0.05;
-    if (cos_incl > 1.0) cos_incl = 1.0;
+    if (cos_incl < 0.05)
+        cos_incl = 0.05;
+    if (cos_incl > 1.0)
+        cos_incl = 1.0;
 
     /* radius effectivus — galaxiae distantes parvae,
      * proximae (lucidiores) maiores. */
     double r_eff = 1.5 + luciditas * 3.0;
-    if (r_eff > 20.0) r_eff = 20.0;
+    if (r_eff > 20.0)
+        r_eff = 20.0;
 
     /* ellipticitas apparens ex inclinatione:
      * discus circularis inclinatus: b/a = cos(i).
@@ -699,8 +774,12 @@ static void reddere_galaxia(unsigned char *fen,
     double dR = (alea_f() - 0.5) * 0.15;
     double dG = (alea_f() - 0.5) * 0.10;
     double dB = (alea_f() - 0.5) * 0.10;
-    col_nuc.r += dR; col_nuc.g += dG; col_nuc.b += dB;
-    col_ext.r += dR * 0.5; col_ext.g += dG * 0.5; col_ext.b += dB * 0.5;
+    col_nuc.r += dR;
+    col_nuc.g += dG;
+    col_nuc.b += dB;
+    col_ext.r += dR * 0.5;
+    col_ext.g += dG * 0.5;
+    col_ext.b += dB * 0.5;
 
     /* --- redditio per morphologiam --- */
 
@@ -717,15 +796,19 @@ static void reddere_galaxia(unsigned char *fen,
                 double rx = lx / r_eff;
                 double ry = ly / (r_eff * ba_ratio);
                 double r2 = rx * rx + ry * ry;
-                double r = sqrt(r2);
-                if (r > 5.0) continue;
+                double r  = sqrt(r2);
+                if (r > 5.0)
+                    continue;
                 /* Sérsic n=4 approximatum: exp(-7.67·(r^0.25 - 1)) */
                 double sersic = exp(-7.67 * (pow(r + 0.01, 0.25) - 1.0));
-                double f = luciditas * sersic;
-                if (f < 0.002) continue;
+                double f      = luciditas * sersic;
+                if (f < 0.002)
+                    continue;
                 /* color: gradiens ab aureo (centrum) ad rubescente (extra) */
                 color_t c;
-                double t = r / 3.0; if (t > 1.0) t = 1.0;
+                double t = r / 3.0;
+                if (t > 1.0)
+                    t = 1.0;
                 c.r = col_nuc.r * (1.0 - t) + col_ext.r * t;
                 c.g = col_nuc.g * (1.0 - t) + col_ext.g * t;
                 c.b = col_nuc.b * (1.0 - t) + col_ext.b * t;
@@ -743,17 +826,20 @@ static void reddere_galaxia(unsigned char *fen,
             double bar_len = r_eff * (0.4 + alea_f() * 0.3);
             double bar_wid = r_eff * 0.12;
             for (int i = -40; i <= 40; i++) {
-                double t = (double)i / 40.0;
+                double t  = (double)i / 40.0;
                 double bx = t * bar_len;
                 double by = 0;
                 /* rotare per ang + applicare inclinationem */
-                double px = bx * ca - by * sa;
-                double py = (bx * sa + by * ca) * ba_ratio;
+                double px   = bx * ca - by * sa;
+                double py   = (bx * sa + by * ca) * ba_ratio;
                 double dist = fabs(t);
-                double f = luciditas * 0.6 * exp(-dist * dist * 3.0);
-                if (f < 0.002) continue;
-                fen_punctum(fen, SEMI + px, SEMI + py, bar_wid * ba_ratio,
-                            col_nuc, f);
+                double f    = luciditas * 0.6 * exp(-dist * dist * 3.0);
+                if (f < 0.002)
+                    continue;
+                fen_punctum(
+                    fen, SEMI + px, SEMI + py, bar_wid * ba_ratio,
+                    col_nuc, f
+                );
             }
         }
 
@@ -762,8 +848,8 @@ static void reddere_galaxia(unsigned char *fen,
          *   tan(pitch) = 1/(b·r), ergo b = 1/tan(pitch).
          *   Sa: pitch ~10° (stricta), Sc: pitch ~25° (laxa).
          * duo brachia (m=2) dominans modus per theoriam Lin-Shu. */
-        int n_brachia = 2;
-        double pitch = 0.3 + alea_f() * 0.4;  /* 0.3-0.7 rad (~17°-40°) */
+        int n_brachia  = 2;
+        double pitch   = 0.3 + alea_f() * 0.4;  /* 0.3-0.7 rad (~17°-40°) */
         double r_start = r_eff * 0.25;
         if (morph == GALAXIA_SPIRALIS_BARRATA)
             r_start = r_eff * 0.45;  /* brachia ex extremis barrae */
@@ -771,35 +857,40 @@ static void reddere_galaxia(unsigned char *fen,
 
         for (int arm = 0; arm < n_brachia; arm++) {
             double theta0 = DUO_PI * arm / n_brachia + alea_f() * 0.3;
-            int n_steps = 200;
+            int n_steps   = 200;
             for (int j = 0; j < n_steps; j++) {
-                double t = (double)j / (double)n_steps;
+                double t     = (double)j / (double)n_steps;
                 double theta = theta0 + t * DUO_PI / tan(pitch);
-                double r = r_start + t * r_eff * 1.8;
+                double r     = r_start + t * r_eff * 1.8;
 
                 /* spirala logarithmica cum perturbatione */
                 double perturb = alea_f() * 0.15 - 0.075;
-                double x_arm = r * cos(theta + perturb);
-                double y_arm = r * sin(theta + perturb);
+                double x_arm   = r * cos(theta + perturb);
+                double y_arm   = r * sin(theta + perturb);
 
                 /* proiectio cum inclinatione et rotatione */
                 double px = x_arm * ca - y_arm * sa;
                 double py = (x_arm * sa + y_arm * ca) * ba_ratio;
 
-                if (fabs(px) > 28 || fabs(py) > 28) continue;
+                if (fabs(px) > 28 || fabs(py) > 28)
+                    continue;
 
                 double fade = (1.0 - t) * (1.0 - t * 0.3);
-                double f = luciditas * arm_bright * fade;
-                if (f < 0.002) continue;
+                double f    = luciditas * arm_bright * fade;
+                if (f < 0.002)
+                    continue;
 
                 /* regiones HII in brachiis (Kennicutt 1998):
                  * formatio stellarum in undis densitatis.
                  * nodi lucidi stochastice distributi. */
                 double nod = 1.0;
-                if (alea_f() < 0.08) nod = 1.5 + alea_f();
+                if (alea_f() < 0.08)
+                    nod = 1.5 + alea_f();
                 double wid = 0.5 + t * 0.8;
-                fen_punctum(fen, SEMI + px, SEMI + py, wid,
-                            col_ext, f * nod);
+                fen_punctum(
+                    fen, SEMI + px, SEMI + py, wid,
+                    col_ext, f * nod
+                );
             }
         }
 
@@ -808,12 +899,16 @@ static void reddere_galaxia(unsigned char *fen,
             for (int dx = -25; dx <= 25; dx++) {
                 double lx = dx * ca + dy * sa;
                 double ly = (-dx * sa + dy * ca) / (ba_ratio + 0.01);
-                double r = sqrt(lx * lx + ly * ly);
-                if (r > r_eff * 3.0) continue;
+                double r  = sqrt(lx * lx + ly * ly);
+                if (r > r_eff * 3.0)
+                    continue;
                 double disc = exp(-r / r_eff) * 0.3;
-                double f = luciditas * disc;
-                if (f < 0.002) continue;
-                double t = r / (r_eff * 2.5); if (t > 1.0) t = 1.0;
+                double f    = luciditas * disc;
+                if (f < 0.002)
+                    continue;
+                double t = r / (r_eff * 2.5);
+                if (t > 1.0)
+                    t = 1.0;
                 color_t c;
                 c.r = col_nuc.r * (1.0 - t) + col_ext.r * t;
                 c.g = col_nuc.g * (1.0 - t) + col_ext.g * t;
@@ -829,17 +924,20 @@ static void reddere_galaxia(unsigned char *fen,
          * extinctio per pulverem: A_V ≈ τ_V / (cos(i) + 0.1). */
         if (cos_incl < 0.3) {
             for (int dx = -25; dx <= 25; dx++) {
-                double lx = dx * ca;
-                double ly = dx * sa * ba_ratio;
+                double lx   = dx * ca;
+                double ly   = dx * sa * ba_ratio;
                 double dist = fabs((double)dx) / (r_eff * 2.0);
-                if (dist > 1.2) continue;
+                if (dist > 1.2)
+                    continue;
                 double f = 0.4 * (1.0 - dist) * (0.3 - cos_incl) / 0.3;
-                if (f < 0.01) continue;
+                if (f < 0.01)
+                    continue;
                 int px = SEMI + (int)(lx + 0.5);
                 int py = SEMI + (int)(ly + 0.5);
-                if (px < 0 || px >= FEN || py < 0 || py >= FEN) continue;
+                if (px < 0 || px >= FEN || py < 0 || py >= FEN)
+                    continue;
                 /* obscurare pixeles existentes */
-                int idx = (py * FEN + px) * 4;
+                int idx      = (py * FEN + px) * 4;
                 fen[idx + 0] = (unsigned char)(fen[idx + 0] * (1.0 - f));
                 fen[idx + 1] = (unsigned char)(fen[idx + 1] * (1.0 - f));
                 fen[idx + 2] = (unsigned char)(fen[idx + 2] * (1.0 - f));
@@ -855,12 +953,16 @@ static void reddere_galaxia(unsigned char *fen,
             for (int dx = -25; dx <= 25; dx++) {
                 double lx = dx * ca + dy * sa;
                 double ly = (-dx * sa + dy * ca) / (ba_ratio + 0.01);
-                double r = sqrt(lx * lx + ly * ly);
-                if (r > r_eff * 3.0) continue;
+                double r  = sqrt(lx * lx + ly * ly);
+                if (r > r_eff * 3.0)
+                    continue;
                 double disc = exp(-r / r_eff) * 0.5;
-                double f = luciditas * disc;
-                if (f < 0.002) continue;
-                double t = r / (r_eff * 2.0); if (t > 1.0) t = 1.0;
+                double f    = luciditas * disc;
+                if (f < 0.002)
+                    continue;
+                double t = r / (r_eff * 2.0);
+                if (t > 1.0)
+                    t = 1.0;
                 color_t c;
                 c.r = col_nuc.r * (1.0 - t) + col_ext.r * t;
                 c.g = col_nuc.g * (1.0 - t) + col_ext.g * t;
@@ -883,10 +985,12 @@ static void reddere_galaxia(unsigned char *fen,
             for (int dx = -20; dx <= 20; dx++) {
                 double lx = dx - offset_x;
                 double ly = dy - offset_y;
-                double r = sqrt(lx * lx + ly * ly);
-                if (r > r_eff * 2.5) continue;
+                double r  = sqrt(lx * lx + ly * ly);
+                if (r > r_eff * 2.5)
+                    continue;
                 double f = luciditas * 0.3 * exp(-r / r_eff);
-                if (f < 0.002) continue;
+                if (f < 0.002)
+                    continue;
                 fen_punctum(fen, SEMI + dx, SEMI + dy, 0.5, col_ext, f);
             }
         }
@@ -909,16 +1013,18 @@ static void reddere_galaxia(unsigned char *fen,
     }
 }
 
-static void reddere_vagans(unsigned char *fen,
-                            const sidus_t *s,
-                            const instrumentum_t *instr)
-{
+static void reddere_vagans(
+    unsigned char *fen,
+    const sidus_t *s,
+    const instrumentum_t *instr
+) {
     (void)instr;
     color_t col = sidus_temperatura_ad_colorem(s->temperatura);
 
     /* vagans: discus maior, matte, cum falce (phase) */
     double radius = 8.0 + pow(10.0, -s->magnitudo * 0.4) * 6.0;
-    if (radius > 25.0) radius = 25.0;
+    if (radius > 25.0)
+        radius = 25.0;
 
     double cos_ph = cos(s->angulus_phase);
     double sin_ph = sin(s->angulus_phase);
@@ -928,7 +1034,8 @@ static void reddere_vagans(unsigned char *fen,
             double dx = x - SEMI, dy = y - SEMI;
             double d2 = dx * dx + dy * dy;
             double r2 = radius * radius;
-            if (d2 > r2) continue;
+            if (d2 > r2)
+                continue;
 
             /* norma hemisphaerica */
             double nz = sqrt(1.0 - d2 / r2);
@@ -939,18 +1046,20 @@ static void reddere_vagans(unsigned char *fen,
             double illum = nx * cos_ph + ny * sin_ph;
             /* phase: 0=plenus (totus illuminatus), 1=novus (obscurus) */
             double terminator = (1.0 - s->phase * 2.0);
-            double vis = illum - terminator;
+            double vis        = illum - terminator;
 
             double f;
             if (vis > 0.05) {
                 /* facies illuminata — Lambert matte */
                 double lambert = nz * 0.5 + illum * 0.4 + 0.1;
-                if (lambert < 0) lambert = 0;
+                if (lambert < 0)
+                    lambert = 0;
                 f = lambert;
             } else if (vis > -0.05) {
                 /* terminator — transitio levis */
                 f = (vis + 0.05) * 10.0 * 0.3;
-                if (f < 0) f = 0;
+                if (f < 0)
+                    f = 0;
             } else {
                 /* facies obscura — paene nigra */
                 f = 0.02;
@@ -960,12 +1069,15 @@ static void reddere_vagans(unsigned char *fen,
             f *= (0.6 + 0.4 * nz);
 
             int idx = (y * FEN + x) * 4;
-            int r = (int)(col.r * f * 255);
-            int g = (int)(col.g * f * 255);
-            int b = (int)(col.b * f * 255);
-            if (r > 255) r = 255;
-            if (g > 255) g = 255;
-            if (b > 255) b = 255;
+            int r   = (int)(col.r * f * 255);
+            int g   = (int)(col.g * f * 255);
+            int b   = (int)(col.b * f * 255);
+            if (r > 255)
+                r = 255;
+            if (g > 255)
+                g = 255;
+            if (b > 255)
+                b = 255;
             fen[idx + 0] = (unsigned char)r;
             fen[idx + 1] = (unsigned char)g;
             fen[idx + 2] = (unsigned char)b;
@@ -978,10 +1090,11 @@ static void reddere_vagans(unsigned char *fen,
  * dispatcher
  * ================================================================ */
 
-void sidus_reddere(unsigned char *fenestra,
-                         const sidus_t *sidus,
-                         const instrumentum_t *instrumentum)
-{
+void sidus_reddere(
+    unsigned char *fenestra,
+    const sidus_t *sidus,
+    const instrumentum_t *instrumentum
+) {
     memset(fenestra, 0, FEN * FEN * 4);
 
     switch (sidus->genus) {

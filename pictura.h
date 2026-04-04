@@ -31,9 +31,11 @@ typedef struct {
 
 camera_t cameram_constituere(vec3_t positio, vec3_t scopus);
 
-int pictura_proicere(const camera_t *cam, vec3_t p,
-                     double *scr_x, double *scr_y, double *prof,
-                     int latitudo, int altitudo);
+int pictura_proicere(
+    const camera_t *cam, vec3_t p,
+    double *scr_x, double *scr_y, double *prof,
+    int latitudo, int altitudo
+);
 
 /* ================================================================
  * tabula imaginis (framebuffer)
@@ -184,18 +186,24 @@ void tabulam_purgare(tabula_t *t);
  *     on the topology of the Universe" — Phys. Rev. D 86, 083526.
  *     Limites inferiores magnitudinis domenii fundamentalis.
  */
-void fundum_implere(tabula_t *t,
-                            const unsigned char *bitmap,
-                            int bm_latitudo, int bm_altitudo,
-                            int delta_x, int delta_y);
+void fundum_implere(
+    tabula_t *t,
+    const unsigned char *bitmap,
+    int bm_latitudo, int bm_altitudo,
+    int delta_x, int delta_y
+);
 
 /* pixel scribere cum profunditate — RGB ordo (PPM) */
-void pixel_rgb(tabula_t *t, int x, int y,
-                       double prof, color_t c);
+void pixel_rgb(
+    tabula_t *t, int x, int y,
+    double prof, color_t c
+);
 
 /* pixel scribere cum profunditate — BGRA ordo (SDL ARGB8888) */
-void pixel_bgra(tabula_t *t, int x, int y,
-                        double prof, color_t c);
+void pixel_bgra(
+    tabula_t *t, int x, int y,
+    double prof, color_t c
+);
 
 /* ================================================================
  * rasterizatio triangulorum
@@ -206,8 +214,10 @@ void pixel_bgra(tabula_t *t, int x, int y,
 
 typedef color_t (*illuminare_fn)(vec3_t punct, vec3_t norm, vec3_t oculus);
 
-typedef void (*pixel_fn)(tabula_t *t, int x, int y,
-                                 double prof, color_t c);
+typedef void (*pixel_fn)(
+    tabula_t *t, int x, int y,
+    double prof, color_t c
+);
 
 void triangulum_reddere(
     tabula_t *t,
@@ -216,7 +226,8 @@ void triangulum_reddere(
     double sx2, double sy2, double sz2, vec3_t p2, vec3_t n2,
     vec3_t oculus,
     illuminare_fn illum_fn,
-    pixel_fn pixel_fn);
+    pixel_fn pixel_fn
+);
 
 /* ================================================================
  * scaenam reddere
@@ -231,6 +242,7 @@ void scaenam_reddere(
     int gradus_u, int gradus_v,
     const camera_t *cam,
     illuminare_fn illum_fn,
-    pixel_fn pixel_fn);
+    pixel_fn pixel_fn
+);
 
 #endif /* PICTURA_H */

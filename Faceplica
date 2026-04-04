@@ -120,4 +120,7 @@ purga:
 	rm -f pictura.o helvea.o astra.o sidus.o campus.o instrumentum.o planeta.o aspectus.o perceptus.o
 	rm -f caelae/*.ppm caelae/*.isonl
 
-.PHONY: omnia purga caelae lude
+linte:
+	insinulint -c *.c *.h
+
+.PHONY: omnia purga caelae lude linte

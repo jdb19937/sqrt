@@ -18,8 +18,10 @@ static void expecta_prope(const char *nomen, double habitus, double expectatus, 
 {
     double diff = fabs(habitus - expectatus);
     if (diff > epsilon) {
-        fprintf(stderr, "  MALUM: %s = %.6f, expectatum %.6f (diff %.2e)\n",
-                nomen, habitus, expectatus, diff);
+        fprintf(
+            stderr, "  MALUM: %s = %.6f, expectatum %.6f (diff %.2e)\n",
+            nomen, habitus, expectatus, diff
+        );
         errores++;
     }
 }
@@ -28,9 +30,11 @@ static void expecta_vec3(const char *nomen, vec3_t h, vec3_t e, double epsilon)
 {
     double diff = magnitudo(differentia(h, e));
     if (diff > epsilon) {
-        fprintf(stderr, "  MALUM: %s = (%.4f, %.4f, %.4f), "
-                "expectatum (%.4f, %.4f, %.4f)\n",
-                nomen, h.x, h.y, h.z, e.x, e.y, e.z);
+        fprintf(
+            stderr, "  MALUM: %s = (%.4f, %.4f, %.4f), "
+            "expectatum (%.4f, %.4f, %.4f)\n",
+            nomen, h.x, h.y, h.z, e.x, e.y, e.z
+        );
         errores++;
     }
 }
@@ -52,8 +56,8 @@ static void proba_vec3_fundamenta(void)
 
     expecta_prope("productum_scalare", productum_scalare(a, b), 32.0, 1e-12);
 
-    vec3_t c = productum_vectoriale(vec3(1,0,0), vec3(0,1,0));
-    expecta_vec3("productum_vectoriale(x,y)", c, vec3(0,0,1), 1e-12);
+    vec3_t c = productum_vectoriale(vec3(1, 0, 0), vec3(0, 1, 0));
+    expecta_vec3("productum_vectoriale(x,y)", c, vec3(0, 0, 1), 1e-12);
 
     fprintf(stderr, "  BENE\n");
 }
@@ -63,16 +67,16 @@ static void proba_magnitudo(void)
     fprintf(stderr, "magnitudo et normalizare:\n");
 
     expecta_prope("magnitudo(3,4,0)", magnitudo(vec3(3.0, 4.0, 0.0)), 5.0, 1e-12);
-    expecta_prope("magnitudo(0,0,0)", magnitudo(vec3(0,0,0)), 0.0, 1e-15);
-    expecta_prope("magnitudo(1,1,1)", magnitudo(vec3(1,1,1)), sqrt(3.0), 1e-12);
+    expecta_prope("magnitudo(0,0,0)", magnitudo(vec3(0, 0, 0)), 0.0, 1e-15);
+    expecta_prope("magnitudo(1,1,1)", magnitudo(vec3(1, 1, 1)), sqrt(3.0), 1e-12);
 
     vec3_t n = normalizare(vec3(0.0, 3.0, 4.0));
     expecta_prope("|normalizare|", magnitudo(n), 1.0, 1e-12);
     expecta_vec3("normalizare(0,3,4)", n, vec3(0.0, 0.6, 0.8), 1e-12);
 
     /* vector nullus — debet (0,0,1) reddere */
-    vec3_t z = normalizare(vec3(0,0,0));
-    expecta_vec3("normalizare(0,0,0)", z, vec3(0,0,1), 1e-12);
+    vec3_t z = normalizare(vec3(0, 0, 0));
+    expecta_vec3("normalizare(0,0,0)", z, vec3(0, 0, 1), 1e-12);
 
     fprintf(stderr, "  BENE\n");
 }
@@ -88,13 +92,13 @@ static void proba_rotationes(void)
     double pi2 = PI_GRAECUM / 2.0;
 
     /* rotare_x: (0,1,0) per π/2 → (0,0,1) */
-    expecta_vec3("rotare_x(y,π/2)", rotare_x(vec3(0,1,0), pi2), vec3(0,0,1), 1e-12);
+    expecta_vec3("rotare_x(y,π/2)", rotare_x(vec3(0, 1, 0), pi2), vec3(0, 0, 1), 1e-12);
 
     /* rotare_y: (1,0,0) per π/2 → (0,0,-1) */
-    expecta_vec3("rotare_y(x,π/2)", rotare_y(vec3(1,0,0), pi2), vec3(0,0,-1), 1e-12);
+    expecta_vec3("rotare_y(x,π/2)", rotare_y(vec3(1, 0, 0), pi2), vec3(0, 0, -1), 1e-12);
 
     /* rotare_z: (1,0,0) per π/2 → (0,1,0) */
-    expecta_vec3("rotare_z(x,π/2)", rotare_z(vec3(1,0,0), pi2), vec3(0,1,0), 1e-12);
+    expecta_vec3("rotare_z(x,π/2)", rotare_z(vec3(1, 0, 0), pi2), vec3(0, 1, 0), 1e-12);
 
     /* rotatio per 2π debet identitatem reddere */
     vec3_t p = vec3(1.7, -2.3, 0.5);
@@ -111,8 +115,10 @@ static void proba_rotationes(void)
     /* functio_rotandi typus */
     functio_rotandi rot[3] = { rotare_x, rotare_y, rotare_z };
     for (int i = 0; i < 3; i++)
-        expecta_prope("functio_rotandi conservat",
-                       magnitudo(rot[i](p, 0.77)), m, 1e-12);
+        expecta_prope(
+            "functio_rotandi conservat",
+            magnitudo(rot[i](p, 0.77)), m, 1e-12
+        );
 
     fprintf(stderr, "  BENE\n");
 }
@@ -238,8 +244,10 @@ static void proba_bessel(void)
     double inv50 = bessel_j0_inversa(0.50);
     double inv75 = bessel_j0_inversa(0.75);
     if (!(inv25 > inv50 && inv50 > inv75)) {
-        fprintf(stderr, "  MALUM: monotonia J0inv %.4f, %.4f, %.4f\n",
-                inv25, inv50, inv75);
+        fprintf(
+            stderr, "  MALUM: monotonia J0inv %.4f, %.4f, %.4f\n",
+            inv25, inv50, inv75
+        );
         errores++;
     }
 
@@ -261,7 +269,9 @@ int main(void)
     proba_color_structura();
     proba_bessel();
 
-    fprintf(stderr, "\n%s\n", errores == 0 ? "Omnes probationes praeterierunt."
-                                            : "ERRORES inventi!");
+    fprintf(
+        stderr, "\n%s\n", errores == 0 ? "Omnes probationes praeterierunt."
+        : "ERRORES inventi!"
+    );
     return errores;
 }

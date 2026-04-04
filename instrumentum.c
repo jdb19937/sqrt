@@ -24,24 +24,28 @@ static unsigned int semen_g = 1;
  * effectus post-processationis
  * ================================================================ */
 
-static void pp_visio(campus_t *c, double radius,
-                     unsigned char *copia)
-{
+static void pp_visio(
+    campus_t *c, double radius,
+    unsigned char *copia
+) {
     int L = c->latitudo, A = c->altitudo;
     unsigned char *px = c->pixels;
     int r = (int)(radius * 3.0);
-    if (r < 1) r = 1;
-    if (r > 30) r = 30;
+    if (r < 1)
+        r = 1;
+    if (r > 30)
+        r = 30;
 
     /* nucleus Gaussianus normalizatus */
     double *kern = (double *)malloc((size_t)(r * 2 + 1) * sizeof(double));
     double sum_k = 0;
     for (int i = -r; i <= r; i++) {
-        double t = (double)i / radius;
+        double t    = (double)i / radius;
         kern[i + r] = exp(-t * t * 0.5);
         sum_k += kern[i + r];
     }
-    for (int i = 0; i <= 2 * r; i++) kern[i] /= sum_k;
+    for (int i = 0; i <= 2 * r; i++)
+        kern[i] /= sum_k;
 
     /* transitus horizontalis — toroidale */
     memcpy(copia, px, (size_t)L * A * 3);
@@ -49,14 +53,14 @@ static void pp_visio(campus_t *c, double radius,
         for (int x = 0; x < L; x++) {
             double sr = 0, sg = 0, sb = 0;
             for (int k = -r; k <= r; k++) {
-                int sx = ((x + k) % L + L) % L;
-                int si = (y * L + sx) * 3;
+                int sx   = ((x + k) % L + L) % L;
+                int si   = (y * L + sx) * 3;
                 double w = kern[k + r];
                 sr += copia[si + 0] * w;
                 sg += copia[si + 1] * w;
                 sb += copia[si + 2] * w;
             }
-            int di = (y * L + x) * 3;
+            int di     = (y * L + x) * 3;
             px[di + 0] = (unsigned char)(sr + 0.5);
             px[di + 1] = (unsigned char)(sg + 0.5);
             px[di + 2] = (unsigned char)(sb + 0.5);
@@ -69,14 +73,14 @@ static void pp_visio(campus_t *c, double radius,
         for (int x = 0; x < L; x++) {
             double sr = 0, sg = 0, sb = 0;
             for (int k = -r; k <= r; k++) {
-                int sy = ((y + k) % A + A) % A;
-                int si = (sy * L + x) * 3;
+                int sy   = ((y + k) % A + A) % A;
+                int si   = (sy * L + x) * 3;
                 double w = kern[k + r];
                 sr += copia[si + 0] * w;
                 sg += copia[si + 1] * w;
                 sb += copia[si + 2] * w;
             }
-            int di = (y * L + x) * 3;
+            int di     = (y * L + x) * 3;
             px[di + 0] = (unsigned char)(sr + 0.5);
             px[di + 1] = (unsigned char)(sg + 0.5);
             px[di + 2] = (unsigned char)(sb + 0.5);
@@ -97,14 +101,19 @@ static void pp_scintillatio(campus_t *c, double amplitudo)
         for (int x = 0; x < L; x++) {
             int idx = (y * L + x) * 3;
             int lum = px[idx] + px[idx + 1] + px[idx + 2];
-            if (lum < 15) continue;
-            sem ^= sem << 13; sem ^= sem >> 17; sem ^= sem << 5;
-            double noise = ((double)(sem & 0xFFFF) / 32768.0) - 1.0;
+            if (lum < 15)
+                continue;
+            sem ^= sem << 13;
+            sem ^= sem >> 17;
+            sem ^= sem << 5;
+            double noise  = ((double)(sem & 0xFFFF) / 32768.0) - 1.0;
             double factor = 1.0 + amplitudo * noise;
-            if (factor < 0.0) factor = 0.0;
+            if (factor < 0.0)
+                factor = 0.0;
             for (int ch = 0; ch < 3; ch++) {
                 int v = (int)(px[idx + ch] * factor + 0.5);
-                if (v > 255) v = 255;
+                if (v > 255)
+                    v = 255;
                 px[idx + ch] = (unsigned char)v;
             }
         }
@@ -116,9 +125,10 @@ static void pp_scintillatio(campus_t *c, double amplitudo)
  * distantiam parvam. coherentia spatiosa per hash de (x/s, y/s)
  * ubi s = scala cellulae turbulentiae (Kolmogorov inner scale).
  * Fried (1966): σ_θ ≈ 0.42 λ/r_0. toroidale involutum. */
-static void pp_refractio(campus_t *c, double amplitudo,
-                         unsigned char *copia)
-{
+static void pp_refractio(
+    campus_t *c, double amplitudo,
+    unsigned char *copia
+) {
     int L = c->latitudo, A = c->altitudo;
     unsigned char *px = c->pixels;
     memcpy(copia, px, (size_t)L * A * 3);
@@ -134,7 +144,7 @@ static void pp_refractio(campus_t *c, double amplitudo,
             /* hash spatiosa cohaerens — interpolata inter cellulas.
              * cellula (gx, gy) dat dislocatio fixa per semen. */
             double fx = x * inv_s, fy = y * inv_s;
-            int gx0 = (int)fx, gy0 = (int)fy;
+            int gx0   = (int)fx, gy0 = (int)fy;
             double tx = fx - gx0, ty = fy - gy0;
             /* smooth interpolatio (Perlin) */
             tx = tx * tx * (3.0 - 2.0 * tx);
@@ -146,23 +156,28 @@ static void pp_refractio(campus_t *c, double amplitudo,
                 for (int cx = 0; cx <= 1; cx++) {
                     unsigned int h = (unsigned int)(
                         (gx0 + cx) * 73856093u ^ (gy0 + cy) * 19349663u
-                        ^ semen_g);
-                    h ^= h >> 13; h ^= h << 7; h ^= h >> 17;
+                        ^ semen_g
+                    );
+                    h ^= h >> 13;
+                    h ^= h << 7;
+                    h ^= h >> 17;
                     double hx = ((double)(h & 0xFFFF) / 32768.0) - 1.0;
-                    h ^= h << 13; h ^= h >> 7; h ^= h << 17;
+                    h ^= h << 13;
+                    h ^= h >> 7;
+                    h ^= h << 17;
                     double hy = ((double)(h & 0xFFFF) / 32768.0) - 1.0;
                     double wx = cx ? tx : (1.0 - tx);
                     double wy = cy ? ty : (1.0 - ty);
-                    double w = wx * wy;
+                    double w  = wx * wy;
                     ddx += hx * w;
                     ddy += hy * w;
                 }
             }
 
-            int sx = ((int)(x + ddx * amplitudo + 0.5) % L + L) % L;
-            int sy = ((int)(y + ddy * amplitudo + 0.5) % A + A) % A;
-            int di = (y * L + x) * 3;
-            int si = (sy * L + sx) * 3;
+            int sx     = ((int)(x + ddx * amplitudo + 0.5) % L + L) % L;
+            int sy     = ((int)(y + ddy * amplitudo + 0.5) % A + A) % A;
+            int di     = (y * L + x) * 3;
+            int si     = (sy * L + sx) * 3;
             px[di + 0] = copia[si + 0];
             px[di + 1] = copia[si + 1];
             px[di + 2] = copia[si + 2];
@@ -183,9 +198,15 @@ static void pp_caeli_lumen(campus_t *c, double intensitas)
     int gb = (int)(intensitas * 22);
     for (int i = 0; i < L * A; i++) {
         int idx = i * 3;
-        int r = px[idx + 0] + gr; if (r > 255) r = 255;
-        int g = px[idx + 1] + gg; if (g > 255) g = 255;
-        int b = px[idx + 2] + gb; if (b > 255) b = 255;
+        int r   = px[idx + 0] + gr;
+        if (r > 255)
+            r = 255;
+        int g = px[idx + 1] + gg;
+        if (g > 255)
+            g = 255;
+        int b = px[idx + 2] + gb;
+        if (b > 255)
+            b = 255;
         px[idx + 0] = (unsigned char)r;
         px[idx + 1] = (unsigned char)g;
         px[idx + 2] = (unsigned char)b;
@@ -195,9 +216,10 @@ static void pp_caeli_lumen(campus_t *c, double intensitas)
 /* florescentia — bloom: regiones lucidae halo diffusum emittunt.
  * extractio supra limen, blur Gaussianus, additio.
  * Janesick (2001): CCD blooming ex saturatione pixelorum. */
-static void pp_florescentia(campus_t *c, double radius,
-                            unsigned char *copia)
-{
+static void pp_florescentia(
+    campus_t *c, double radius,
+    unsigned char *copia
+) {
     int L = c->latitudo, A = c->altitudo;
     unsigned char *px = c->pixels;
     size_t n = (size_t)L * A * 3;
@@ -207,7 +229,7 @@ static void pp_florescentia(campus_t *c, double radius,
         int idx = (int)i * 3;
         int lum = px[idx] + px[idx + 1] + px[idx + 2];
         if (lum > 180) {
-            double f = (double)(lum - 180) / (765.0 - 180.0);
+            double f       = (double)(lum - 180) / (765.0 - 180.0);
             copia[idx + 0] = (unsigned char)(px[idx + 0] * f);
             copia[idx + 1] = (unsigned char)(px[idx + 1] * f);
             copia[idx + 2] = (unsigned char)(px[idx + 2] * f);
@@ -222,31 +244,35 @@ static void pp_florescentia(campus_t *c, double radius,
      * tres iterationes box blur approximant Gaussianam (Wells 1986). */
     unsigned char *temp = (unsigned char *)malloc(n);
     int box_r = (int)(radius + 0.5);
-    if (box_r < 1) box_r = 1;
-    if (box_r > 30) box_r = 30;
+    if (box_r < 1)
+        box_r = 1;
+    if (box_r > 30)
+        box_r = 30;
 
     for (int iter = 0; iter < 3; iter++) {
         /* horizontale — toroidale */
         memcpy(temp, copia, n);
         for (int y = 0; y < A; y++) {
             int sr = 0, sg = 0, sb = 0;
-            int w = 2 * box_r + 1;
+            int w  = 2 * box_r + 1;
             /* initia summa */
             for (int k = -box_r; k <= box_r; k++) {
                 int sx = ((k) % L + L) % L;
                 int si = (y * L + sx) * 3;
-                sr += temp[si]; sg += temp[si + 1]; sb += temp[si + 2];
+                sr += temp[si];
+                sg += temp[si + 1];
+                sb += temp[si + 2];
             }
             for (int x = 0; x < L; x++) {
-                int di = (y * L + x) * 3;
+                int di        = (y * L + x) * 3;
                 copia[di + 0] = (unsigned char)(sr / w);
                 copia[di + 1] = (unsigned char)(sg / w);
                 copia[di + 2] = (unsigned char)(sb / w);
                 /* glide: adde dextrum, remove sinistrum */
                 int add_x = ((x + box_r + 1) % L + L) % L;
                 int rem_x = ((x - box_r) % L + L) % L;
-                int ai = (y * L + add_x) * 3;
-                int ri = (y * L + rem_x) * 3;
+                int ai    = (y * L + add_x) * 3;
+                int ri    = (y * L + rem_x) * 3;
                 sr += temp[ai] - temp[ri];
                 sg += temp[ai + 1] - temp[ri + 1];
                 sb += temp[ai + 2] - temp[ri + 2];
@@ -256,21 +282,23 @@ static void pp_florescentia(campus_t *c, double radius,
         memcpy(temp, copia, n);
         for (int x = 0; x < L; x++) {
             int sr = 0, sg = 0, sb = 0;
-            int w = 2 * box_r + 1;
+            int w  = 2 * box_r + 1;
             for (int k = -box_r; k <= box_r; k++) {
                 int sy = ((k) % A + A) % A;
                 int si = (sy * L + x) * 3;
-                sr += temp[si]; sg += temp[si + 1]; sb += temp[si + 2];
+                sr += temp[si];
+                sg += temp[si + 1];
+                sb += temp[si + 2];
             }
             for (int y = 0; y < A; y++) {
-                int di = (y * L + x) * 3;
+                int di        = (y * L + x) * 3;
                 copia[di + 0] = (unsigned char)(sr / w);
                 copia[di + 1] = (unsigned char)(sg / w);
                 copia[di + 2] = (unsigned char)(sb / w);
-                int add_y = ((y + box_r + 1) % A + A) % A;
-                int rem_y = ((y - box_r) % A + A) % A;
-                int ai = (add_y * L + x) * 3;
-                int ri = (rem_y * L + x) * 3;
+                int add_y     = ((y + box_r + 1) % A + A) % A;
+                int rem_y     = ((y - box_r) % A + A) % A;
+                int ai        = (add_y * L + x) * 3;
+                int ri        = (rem_y * L + x) * 3;
                 sr += temp[ai] - temp[ri];
                 sg += temp[ai + 1] - temp[ri + 1];
                 sb += temp[ai + 2] - temp[ri + 2];
@@ -284,7 +312,8 @@ static void pp_florescentia(campus_t *c, double radius,
         int idx = (int)i * 3;
         for (int ch = 0; ch < 3; ch++) {
             int v = px[idx + ch] + copia[idx + ch];
-            if (v > 255) v = 255;
+            if (v > 255)
+                v = 255;
             px[idx + ch] = (unsigned char)v;
         }
     }
@@ -292,9 +321,10 @@ static void pp_florescentia(campus_t *c, double radius,
 
 /* acuitas — unsharp masking (Malin 1977).
  * I_acuta = I + α(I - I_blur). α > 0 acuit, α < 0 lenit. */
-static void pp_acuitas(campus_t *c, double factor,
-                       unsigned char *copia)
-{
+static void pp_acuitas(
+    campus_t *c, double factor,
+    unsigned char *copia
+) {
     int L = c->latitudo, A = c->altitudo;
     unsigned char *px = c->pixels;
     memcpy(copia, px, (size_t)L * A * 3);
@@ -312,10 +342,13 @@ static void pp_acuitas(campus_t *c, double factor,
                         sum += copia[(sy * L + sx) * 3 + ch];
                     }
                 }
-                double avg = sum / 9.0;
+                double avg  = sum / 9.0;
                 double orig = copia[idx + ch];
-                double v = orig + factor * (orig - avg);
-                if (v < 0) v = 0; if (v > 255) v = 255;
+                double v    = orig + factor * (orig - avg);
+                if (v < 0)
+                    v = 0;
+                if (v > 255)
+                    v = 255;
                 px[idx + ch] = (unsigned char)(v + 0.5);
             }
         }
@@ -324,9 +357,10 @@ static void pp_acuitas(campus_t *c, double factor,
 
 /* aberratio chromatica — separatio canalium R et B radialis.
  * Cauchy: n(λ) = A + B/λ². Toroidale involutum. */
-static void pp_aberratio(campus_t *c, double aberratio,
-                         unsigned char *copia)
-{
+static void pp_aberratio(
+    campus_t *c, double aberratio,
+    unsigned char *copia
+) {
     int L = c->latitudo, A = c->altitudo;
     unsigned char *px = c->pixels;
     memcpy(copia, px, (size_t)L * A * 3);
@@ -334,18 +368,19 @@ static void pp_aberratio(campus_t *c, double aberratio,
     double cx = L * 0.5, cy = A * 0.5;
     for (int y = 0; y < A; y++) {
         for (int x = 0; x < L; x++) {
-            double dx = x - cx, dy = y - cy;
+            double dx   = x - cx, dy = y - cy;
             double dist = sqrt(dx * dx + dy * dy);
-            if (dist < 1.0) continue;
-            double nx = dx / dist, ny = dy / dist;
+            if (dist < 1.0)
+                continue;
+            double nx      = dx / dist, ny = dy / dist;
             double shift_r = aberratio * dist / (L * 0.5);
-            int rx = ((int)(x + nx * shift_r) % L + L) % L;
-            int ry = ((int)(y + ny * shift_r) % A + A) % A;
-            int bx = ((int)(x - nx * shift_r) % L + L) % L;
-            int by = ((int)(y - ny * shift_r) % A + A) % A;
-            int idx = (y * L + x) * 3;
-            px[idx + 0] = copia[(ry * L + rx) * 3 + 0];
-            px[idx + 2] = copia[(by * L + bx) * 3 + 2];
+            int rx         = ((int)(x + nx * shift_r) % L + L) % L;
+            int ry         = ((int)(y + ny * shift_r) % A + A) % A;
+            int bx         = ((int)(x - nx * shift_r) % L + L) % L;
+            int by         = ((int)(y - ny * shift_r) % A + A) % A;
+            int idx        = (y * L + x) * 3;
+            px[idx + 0]    = copia[(ry * L + rx) * 3 + 0];
+            px[idx + 2]    = copia[(by * L + bx) * 3 + 2];
         }
     }
 }
@@ -361,25 +396,26 @@ static void pp_aberratio(campus_t *c, double aberratio,
  *   shear γ = γ₁ + iγ₂ (deformatio elliptica)
  * hic simplificamus ad distorsionem radialem symmetricam.
  * omnes coordinatae toroidaliter involutae. */
-static void pp_distorsio(campus_t *c, double coeff,
-                         unsigned char *copia)
-{
+static void pp_distorsio(
+    campus_t *c, double coeff,
+    unsigned char *copia
+) {
     int L = c->latitudo, A = c->altitudo;
     unsigned char *px = c->pixels;
     memcpy(copia, px, (size_t)L * A * 3);
 
-    double cx = L * 0.5, cy = A * 0.5;
+    double cx    = L * 0.5, cy = A * 0.5;
     double r_max = sqrt(cx * cx + cy * cy);
     for (int y = 0; y < A; y++) {
         for (int x = 0; x < L; x++) {
-            double dx = x - cx, dy = y - cy;
-            double r = sqrt(dx * dx + dy * dy) / r_max;
+            double dx     = x - cx, dy = y - cy;
+            double r      = sqrt(dx * dx + dy * dy) / r_max;
             double r_dist = r * (1.0 + coeff * r * r);
             /* coordinatae fontis — toroidale */
-            int sx = ((int)(cx + dx * r_dist / (r + 1e-10) + 0.5) % L + L) % L;
-            int sy = ((int)(cy + dy * r_dist / (r + 1e-10) + 0.5) % A + A) % A;
-            int di = (y * L + x) * 3;
-            int si = (sy * L + sx) * 3;
+            int sx     = ((int)(cx + dx * r_dist / (r + 1e-10) + 0.5) % L + L) % L;
+            int sy     = ((int)(cy + dy * r_dist / (r + 1e-10) + 0.5) % A + A) % A;
+            int di     = (y * L + x) * 3;
+            int si     = (sy * L + sx) * 3;
             px[di + 0] = copia[si + 0];
             px[di + 1] = copia[si + 1];
             px[di + 2] = copia[si + 2];
@@ -401,9 +437,18 @@ static void pp_saturatio(campus_t *c, double saturatio)
         r = lum + (r - lum) * saturatio;
         g = lum + (g - lum) * saturatio;
         b = lum + (b - lum) * saturatio;
-        if (r < 0) r = 0; if (r > 1) r = 1;
-        if (g < 0) g = 0; if (g > 1) g = 1;
-        if (b < 0) b = 0; if (b > 1) b = 1;
+        if (r < 0)
+            r = 0;
+        if (r > 1)
+            r = 1;
+        if (g < 0)
+            g = 0;
+        if (g > 1)
+            g = 1;
+        if (b < 0)
+            b = 0;
+        if (b > 1)
+            b = 1;
         px[idx + 0] = (unsigned char)(r * 255);
         px[idx + 1] = (unsigned char)(g * 255);
         px[idx + 2] = (unsigned char)(b * 255);
@@ -421,10 +466,11 @@ static void pp_vignetta(campus_t *c, double fortitudo)
     for (int y = 0; y < A; y++) {
         for (int x = 0; x < L; x++) {
             double dx = x - cx, dy = y - cy;
-            double d = sqrt(dx * dx + dy * dy) / r_max;
-            double f = 1.0 - fortitudo * d * d;
-            if (f < 0) f = 0;
-            int idx = (y * L + x) * 3;
+            double d  = sqrt(dx * dx + dy * dy) / r_max;
+            double f  = 1.0 - fortitudo * d * d;
+            if (f < 0)
+                f = 0;
+            int idx     = (y * L + x) * 3;
             px[idx + 0] = (unsigned char)(px[idx + 0] * f);
             px[idx + 1] = (unsigned char)(px[idx + 1] * f);
             px[idx + 2] = (unsigned char)(px[idx + 2] * f);
@@ -459,9 +505,10 @@ static void pp_vignetta(campus_t *c, double fortitudo)
  * (Conti, De Lellis & Székelyhidi 2012) inventa.
  *
  * fenestra = 0: nulla. >0: fortitudo effectus. */
-static void pp_fenestra(campus_t *c, double fortitudo,
-                        unsigned char *copia)
-{
+static void pp_fenestra(
+    campus_t *c, double fortitudo,
+    unsigned char *copia
+) {
     int L = c->latitudo, A = c->altitudo;
     unsigned char *px = c->pixels;
     memcpy(copia, px, (size_t)L * A * 3);
@@ -478,19 +525,19 @@ static void pp_fenestra(campus_t *c, double fortitudo,
 
             /* lens 1: inflatio centralis (bubbling).
              * Gaussiana lata — maxima in centro, evanescens ad margines */
-            double r_c2 = dx * dx + dy * dy;
+            double r_c2     = dx * dx + dy * dy;
             double d_centro = -fortitudo * 0.15 * exp(-r_c2 * 1.5);
 
             /* lens 2: contractio ad angulos (omnes 4 = idem punctum in toro).
              * distantia toroidalis ab angulo proximo */
-            double ax = fabs(dx), ay = fabs(dy);
-            double r_a2 = (1.0 - ax) * (1.0 - ax) + (1.0 - ay) * (1.0 - ay);
+            double ax       = fabs(dx), ay = fabs(dy);
+            double r_a2     = (1.0 - ax) * (1.0 - ax) + (1.0 - ay) * (1.0 - ay);
             double d_anguli = fortitudo * 0.12 * exp(-r_a2 * 2.5);
 
             /* lens 3: levis ondulatio ad margines laterales (ubi
              * margines oppositi identificantur in toro) */
-            double edge_x = exp(-ax * ax * 8.0) * (1.0 - ay * ay);
-            double edge_y = exp(-ay * ay * 8.0) * (1.0 - ax * ax);
+            double edge_x     = exp(-ax * ax * 8.0) * (1.0 - ay * ay);
+            double edge_y     = exp(-ay * ay * 8.0) * (1.0 - ax * ax);
             double d_marginis = fortitudo * 0.04 * (edge_x + edge_y);
 
             double dt = d_centro + d_anguli + d_marginis;
@@ -498,11 +545,11 @@ static void pp_fenestra(campus_t *c, double fortitudo,
             /* coordinatae fontis — toroidale */
             double sx_f = x + dx * dt * norm_x;
             double sy_f = y + dy * dt * norm_y;
-            int sx = ((int)(sx_f + 0.5) % L + L) % L;
-            int sy = ((int)(sy_f + 0.5) % A + A) % A;
+            int sx      = ((int)(sx_f + 0.5) % L + L) % L;
+            int sy      = ((int)(sy_f + 0.5) % A + A) % A;
 
-            int di = (y * L + x) * 3;
-            int si = (sy * L + sx) * 3;
+            int di     = (y * L + x) * 3;
+            int si     = (sy * L + sx) * 3;
             px[di + 0] = copia[si + 0];
             px[di + 1] = copia[si + 1];
             px[di + 2] = copia[si + 2];
@@ -511,18 +558,21 @@ static void pp_fenestra(campus_t *c, double fortitudo,
 }
 
 /* pipeline post-processationis — omnes effectus in ordine physico */
-void isonl_post_processare(campus_t *c,
-                            const instrumentum_t *inst)
-{
+void isonl_post_processare(
+    campus_t *c,
+    const instrumentum_t *inst
+) {
     size_t n = (size_t)c->latitudo * c->altitudo * 3;
 
     /* alveus communis pro effectibus qui copiam requirunt */
-    int opus_copia = (inst->visio > 0.1 || inst->refractio > 0.1
+    int opus_copia = (
+        inst->visio > 0.1 || inst->refractio > 0.1
         || inst->florescentia > 0.1
         || (inst->acuitas > 0.01 || inst->acuitas < -0.01)
         || inst->aberratio > 0.1
         || (inst->distorsio > 0.001 || inst->distorsio < -0.001)
-        || inst->fenestra > 0.001);
+        || inst->fenestra > 0.001
+    );
     unsigned char *copia = opus_copia ? (unsigned char *)malloc(n) : NULL;
 
     if (inst->visio > 0.1)
@@ -565,20 +615,23 @@ void isonl_post_processare(campus_t *c,
  * In campo 360°, una revolutio = 24h = 86400 tabulae ad 1/s.
  * ================================================================ */
 
-campus_t *campus_tabulam_dynamicam(const campus_t *basis,
-                                         const instrumentum_t *inst,
-                                         int tabula,
-                                         int scala,
-                                         double dx, double dy)
-{
-    int L = basis->latitudo, A = basis->altitudo;
+campus_t *campus_tabulam_dynamicam(
+    const campus_t *basis,
+    const instrumentum_t *inst,
+    int tabula,
+    int scala,
+    double dx, double dy
+) {
+    int L  = basis->latitudo, A = basis->altitudo;
     int oL = L / scala, oA = A / scala;
-    if (oL < 1) oL = 1;
-    if (oA < 1) oA = 1;
+    if (oL < 1)
+        oL = 1;
+    if (oA < 1)
+        oA = 1;
 
     campus_t *out = campus_creare(oL, oA);
-    int off_x = (int)(dx + 0.5);
-    int off_y = (int)(dy + 0.5);
+    int off_x     = (int)(dx + 0.5);
+    int off_y     = (int)(dy + 0.5);
 
     for (int y = 0; y < oA; y++) {
         for (int x = 0; x < oL; x++) {

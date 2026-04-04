@@ -57,7 +57,8 @@ static inline unsigned int aleatorium(void)
 
 static void pfx_applicare(tabula_t *t, int pfx, int posteriza_niv)
 {
-    if (pfx == HELVEA_PFX_NULLUS) return;
+    if (pfx == HELVEA_PFX_NULLUS)
+        return;
 
     size_t n_pix = (size_t)t->latitudo * t->altitudo;
 
@@ -66,9 +67,10 @@ static void pfx_applicare(tabula_t *t, int pfx, int posteriza_niv)
         limbus = (unsigned char *)calloc(n_pix, 1);
         for (int y = 1; y < t->altitudo - 1; y++) {
             for (int x = 1; x < t->latitudo - 1; x++) {
-                int c = y * t->latitudo + x;
+                int c    = y * t->latitudo + x;
                 double d = t->profunditatis[c];
-                if (d > 1e20) continue;
+                if (d > 1e20)
+                    continue;
 
                 double dl = t->profunditatis[c - 1];
                 double dr = t->profunditatis[c + 1];
@@ -82,8 +84,9 @@ static void pfx_applicare(tabula_t *t, int pfx, int posteriza_niv)
 
                 double gx = fabs(dr - dl);
                 double gy = fabs(dd - du);
-                double g = (gx + gy) * 25.0;
-                if (g > 1.0) g = 1.0;
+                double g  = (gx + gy) * 25.0;
+                if (g > 1.0)
+                    g = 1.0;
                 limbus[c] = (unsigned char)(g * 255.0);
             }
         }
@@ -91,15 +94,15 @@ static void pfx_applicare(tabula_t *t, int pfx, int posteriza_niv)
 
     for (size_t i = 0; i < n_pix; i++) {
         size_t base = i * 4;
-        double b = t->imaginis[base + 0] / 255.0;
-        double g = t->imaginis[base + 1] / 255.0;
-        double r = t->imaginis[base + 2] / 255.0;
+        double b    = t->imaginis[base + 0] / 255.0;
+        double g    = t->imaginis[base + 1] / 255.0;
+        double r    = t->imaginis[base + 2] / 255.0;
 
         if ((pfx & HELVEA_PFX_POSTERIZA) && posteriza_niv > 0) {
             double nf = (double)posteriza_niv;
-            r = floor(r * nf + 0.5) / nf;
-            g = floor(g * nf + 0.5) / nf;
-            b = floor(b * nf + 0.5) / nf;
+            r         = floor(r * nf + 0.5) / nf;
+            g         = floor(g * nf + 0.5) / nf;
+            b         = floor(b * nf + 0.5) / nf;
         }
 
         if (pfx & HELVEA_PFX_GRANUM) {
@@ -110,13 +113,14 @@ static void pfx_applicare(tabula_t *t, int pfx, int posteriza_niv)
         }
 
         if (pfx & HELVEA_PFX_NIGRESCO) {
-            int px = (int)(i % (size_t)t->latitudo);
-            int py = (int)(i / (size_t)t->latitudo);
-            double dx = (px - t->latitudo * 0.5) / (t->latitudo * 0.5);
-            double dy = (py - t->altitudo * 0.5) / (t->altitudo * 0.5);
-            double dist = dx * dx + dy * dy;
+            int px         = (int)(i % (size_t)t->latitudo);
+            int py         = (int)(i / (size_t)t->latitudo);
+            double dx      = (px - t->latitudo * 0.5) / (t->latitudo * 0.5);
+            double dy      = (py - t->altitudo * 0.5) / (t->altitudo * 0.5);
+            double dist    = dx * dx + dy * dy;
             double obscura = 1.0 - dist * 0.45;
-            if (obscura < 0.2) obscura = 0.2;
+            if (obscura < 0.2)
+                obscura = 0.2;
             r *= obscura;
             g *= obscura;
             b *= obscura;
@@ -129,9 +133,18 @@ static void pfx_applicare(tabula_t *t, int pfx, int posteriza_niv)
             b *= (1.0 - lf);
         }
 
-        if (r < 0) r = 0; if (r > 1) r = 1;
-        if (g < 0) g = 0; if (g > 1) g = 1;
-        if (b < 0) b = 0; if (b > 1) b = 1;
+        if (r < 0)
+            r = 0;
+        if (r > 1)
+            r = 1;
+        if (g < 0)
+            g = 0;
+        if (g > 1)
+            g = 1;
+        if (b < 0)
+            b = 0;
+        if (b > 1)
+            b = 1;
         t->imaginis[base + 0] = (unsigned char)(b * 255.0);
         t->imaginis[base + 1] = (unsigned char)(g * 255.0);
         t->imaginis[base + 2] = (unsigned char)(r * 255.0);
@@ -142,27 +155,46 @@ static void pfx_applicare(tabula_t *t, int pfx, int posteriza_niv)
 
 /* rotatio N vectorum per matricem rotationis (CPU BLAS).
  * axis: 0=x, 1=y, 2=z. Matrices R^T pro GEMM: result = src × R^T. */
-static void vertices_rotare(vec3_t *dest, vec3_t *fons,
-                             size_t n, int axis, double angulus)
-{
+static void vertices_rotare(
+    vec3_t *dest, vec3_t *fons,
+    size_t n, int axis, double angulus
+) {
     double ca = cos(angulus), sa = sin(angulus);
     double r[9];
 
     switch (axis) {
     case 0: /* R_x^T */
-        r[0]=1;   r[1]=0;   r[2]=0;
-        r[3]=0;   r[4]=ca;  r[5]=sa;
-        r[6]=0;   r[7]=-sa; r[8]=ca;
+        r[0] = 1;
+        r[1] = 0;
+        r[2] = 0;
+        r[3] = 0;
+        r[4] = ca;
+        r[5] = sa;
+        r[6] = 0;
+        r[7] = -sa;
+        r[8] = ca;
         break;
     case 1: /* R_y^T */
-        r[0]=ca;  r[1]=0;   r[2]=-sa;
-        r[3]=0;   r[4]=1;   r[5]=0;
-        r[6]=sa;  r[7]=0;   r[8]=ca;
+        r[0] = ca;
+        r[1] = 0;
+        r[2] = -sa;
+        r[3] = 0;
+        r[4] = 1;
+        r[5] = 0;
+        r[6] = sa;
+        r[7] = 0;
+        r[8] = ca;
         break;
     default: /* R_z^T */
-        r[0]=ca;  r[1]=sa;  r[2]=0;
-        r[3]=-sa; r[4]=ca;  r[5]=0;
-        r[6]=0;   r[7]=0;   r[8]=1;
+        r[0] = ca;
+        r[1] = sa;
+        r[2] = 0;
+        r[3] = -sa;
+        r[4] = ca;
+        r[5] = 0;
+        r[6] = 0;
+        r[7] = 0;
+        r[8] = 1;
         break;
     }
 
@@ -178,7 +210,8 @@ static void vertices_rotare(vec3_t *dest, vec3_t *fons,
 
 int main(int argc, char **argv)
 {
-    (void)argc; (void)argv;
+    (void)argc;
+    (void)argv;
 
     fprintf(stderr, "Superficiem computans...\n");
 
@@ -190,21 +223,23 @@ int main(int argc, char **argv)
     #define GRADUS_U(g) (10 * (1 << (g)))
     #define GRADUS_V(g) (5 * (1 << (g)))
 
-    size_t n_vert = (size_t)(GRADUS_U(gradus) + 1) * (GRADUS_V(gradus) + 1);
+    size_t n_vert       = (size_t)(GRADUS_U(gradus) + 1) * (GRADUS_V(gradus) + 1);
     vec3_t *puncta_orig = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
     vec3_t *normae_orig = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
     vec3_t *puncta_rot  = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
     vec3_t *normae_rot  = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
-    int gradus_mutatus = 0;
+    int gradus_mutatus  = 0;
 
     if (!puncta_orig || !normae_orig || !puncta_rot || !normae_rot) {
         fprintf(stderr, "ERROR: memoria insufficiens!\n");
         return 1;
     }
 
-    helvea_superficiem_computare(puncta_orig, normae_orig,
-                                 GRADUS_U(gradus), GRADUS_V(gradus),
-                                 radius_maior, radius_minor, methodus);
+    helvea_superficiem_computare(
+        puncta_orig, normae_orig,
+        GRADUS_U(gradus), GRADUS_V(gradus),
+        radius_maior, radius_minor, methodus
+    );
     int superficies_obsoleta = 0;
     fprintf(stderr, "Superficies parata: %zu vertices.\n", n_vert);
 
@@ -221,10 +256,10 @@ int main(int argc, char **argv)
 
     size_t n_pix = (size_t)LATITUDO_IMG * ALTITUDO_IMG;
     tabula_t tab;
-    tab.latitudo = LATITUDO_IMG;
-    tab.altitudo = ALTITUDO_IMG;
-    tab.bytes_pixel = 4;
-    tab.imaginis = (unsigned char *)malloc(n_pix * 4);
+    tab.latitudo      = LATITUDO_IMG;
+    tab.altitudo      = ALTITUDO_IMG;
+    tab.bytes_pixel   = 4;
+    tab.imaginis      = (unsigned char *)malloc(n_pix * 4);
     tab.profunditatis = (double *)malloc(n_pix * sizeof(double));
 
     if (pfr_initia(PFR_INITIA_VIDEO) != 0) {
@@ -235,7 +270,8 @@ int main(int argc, char **argv)
     pfr_fenestra_t *fenestra = pfr_fenestram_crea(
         "Torus Hevea — Spectator",
         PFR_POS_MEDIUM, PFR_POS_MEDIUM,
-        LATITUDO_IMG, ALTITUDO_IMG, 0);
+        LATITUDO_IMG, ALTITUDO_IMG, 0
+    );
     if (!fenestra) {
         fprintf(stderr, "ERROR fenestra: %s\n", pfr_erratum());
         pfr_fini();
@@ -243,7 +279,8 @@ int main(int argc, char **argv)
     }
 
     pfr_pictor_t *pictor = pfr_pictorem_crea(
-        fenestra, -1, PFR_PICTOR_CELER | PFR_PICTOR_SYNC);
+        fenestra, -1, PFR_PICTOR_CELER | PFR_PICTOR_SYNC
+    );
     if (!pictor) {
         fprintf(stderr, "ERROR pictor: %s\n", pfr_erratum());
         pfr_fenestram_destrue(fenestra);
@@ -253,7 +290,8 @@ int main(int argc, char **argv)
 
     pfr_textura_t *textura = pfr_texturam_crea(
         pictor, PFR_PIXEL_ARGB8888, PFR_TEXTURA_FLUENS,
-        LATITUDO_IMG, ALTITUDO_IMG);
+        LATITUDO_IMG, ALTITUDO_IMG
+    );
     if (!textura) {
         fprintf(stderr, "ERROR textura: %s\n", pfr_erratum());
         pfr_pictorem_destrue(pictor);
@@ -293,7 +331,7 @@ int main(int argc, char **argv)
 
     /* inscriptio (recording) — directe per phantasma inscriptores */
     pfr_mp4_t *inscr_mp4 = NULL;
-    int inscr_tabula = 0;
+    int inscr_tabula     = 0;
 
     /* orbita inscriptio — unus cyclus exactus */
     pfr_mp4_t *orbita_mp4 = NULL;
@@ -321,15 +359,19 @@ int main(int argc, char **argv)
                 currit = 0;
             } else if (eventus.typus == PFR_ROTA_MURIS) {
                 distantia -= eventus.rota.y * 0.25;
-                if (distantia < 1.8) distantia = 1.8;
-                if (distantia > 8.0) distantia = 8.0;
+                if (distantia < 1.8)
+                    distantia = 1.8;
+                if (distantia > 8.0)
+                    distantia = 8.0;
                 if (orbita_mp4) {
                     pfr_mp4_fini(orbita_mp4);
                     pfr_gif_fini(orbita_gif);
                     orbita_mp4 = NULL;
                     orbita_gif = NULL;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "Orbita cancellata");
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "Orbita cancellata"
+                    );
                 }
             } else if (eventus.typus == PFR_CLAVIS_INF) {
                 switch (eventus.clavis.signum.symbolum) {
@@ -341,95 +383,131 @@ int main(int argc, char **argv)
                 case PFR_CL_DEXTRUM:
                 case PFR_CL_SURSUM:
                 case PFR_CL_DEORSUM:
-                    if (eventus.clavis.signum.symbolum == PFR_CL_SINISTRUM) theta -= 0.08;
-                    if (eventus.clavis.signum.symbolum == PFR_CL_DEXTRUM)   theta += 0.08;
-                    if (eventus.clavis.signum.symbolum == PFR_CL_SURSUM)    phi   += 0.06;
-                    if (eventus.clavis.signum.symbolum == PFR_CL_DEORSUM)   phi   -= 0.06;
+                    if (eventus.clavis.signum.symbolum == PFR_CL_SINISTRUM)
+                        theta -= 0.08;
+                    if (eventus.clavis.signum.symbolum == PFR_CL_DEXTRUM)
+                        theta += 0.08;
+                    if (eventus.clavis.signum.symbolum == PFR_CL_SURSUM)
+                        phi   += 0.06;
+                    if (eventus.clavis.signum.symbolum == PFR_CL_DEORSUM)
+                        phi   -= 0.06;
                     if (orbita_mp4) {
                         pfr_mp4_fini(orbita_mp4);
                         pfr_gif_fini(orbita_gif);
                         orbita_mp4 = NULL;
                         orbita_gif = NULL;
-                        snprintf(status_nuntius, sizeof(status_nuntius),
-                             "Orbita cancellata");
+                        snprintf(
+                            status_nuntius, sizeof(status_nuntius),
+                            "Orbita cancellata"
+                        );
                     }
                     break;
                 case 'w':
                     distantia -= 0.15;
-                    if (distantia < 1.8) distantia = 1.8;
+                    if (distantia < 1.8)
+                        distantia = 1.8;
                     break;
                 case 's':
                     distantia += 0.15;
-                    if (distantia > 8.0) distantia = 8.0;
+                    if (distantia > 8.0)
+                        distantia = 8.0;
                     break;
                 case 'x':
                     axis_index = 0;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "Axis: %s", nomina_axium[axis_index]);
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "Axis: %s", nomina_axium[axis_index]
+                    );
                     break;
                 case 'y':
                     axis_index = 1;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "Axis: %s", nomina_axium[axis_index]);
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "Axis: %s", nomina_axium[axis_index]
+                    );
                     break;
                 case 'z':
                     axis_index = 2;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "Axis: %s", nomina_axium[axis_index]);
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "Axis: %s", nomina_axium[axis_index]
+                    );
                     break;
                 case PFR_CL_SPATIUM:
                     rotatio_activa = !rotatio_activa;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "Rotatio: %s",
-                             rotatio_activa ? "activa" : "sistita");
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "Rotatio: %s",
+                        rotatio_activa ? "activa" : "sistita"
+                    );
                     break;
                 case PFR_CL_AEQUALE:
                 case PFR_CL_PLUS:
                     celeritas *= 1.3;
-                    if (celeritas > 6.0) celeritas = 6.0;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "Celeritas: %.2f rad/s", celeritas);
+                    if (celeritas > 6.0)
+                        celeritas = 6.0;
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "Celeritas: %.2f rad/s", celeritas
+                    );
                     break;
                 case PFR_CL_MINUS:
                     celeritas /= 1.3;
-                    if (celeritas < 0.05) celeritas = 0.05;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "Celeritas: %.2f rad/s", celeritas);
+                    if (celeritas < 0.05)
+                        celeritas = 0.05;
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "Celeritas: %.2f rad/s", celeritas
+                    );
                     break;
                 case PFR_CL_1:
                     radius_maior -= 0.05;
-                    if (radius_maior < 0.3) radius_maior = 0.3;
+                    if (radius_maior < 0.3)
+                        radius_maior = 0.3;
                     superficies_obsoleta = 1;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "R=%.2f r=%.2f", radius_maior, radius_minor);
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "R=%.2f r=%.2f", radius_maior, radius_minor
+                    );
                     break;
                 case PFR_CL_2:
                     radius_maior += 0.05;
-                    if (radius_maior > 3.0) radius_maior = 3.0;
+                    if (radius_maior > 3.0)
+                        radius_maior = 3.0;
                     superficies_obsoleta = 1;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "R=%.2f r=%.2f", radius_maior, radius_minor);
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "R=%.2f r=%.2f", radius_maior, radius_minor
+                    );
                     break;
                 case PFR_CL_3:
                     radius_minor -= 0.02;
-                    if (radius_minor < 0.08) radius_minor = 0.08;
+                    if (radius_minor < 0.08)
+                        radius_minor = 0.08;
                     superficies_obsoleta = 1;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "R=%.2f r=%.2f", radius_maior, radius_minor);
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "R=%.2f r=%.2f", radius_maior, radius_minor
+                    );
                     break;
                 case PFR_CL_4:
                     radius_minor += 0.02;
-                    if (radius_minor > 1.5) radius_minor = 1.5;
+                    if (radius_minor > 1.5)
+                        radius_minor = 1.5;
                     superficies_obsoleta = 1;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "R=%.2f r=%.2f", radius_maior, radius_minor);
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "R=%.2f r=%.2f", radius_maior, radius_minor
+                    );
                     break;
                 case PFR_CL_TABULA:
                     helvea_index_thematis = (helvea_index_thematis + 1) % helvea_numerus_thematum;
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "Thema [%d]: %s",
-                             helvea_index_thematis,
-                             helvea_themata[helvea_index_thematis].nomen);
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "Thema [%d]: %s",
+                        helvea_index_thematis,
+                        helvea_themata[helvea_index_thematis].nomen
+                    );
                     break;
                 case 'm':
                     methodus = (methodus + 1) % HELVEA_NUMERUS_METHODORUM;
@@ -437,25 +515,27 @@ int main(int argc, char **argv)
                     break;
                 case PFR_CL_5:
                     helvea_strata--;
-                    if (helvea_strata < 1) helvea_strata = 1;
+                    if (helvea_strata < 1)
+                        helvea_strata = 1;
                     superficies_obsoleta = 1;
                     break;
                 case PFR_CL_6:
                     helvea_strata++;
-                    if (helvea_strata > HELVEA_STRATA_MAX) helvea_strata = HELVEA_STRATA_MAX;
+                    if (helvea_strata > HELVEA_STRATA_MAX)
+                        helvea_strata = HELVEA_STRATA_MAX;
                     superficies_obsoleta = 1;
                     break;
                 case PFR_CL_7:
                     if (gradus > 1) {
                         gradus--;
-                        gradus_mutatus = 1;
+                        gradus_mutatus       = 1;
                         superficies_obsoleta = 1;
                     }
                     break;
                 case PFR_CL_8:
                     if (gradus < 7) {
                         gradus++;
-                        gradus_mutatus = 1;
+                        gradus_mutatus       = 1;
                         superficies_obsoleta = 1;
                     }
                     break;
@@ -465,73 +545,94 @@ int main(int argc, char **argv)
                         time_t nunc = time(NULL);
                         struct tm *tm = localtime(&nunc);
                         char via[256];
-                        snprintf(via, sizeof(via),
-                                 "caelae/inscr_%04d%02d%02d_%02d%02d%02d.mp4",
-                                 tm->tm_year + 1900, tm->tm_mon + 1,
-                                 tm->tm_mday, tm->tm_hour,
-                                 tm->tm_min, tm->tm_sec);
-                        inscr_mp4 = pfr_mp4_initia(via, LATITUDO_IMG, ALTITUDO_IMG, 30);
+                        snprintf(
+                            via, sizeof(via),
+                            "caelae/inscr_%04d%02d%02d_%02d%02d%02d.mp4",
+                            tm->tm_year + 1900, tm->tm_mon + 1,
+                            tm->tm_mday, tm->tm_hour,
+                            tm->tm_min, tm->tm_sec
+                        );
+                        inscr_mp4    = pfr_mp4_initia(via, LATITUDO_IMG, ALTITUDO_IMG, 30);
                         inscr_tabula = 0;
-                        snprintf(status_nuntius, sizeof(status_nuntius),
-                                 "● INSCRIPTIO: %s", via);
+                        snprintf(
+                            status_nuntius, sizeof(status_nuntius),
+                            "● INSCRIPTIO: %s", via
+                        );
                     } else {
-                        snprintf(status_nuntius, sizeof(status_nuntius),
-                                 "■ INSCRIPTIO FINITA: %d tabulae",
-                                 inscr_tabula);
+                        snprintf(
+                            status_nuntius, sizeof(status_nuntius),
+                            "■ INSCRIPTIO FINITA: %d tabulae",
+                            inscr_tabula
+                        );
                         pfr_mp4_fini(inscr_mp4);
                         inscr_mp4 = NULL;
                     }
                     break;
                 case 'g': {
-                    time_t nunc = time(NULL);
-                    struct tm *tm = localtime(&nunc);
-                    char via[256];
-                    snprintf(via, sizeof(via),
-                             "caelae/imago_%04d%02d%02d_%02d%02d%02d.gif",
-                             tm->tm_year + 1900, tm->tm_mon + 1,
-                             tm->tm_mday, tm->tm_hour,
-                             tm->tm_min, tm->tm_sec);
-                    pfr_gif_t *g = pfr_gif_initia(via, LATITUDO_IMG, ALTITUDO_IMG, 0, 1);
-                    if (g) {
-                        uint32_t *inv = (uint32_t *)malloc(
-                            (size_t)LATITUDO_IMG * ALTITUDO_IMG * 4);
-                        if (inv) {
-                            const uint32_t *src = (const uint32_t *)tab.imaginis;
-                            for (int iy = 0; iy < ALTITUDO_IMG; iy++)
-                                memcpy(inv + (size_t)(ALTITUDO_IMG - 1 - iy) * LATITUDO_IMG,
-                                       src + (size_t)iy * LATITUDO_IMG,
-                                       (size_t)LATITUDO_IMG * 4);
-                            pfr_gif_tabulam_adde(g, inv);
-                            free(inv);
+                        time_t nunc = time(NULL);
+                        struct tm *tm = localtime(&nunc);
+                        char via[256];
+                        snprintf(
+                            via, sizeof(via),
+                            "caelae/imago_%04d%02d%02d_%02d%02d%02d.gif",
+                            tm->tm_year + 1900, tm->tm_mon + 1,
+                            tm->tm_mday, tm->tm_hour,
+                            tm->tm_min, tm->tm_sec
+                        );
+                        pfr_gif_t *g = pfr_gif_initia(via, LATITUDO_IMG, ALTITUDO_IMG, 0, 1);
+                        if (g) {
+                            uint32_t *inv = (uint32_t *)malloc(
+                                (size_t)LATITUDO_IMG * ALTITUDO_IMG * 4
+                            );
+                            if (inv) {
+                                const uint32_t *src = (const uint32_t *)tab.imaginis;
+                                for (int iy = 0; iy < ALTITUDO_IMG; iy++)
+                                    memcpy(
+                                        inv + (size_t)(ALTITUDO_IMG - 1 - iy) * LATITUDO_IMG,
+                                        src + (size_t)iy * LATITUDO_IMG,
+                                        (size_t)LATITUDO_IMG * 4
+                                    );
+                                pfr_gif_tabulam_adde(g, inv);
+                                free(inv);
+                            }
+                            pfr_gif_fini(g);
+                            snprintf(
+                                status_nuntius, sizeof(status_nuntius),
+                                "■ IMAGO: %s", via
+                            );
                         }
-                        pfr_gif_fini(g);
-                        snprintf(status_nuntius, sizeof(status_nuntius),
-                                 "■ IMAGO: %s", via);
+                        break;
                     }
-                    break;
-                }
                 case 'l':
                     if (!orbita_mp4 && rotatio_activa) {
                         time_t nunc = time(NULL);
                         struct tm *tm = localtime(&nunc);
-                        snprintf(orbita_nomen, sizeof(orbita_nomen),
-                                 "caelae/orbita_%04d%02d%02d_%02d%02d%02d",
-                                 tm->tm_year + 1900, tm->tm_mon + 1,
-                                 tm->tm_mday, tm->tm_hour,
-                                 tm->tm_min, tm->tm_sec);
+                        snprintf(
+                            orbita_nomen, sizeof(orbita_nomen),
+                            "caelae/orbita_%04d%02d%02d_%02d%02d%02d",
+                            tm->tm_year + 1900, tm->tm_mon + 1,
+                            tm->tm_mday, tm->tm_hour,
+                            tm->tm_min, tm->tm_sec
+                        );
                         char via_mp4[280];
                         char via_gif[280];
                         snprintf(via_mp4, sizeof(via_mp4), "%s.mp4", orbita_nomen);
                         snprintf(via_gif, sizeof(via_gif), "%s.gif", orbita_nomen);
-                        orbita_mp4 = pfr_mp4_initia(via_mp4,
-                                                     LATITUDO_IMG, ALTITUDO_IMG, 30);
-                        orbita_gif = pfr_gif_initia(via_gif,
-                                                     LATITUDO_IMG, ALTITUDO_IMG, 3, 2);
-                        orbita_tabula = 0;
+                        orbita_mp4 = pfr_mp4_initia(
+                            via_mp4,
+                            LATITUDO_IMG, ALTITUDO_IMG, 30
+                        );
+                        orbita_gif = pfr_gif_initia(
+                            via_gif,
+                            LATITUDO_IMG, ALTITUDO_IMG, 3, 2
+                        );
+                        orbita_tabula       = 0;
                         orbita_angulus_init = angulus_rot;
-                        snprintf(status_nuntius, sizeof(status_nuntius),
-                                 "◎ ORBITA: %s (unus cyclus)",
-                                 orbita_nomen);
+                        snprintf(
+                            status_nuntius, sizeof(status_nuntius),
+                            "◎ ORBITA: %s (unus cyclus)",
+                            orbita_nomen
+                        );
                     }
                     break;
                 case 'r':
@@ -542,16 +643,20 @@ int main(int argc, char **argv)
                     celeritas  = 0.12;
                     axis_index = 2;
                     rotatio_activa = 1;
-                    if (radius_maior != HELVEA_RADIUS_MAIOR ||
+                    if (
+                        radius_maior != HELVEA_RADIUS_MAIOR ||
                         radius_minor != HELVEA_RADIUS_MINOR ||
-                        methodus != HELVEA_BORRELLI) {
+                        methodus != HELVEA_BORRELLI
+                    ) {
                         radius_maior = HELVEA_RADIUS_MAIOR;
                         radius_minor = HELVEA_RADIUS_MINOR;
                         methodus = HELVEA_BORRELLI;
                         superficies_obsoleta = 1;
                     }
-                    snprintf(status_nuntius, sizeof(status_nuntius),
-                             "Conspectus restitutus");
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "Conspectus restitutus"
+                    );
                     break;
                 default:
                     break;
@@ -561,12 +666,30 @@ int main(int argc, char **argv)
 
         const pfr_u8 *status_clavium = pfr_claves_status(NULL);
         int perturbatum = 0;
-        if (status_clavium[PFR_SC_SINISTRUM]) { theta -= 1.5 * dt; perturbatum = 1; }
-        if (status_clavium[PFR_SC_DEXTRUM])   { theta += 1.5 * dt; perturbatum = 1; }
-        if (status_clavium[PFR_SC_SURSUM])    { phi   += 1.0 * dt; perturbatum = 1; }
-        if (status_clavium[PFR_SC_DEORSUM])   { phi   -= 1.0 * dt; perturbatum = 1; }
-        if (status_clavium[PFR_SC_W])         { distantia -= 2.0 * dt; perturbatum = 1; }
-        if (status_clavium[PFR_SC_S])         { distantia += 2.0 * dt; perturbatum = 1; }
+        if (status_clavium[PFR_SC_SINISTRUM]) {
+            theta -= 1.5 * dt;
+            perturbatum = 1;
+        }
+        if (status_clavium[PFR_SC_DEXTRUM])   {
+            theta += 1.5 * dt;
+            perturbatum = 1;
+        }
+        if (status_clavium[PFR_SC_SURSUM])    {
+            phi   += 1.0 * dt;
+            perturbatum = 1;
+        }
+        if (status_clavium[PFR_SC_DEORSUM])   {
+            phi   -= 1.0 * dt;
+            perturbatum = 1;
+        }
+        if (status_clavium[PFR_SC_W])         {
+            distantia -= 2.0 * dt;
+            perturbatum = 1;
+        }
+        if (status_clavium[PFR_SC_S])         {
+            distantia += 2.0 * dt;
+            perturbatum = 1;
+        }
         if (perturbatum && orbita_mp4) {
             pfr_mp4_fini(orbita_mp4);
             pfr_gif_fini(orbita_gif);
@@ -574,25 +697,29 @@ int main(int argc, char **argv)
             orbita_gif = NULL;
             fprintf(stderr, "  orbita cancellata\n");
         }
-        if (distantia < 1.8) distantia = 1.8;
-        if (distantia > 8.0) distantia = 8.0;
+        if (distantia < 1.8)
+            distantia = 1.8;
+        if (distantia > 8.0)
+            distantia = 8.0;
 
         if (rotatio_activa)
             angulus_rot += celeritas * dt;
 
         if (gradus_mutatus) {
-            n_vert = (size_t)(GRADUS_U(gradus) + 1) * (GRADUS_V(gradus) + 1);
-            puncta_orig = (vec3_t *)realloc(puncta_orig, n_vert * sizeof(vec3_t));
-            normae_orig = (vec3_t *)realloc(normae_orig, n_vert * sizeof(vec3_t));
-            puncta_rot  = (vec3_t *)realloc(puncta_rot,  n_vert * sizeof(vec3_t));
-            normae_rot  = (vec3_t *)realloc(normae_rot,  n_vert * sizeof(vec3_t));
+            n_vert         = (size_t)(GRADUS_U(gradus) + 1) * (GRADUS_V(gradus) + 1);
+            puncta_orig    = (vec3_t *)realloc(puncta_orig, n_vert * sizeof(vec3_t));
+            normae_orig    = (vec3_t *)realloc(normae_orig, n_vert * sizeof(vec3_t));
+            puncta_rot     = (vec3_t *)realloc(puncta_rot,  n_vert * sizeof(vec3_t));
+            normae_rot     = (vec3_t *)realloc(normae_rot,  n_vert * sizeof(vec3_t));
             gradus_mutatus = 0;
         }
 
         if (superficies_obsoleta) {
-            helvea_superficiem_computare(puncta_orig, normae_orig,
-                                         GRADUS_U(gradus), GRADUS_V(gradus),
-                                         radius_maior, radius_minor, methodus);
+            helvea_superficiem_computare(
+                puncta_orig, normae_orig,
+                GRADUS_U(gradus), GRADUS_V(gradus),
+                radius_maior, radius_minor, methodus
+            );
             superficies_obsoleta = 0;
         }
 
@@ -602,10 +729,12 @@ int main(int argc, char **argv)
         /* camera: positio ex coordinatis toroidalibus (theta, phi).
          * theta = horizontalis, phi = verticalis. ambo libere volvuntur.
          * camera orbitat in plano inclinato per phi. */
-        vec3_t pos_cam = vec3(distantia * cos(theta),
-                            distantia * sin(theta),
-                            0.0);
-        pos_cam = rotare_x(pos_cam, phi);
+        vec3_t pos_cam = vec3(
+            distantia * cos(theta),
+            distantia * sin(theta),
+            0.0
+        );
+        pos_cam       = rotare_x(pos_cam, phi);
         vec3_t scopus = vec3(0.0, 0.0, 0.0);
 
         /* sursum: perpendiculare ad orbitam, rotatum per phi */
@@ -621,16 +750,22 @@ int main(int argc, char **argv)
         tabulam_purgare(&tab);
         int delta_x = (int)(theta / DUO_PI * campus->latitudo);
         int delta_y = (int)(phi   / DUO_PI * campus->altitudo);
-        fundum_implere(&tab, campus->pixels,
-                              campus->latitudo, campus->altitudo,
-                              delta_x, delta_y);
+        fundum_implere(
+            &tab, campus->pixels,
+            campus->latitudo, campus->altitudo,
+            delta_x, delta_y
+        );
 
-        scaenam_reddere(&tab, puncta_rot, normae_rot,
-                               GRADUS_U(gradus), GRADUS_V(gradus), &cam,
-                               helvea_illuminare_thema, pixel_bgra);
+        scaenam_reddere(
+            &tab, puncta_rot, normae_rot,
+            GRADUS_U(gradus), GRADUS_V(gradus), &cam,
+            helvea_illuminare_thema, pixel_bgra
+        );
 
-        pfx_applicare(&tab, helvea_themata[helvea_index_thematis].pfx,
-                       helvea_themata[helvea_index_thematis].posteriza_niv);
+        pfx_applicare(
+            &tab, helvea_themata[helvea_index_thematis].pfx,
+            helvea_themata[helvea_index_thematis].posteriza_niv
+        );
 
         pfr_texturam_renova(textura, NULL, tab.imaginis, LATITUDO_IMG * 4);
         pfr_purga(pictor);
@@ -651,13 +786,17 @@ int main(int argc, char **argv)
             for (int dy = -5; dy <= 5; dy++)
                 for (int dx = -5; dx <= 5; dx++)
                     if (dx * dx + dy * dy <= 25)
-                        pfr_punctum_pinge(pictor, inscr_mp4 ? 40 : 20,
-                                            20 + dy + dx * 0);
+                        pfr_punctum_pinge(
+                            pictor, inscr_mp4 ? 40 : 20,
+                            20 + dy + dx * 0
+                        );
             /* arcum progressus reddere */
             double prog = angulus_rot - orbita_angulus_init;
-            if (prog < 0) prog = -prog;
+            if (prog < 0)
+                prog = -prog;
             double frac = prog / DUO_PI;
-            if (frac > 1.0) frac = 1.0;
+            if (frac > 1.0)
+                frac = 1.0;
             int arc_px = (int)(frac * (LATITUDO_IMG - 40));
             pfr_colorem_pone(pictor, 30, 120, 220, 255);
             pfr_rectum_t bar = {20, ALTITUDO_IMG - 8, arc_px, 4};
@@ -680,11 +819,14 @@ int main(int argc, char **argv)
         /* orbita: fini post unum cyclum (2π) */
         if (orbita_mp4) {
             double progressus = angulus_rot - orbita_angulus_init;
-            if (progressus < 0) progressus = -progressus;
+            if (progressus < 0)
+                progressus = -progressus;
             if (progressus >= DUO_PI) {
-                snprintf(status_nuntius, sizeof(status_nuntius),
-                         "◎ ORBITA PERFECTA: %d tabulae",
-                         orbita_tabula);
+                snprintf(
+                    status_nuntius, sizeof(status_nuntius),
+                    "◎ ORBITA PERFECTA: %d tabulae",
+                    orbita_tabula
+                );
                 pfr_mp4_fini(orbita_mp4);
                 pfr_gif_fini(orbita_gif);
                 orbita_mp4 = NULL;
@@ -698,20 +840,22 @@ int main(int argc, char **argv)
         pfr_u32 intervallum_fps = tempus_nunc_fps - tempus_fps;
         if (intervallum_fps >= 1000) {
             double fps = tabulae_fps * 1000.0 / intervallum_fps;
-            fprintf(stderr, "\r\033[K%3.0f fps | %-12s | %-10s s%d g%d | %s | %4.2f rad/s",
-                    fps,
-                    helvea_themata[helvea_index_thematis].nomen,
-                    helvea_nomina_methodorum[methodus],
-                    helvea_strata,
-                    gradus,
-                    nomina_axium[axis_index],
-                    celeritas);
+            fprintf(
+                stderr, "\r\033[K%3.0f fps | %-12s | %-10s s%d g%d | %s | %4.2f rad/s",
+                fps,
+                helvea_themata[helvea_index_thematis].nomen,
+                helvea_nomina_methodorum[methodus],
+                helvea_strata,
+                gradus,
+                nomina_axium[axis_index],
+                celeritas
+            );
             if (status_nuntius[0]) {
                 fprintf(stderr, " | %s", status_nuntius);
                 status_nuntius[0] = '\0';
             }
             tabulae_fps = 0;
-            tempus_fps = tempus_nunc_fps;
+            tempus_fps  = tempus_nunc_fps;
         }
     }
 

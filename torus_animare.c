@@ -29,9 +29,12 @@ int main(int argc, char **argv)
     if (argi < argc && argv[argi][0] != '-') {
         numerus_imaginum = atoi(argv[argi++]);
     }
-    if (argi < argc) via_isonl = argv[argi++];
-    if (argi < argc) via_instr = argv[argi++];
-    if (numerus_imaginum < 1) numerus_imaginum = 72;
+    if (argi < argc)
+        via_isonl = argv[argi++];
+    if (argi < argc)
+        via_instr = argv[argi++];
+    if (numerus_imaginum < 1)
+        numerus_imaginum = 72;
 
     /* campum stellarum ex ISONL reddere */
     fprintf(stderr, "Campum stellarum reddens: %s + %s\n", via_isonl, via_instr);
@@ -43,10 +46,10 @@ int main(int argc, char **argv)
 
     size_t n_pix = (size_t)LATITUDO_IMG * ALTITUDO_IMG;
     tabula_t tab;
-    tab.latitudo = LATITUDO_IMG;
-    tab.altitudo = ALTITUDO_IMG;
-    tab.bytes_pixel = 3;
-    tab.imaginis = (unsigned char *)malloc(n_pix * 3);
+    tab.latitudo      = LATITUDO_IMG;
+    tab.altitudo      = ALTITUDO_IMG;
+    tab.bytes_pixel   = 3;
+    tab.imaginis      = (unsigned char *)malloc(n_pix * 3);
     tab.profunditatis = (double *)malloc(n_pix * sizeof(double));
 
     if (!tab.imaginis || !tab.profunditatis) {
@@ -56,7 +59,7 @@ int main(int argc, char **argv)
 
     /* superficiem praecomputare */
     fprintf(stderr, "Superficiem computans...\n");
-    size_t n_vert = (size_t)(GRADUS_U + 1) * (GRADUS_V + 1);
+    size_t n_vert  = (size_t)(GRADUS_U + 1) * (GRADUS_V + 1);
     vec3_t *puncta = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
     vec3_t *normae = (vec3_t *)malloc(n_vert * sizeof(vec3_t));
 
@@ -65,35 +68,43 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    helvea_superficiem_computare(puncta, normae, GRADUS_U, GRADUS_V,
-                                 HELVEA_RADIUS_MAIOR, HELVEA_RADIUS_MINOR,
-                                 HELVEA_BORRELLI);
+    helvea_superficiem_computare(
+        puncta, normae, GRADUS_U, GRADUS_V,
+        HELVEA_RADIUS_MAIOR, HELVEA_RADIUS_MINOR,
+        HELVEA_BORRELLI
+    );
 
     fprintf(stderr, "Animationem reddens: %d imagines\n", numerus_imaginum);
 
     for (int f = 0; f < numerus_imaginum; f++) {
         fprintf(stderr, "Imago %d/%d\n", f + 1, numerus_imaginum);
 
-        double angulus = DUO_PI * (double)f / (double)numerus_imaginum;
+        double angulus  = DUO_PI * (double)f / (double)numerus_imaginum;
         double dist_cam = 3.2;
         double alt_cam  = 1.3;
-        vec3_t pos_cam = vec3(dist_cam * cos(angulus),
-                            dist_cam * sin(angulus),
-                            alt_cam);
+        vec3_t pos_cam = vec3(
+            dist_cam * cos(angulus),
+            dist_cam * sin(angulus),
+            alt_cam
+        );
         vec3_t scopus = vec3(0.0, 0.0, -0.05);
-        camera_t cam = cameram_constituere(pos_cam, scopus);
+        camera_t cam  = cameram_constituere(pos_cam, scopus);
 
         /* fundum stellarum — toroidaliter volvitur cum camera */
         int delta_x = (int)(angulus / DUO_PI * campus->latitudo);
         int delta_y = (int)(alt_cam / 4.0 * campus->altitudo);
 
         tabulam_purgare(&tab);
-        fundum_implere(&tab, campus->pixels,
-                              campus->latitudo, campus->altitudo,
-                              delta_x, delta_y);
+        fundum_implere(
+            &tab, campus->pixels,
+            campus->latitudo, campus->altitudo,
+            delta_x, delta_y
+        );
 
-        scaenam_reddere(&tab, puncta, normae, GRADUS_U, GRADUS_V,
-                               &cam, helvea_illuminare, pixel_rgb);
+        scaenam_reddere(
+            &tab, puncta, normae, GRADUS_U, GRADUS_V,
+            &cam, helvea_illuminare, pixel_rgb
+        );
 
         char nomen[256];
         snprintf(nomen, sizeof(nomen), "tabulae/imago_%04d.ppm", f);

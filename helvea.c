@@ -41,9 +41,10 @@ int helvea_strata = 0; /* 0 = praefinitum per methodum */
  * circa interiorem (v=π) "nimis brevis".
  */
 
-static vec3_t torus_basis(double u, double v,
-                        double radius_maior, double radius_minor)
-{
+static vec3_t torus_basis(
+    double u, double v,
+    double radius_maior, double radius_minor
+) {
     double cu = cos(u), su = sin(u);
     double cv = cos(v), sv = sin(v);
     return (vec3_t){
@@ -176,15 +177,16 @@ static vec3_t torus_basis(double u, double v,
  *   non transpositas — orientatio altera, aeque valida.
  * ================================================================ */
 
-static vec3_t superficies_borrelli(double u, double v,
-                                   double R, double r,
-                                   int transpone)
-{
+static vec3_t superficies_borrelli(
+    double u, double v,
+    double R, double r,
+    int transpone
+) {
     vec3_t p = torus_basis(u, v, R, r);
 
     double cu = cos(u), su = sin(u);
     double cv = cos(v), sv = sin(v);
-    vec3_t n = vec3(cv * cu, cv * su, sv);
+    vec3_t n  = vec3(cv * cu, cv * su, sv);
 
     /*
      * Error metricus tori revolutionis:
@@ -228,14 +230,15 @@ static vec3_t superficies_borrelli(double u, double v,
     };
 
     int strata = helvea_strata > 0 ? helvea_strata : 3;
-    if (strata > HELVEA_STRATA_MAX) strata = HELVEA_STRATA_MAX;
+    if (strata > HELVEA_STRATA_MAX)
+        strata = HELVEA_STRATA_MAX;
 
     double dislocatio = 0.0;
 
     for (int phase = 0; phase < strata; phase++) {
         double lu = dir_u[phase % 3];
         double lv = dir_v[phase % 3];
-        double N = N_oscil[phase];
+        double N  = N_oscil[phase];
 
         /* parameter per directionem corrugationis */
         double t = lu * u + lv * v;
@@ -244,13 +247,13 @@ static vec3_t superficies_borrelli(double u, double v,
          * corrugatio fortior ubi torus ab isometria magis deviat
          * (circa equatorem, ubi R + r cos v maximus) */
         double stretch = (R + r * cv) / (R + r);
-        double amp = amp_basis[phase] * r * (0.3 + 0.7 * stretch);
+        double amp     = amp_basis[phase] * r * (0.3 + 0.7 * stretch);
 
         /* angulus per inversam Bessel J₀:
          * determinat formam undae — non purus sinus sed
          * "corrugatio truncata" characteristica Borrelli.
          * Ratio |z|/r_corr ex errore metrico. */
-        double rho = stretch * stretch;
+        double rho   = stretch * stretch;
         double alpha = bessel_j0_inversa(0.3 + 0.6 * rho);
 
         /* oscillatio */
@@ -265,10 +268,11 @@ static vec3_t superficies_borrelli(double u, double v,
  * selectio methodi et norma
  * ================================================================ */
 
-vec3_t helvea_superficies(double u, double v,
-                        double radius_maior, double radius_minor,
-                        helvea_methodus_t methodus)
-{
+vec3_t helvea_superficies(
+    double u, double v,
+    double radius_maior, double radius_minor,
+    helvea_methodus_t methodus
+) {
     switch (methodus) {
     case HELVEA_BORRELLI:
         return superficies_borrelli(u, v, radius_maior, radius_minor, 0);
@@ -280,30 +284,34 @@ vec3_t helvea_superficies(double u, double v,
     return torus_basis(u, v, radius_maior, radius_minor);
 }
 
-vec3_t helvea_norma(double u, double v,
-                  double radius_maior, double radius_minor,
-                  helvea_methodus_t methodus)
-{
+vec3_t helvea_norma(
+    double u, double v,
+    double radius_maior, double radius_minor,
+    helvea_methodus_t methodus
+) {
     double h = 5e-5;
     vec3_t du = differentia(
         helvea_superficies(u + h, v, radius_maior, radius_minor, methodus),
-        helvea_superficies(u - h, v, radius_maior, radius_minor, methodus));
+        helvea_superficies(u - h, v, radius_maior, radius_minor, methodus)
+    );
     vec3_t dv = differentia(
         helvea_superficies(u, v + h, radius_maior, radius_minor, methodus),
-        helvea_superficies(u, v - h, radius_maior, radius_minor, methodus));
+        helvea_superficies(u, v - h, radius_maior, radius_minor, methodus)
+    );
     return normalizare(productum_vectoriale(du, dv));
 }
 
-void helvea_superficiem_computare(vec3_t *puncta, vec3_t *normae,
-                                  int gradus_u, int gradus_v,
-                                  double radius_maior, double radius_minor,
-                                  helvea_methodus_t methodus)
-{
+void helvea_superficiem_computare(
+    vec3_t *puncta, vec3_t *normae,
+    int gradus_u, int gradus_v,
+    double radius_maior, double radius_minor,
+    helvea_methodus_t methodus
+) {
     for (int i = 0; i <= gradus_u; i++) {
         double u = DUO_PI * (double)i / (double)gradus_u;
         for (int j = 0; j <= gradus_v; j++) {
-            double v = DUO_PI * (double)j / (double)gradus_v;
-            size_t idx = (size_t)i * (gradus_v + 1) + j;
+            double v    = DUO_PI * (double)j / (double)gradus_v;
+            size_t idx  = (size_t)i * (gradus_v + 1) + j;
             puncta[idx] = helvea_superficies(u, v, radius_maior, radius_minor, methodus);
             normae[idx] = helvea_norma(u, v, radius_maior, radius_minor, methodus);
         }
@@ -312,14 +320,14 @@ void helvea_superficiem_computare(vec3_t *puncta, vec3_t *normae,
     /* vertices marginales copiare ut superficies claudatur —
      * corrugatio non necessarie periodica in [0,2π] */
     for (int j = 0; j <= gradus_v; j++) {
-        size_t idx_fin = (size_t)gradus_u * (gradus_v + 1) + j;
-        size_t idx_ini = (size_t)0 * (gradus_v + 1) + j;
+        size_t idx_fin  = (size_t)gradus_u * (gradus_v + 1) + j;
+        size_t idx_ini  = (size_t)0 * (gradus_v + 1) + j;
         puncta[idx_fin] = puncta[idx_ini];
         normae[idx_fin] = normae[idx_ini];
     }
     for (int i = 0; i <= gradus_u; i++) {
-        size_t idx_fin = (size_t)i * (gradus_v + 1) + gradus_v;
-        size_t idx_ini = (size_t)i * (gradus_v + 1) + 0;
+        size_t idx_fin  = (size_t)i * (gradus_v + 1) + gradus_v;
+        size_t idx_ini  = (size_t)i * (gradus_v + 1) + 0;
         puncta[idx_fin] = puncta[idx_ini];
         normae[idx_fin] = normae[idx_ini];
     }
@@ -350,13 +358,15 @@ color_t helvea_illuminare(vec3_t punct, vec3_t norm, vec3_t oculus)
         norm = multiplicare(norm, -1.0);
 
     for (int i = 0; i < 3; i++) {
-        vec3_t ld = normalizare(lux_dir[i]);
+        vec3_t ld    = normalizare(lux_dir[i]);
         double NdotL = productum_scalare(norm, ld);
-        if (NdotL < 0.0) NdotL = 0.0;
+        if (NdotL < 0.0)
+            NdotL = 0.0;
 
-        vec3_t semi = normalizare(summa(ld, ad_oculum));
+        vec3_t semi  = normalizare(summa(ld, ad_oculum));
         double NdotH = productum_scalare(norm, semi);
-        if (NdotH < 0.0) NdotH = 0.0;
+        if (NdotH < 0.0)
+            NdotH = 0.0;
         double spec = pow(NdotH, 60.0);
 
         res.r += mat_r * NdotL * lux_intens[i].r + spec * lux_intens[i].r * 0.45;
@@ -365,7 +375,7 @@ color_t helvea_illuminare(vec3_t punct, vec3_t norm, vec3_t oculus)
     }
 
     double fresnel = 1.0 - fabs(productum_scalare(norm, ad_oculum));
-    fresnel = fresnel * fresnel * fresnel * 0.35;
+    fresnel        = fresnel * fresnel * fresnel * 0.35;
     res.r += fresnel * 0.4;
     res.g += fresnel * 0.5;
     res.b += fresnel * 0.65;
@@ -433,41 +443,41 @@ const helvea_thema_t helvea_themata[16] = {
     },
     /* --- rampa --- */
     { "Ignis", LUX_RAMPA, HELVEA_PFX_NULLUS,
-        0, {0,0,0, 1.0}, 0,
-        {0,0,0, 1.0}, {0.95, 0.70, 0.30, 1.0}, 0.30,
+        0, {0, 0, 0, 1.0}, 0,
+        {0, 0, 0, 1.0}, {0.95, 0.70, 0.30, 1.0}, 0.30,
         0, 0, 0.0, 0, 0,
         {{0.15, 0.02, 0.20, 1.0}, {0.90, 0.15, 0.05, 1.0},
-         {1.00, 0.65, 0.00, 1.0}, {1.00, 1.00, 0.70, 1.0}}
+            {1.00, 0.65, 0.00, 1.0}, {1.00, 1.00, 0.70, 1.0}}
     },
     { "Oceanus", LUX_RAMPA, HELVEA_PFX_NULLUS,
-        0, {0,0,0, 1.0}, 0,
-        {0,0,0, 1.0}, {0.60, 0.85, 0.95, 1.0}, 0.35,
+        0, {0, 0, 0, 1.0}, 0,
+        {0, 0, 0, 1.0}, {0.60, 0.85, 0.95, 1.0}, 0.35,
         0, 0, 0.0, 0, 0,
         {{0.05, 0.02, 0.15, 1.0}, {0.00, 0.20, 0.55, 1.0},
-         {0.10, 0.75, 0.60, 1.0}, {0.85, 0.95, 0.70, 1.0}}
+            {0.10, 0.75, 0.60, 1.0}, {0.85, 0.95, 0.70, 1.0}}
     },
     { "Autumnus", LUX_RAMPA, HELVEA_PFX_GRANUM,
-        0, {0,0,0, 1.0}, 0,
-        {0,0,0, 1.0}, {0.50, 0.35, 0.20, 1.0}, 0.20,
+        0, {0, 0, 0, 1.0}, 0,
+        {0, 0, 0, 1.0}, {0.50, 0.35, 0.20, 1.0}, 0.20,
         0, 0, 0.0, 0, 0,
         {{0.20, 0.05, 0.15, 1.0}, {0.80, 0.25, 0.05, 1.0},
-         {0.95, 0.60, 0.10, 1.0}, {0.40, 0.75, 0.15, 1.0}}
+            {0.95, 0.60, 0.10, 1.0}, {0.40, 0.75, 0.15, 1.0}}
     },
     { "Glacialis", LUX_RAMPA, HELVEA_PFX_NIGRESCO,
-        0, {0,0,0, 1.0}, 0,
-        {0,0,0, 1.0}, {0.80, 0.90, 1.00, 1.0}, 0.45,
+        0, {0, 0, 0, 1.0}, 0,
+        {0, 0, 0, 1.0}, {0.80, 0.90, 1.00, 1.0}, 0.45,
         0, 0, 0.0, 0, 0,
         {{0.05, 0.00, 0.20, 1.0}, {0.15, 0.30, 0.70, 1.0},
-         {0.50, 0.80, 0.95, 1.0}, {0.95, 0.95, 1.00, 1.0}}
+            {0.50, 0.80, 0.95, 1.0}, {0.95, 0.95, 1.00, 1.0}}
     },
     /* --- cel / tabulata --- */
     { "Pictura", LUX_TABULATA, HELVEA_PFX_LINEAE | HELVEA_PFX_POSTERIZA,
-        0, {0,0,0, 1.0}, 0,
+        0, {0, 0, 0, 1.0}, 0,
         {0.95, 0.45, 0.15, 1.0}, {0.10, 0.08, 0.15, 1.0}, 0.20,
         20.0, 0.25, 0.08, 4, 6, RAMPA_NUL
     },
     { "Manga", LUX_TABULATA, HELVEA_PFX_LINEAE,
-        0, {0,0,0, 1.0}, 0,
+        0, {0, 0, 0, 1.0}, 0,
         {0.90, 0.30, 0.50, 1.0}, {0.15, 0.10, 0.20, 1.0}, 0.25,
         30.0, 0.20, 0.06, 3, 0, RAMPA_NUL
     },
@@ -517,28 +527,31 @@ color_t helvea_illuminare_thema(vec3_t punct, vec3_t norm, vec3_t oculus)
         norm = multiplicare(norm, -1.0);
 
     double NdotV = productum_scalare(norm, ad_oculum);
-    if (NdotV < 0.0) NdotV = 0.0;
+    if (NdotV < 0.0)
+        NdotV = 0.0;
 
     color_t mat = th->materia;
     if (th->modus == LUX_IRIDESCENS) {
         color_t ir = iridescentia(NdotV, th);
-        double s = th->ir_saturatio;
-        mat.r = mat.r * (1.0 - s) + ir.r * s;
-        mat.g = mat.g * (1.0 - s) + ir.g * s;
-        mat.b = mat.b * (1.0 - s) + ir.b * s;
+        double s   = th->ir_saturatio;
+        mat.r      = mat.r * (1.0 - s) + ir.r * s;
+        mat.g      = mat.g * (1.0 - s) + ir.g * s;
+        mat.b      = mat.b * (1.0 - s) + ir.b * s;
     }
 
     if (th->modus == LUX_RAMPA) {
-        vec3_t ld = normalizare(lux_cruda[0]);
+        vec3_t ld    = normalizare(lux_cruda[0]);
         double NdotL = productum_scalare(norm, ld);
-        if (NdotL < 0.0) NdotL = 0.0;
+        if (NdotL < 0.0)
+            NdotL = 0.0;
 
         double t3 = NdotL * 3.0;
-        int seg = (int)t3;
-        if (seg > 2) seg = 2;
+        int seg   = (int)t3;
+        if (seg > 2)
+            seg = 2;
         double f = t3 - (double)seg;
-        f = f * f * (3.0 - 2.0 * f);
-        f = f * f * (3.0 - 2.0 * f);
+        f        = f * f * (3.0 - 2.0 * f);
+        f        = f * f * (3.0 - 2.0 * f);
 
         const color_t *ca = &th->rampa[seg];
         const color_t *cb = &th->rampa[seg + 1];
@@ -548,7 +561,7 @@ color_t helvea_illuminare_thema(vec3_t punct, vec3_t norm, vec3_t oculus)
         res.b = ca->b * (1.0 - f) + cb->b * f;
 
         double fresnel = 1.0 - NdotV;
-        fresnel = fresnel * fresnel * fresnel * th->fresnel_vis;
+        fresnel        = fresnel * fresnel * fresnel * th->fresnel_vis;
         res.r += fresnel * th->fresnel_color.r;
         res.g += fresnel * th->fresnel_color.g;
         res.b += fresnel * th->fresnel_color.b;
@@ -558,13 +571,15 @@ color_t helvea_illuminare_thema(vec3_t punct, vec3_t norm, vec3_t oculus)
     color_t res = {mat.r * th->ambiens, mat.g * th->ambiens, mat.b * th->ambiens, 1.0};
 
     for (int i = 0; i < 3; i++) {
-        vec3_t ld = normalizare(lux_cruda[i]);
+        vec3_t ld    = normalizare(lux_cruda[i]);
         double NdotL = productum_scalare(norm, ld);
-        if (NdotL < 0.0) NdotL = 0.0;
+        if (NdotL < 0.0)
+            NdotL = 0.0;
 
-        vec3_t semi = normalizare(summa(ld, ad_oculum));
+        vec3_t semi  = normalizare(summa(ld, ad_oculum));
         double NdotH = productum_scalare(norm, semi);
-        if (NdotH < 0.0) NdotH = 0.0;
+        if (NdotH < 0.0)
+            NdotH = 0.0;
         double spec = pow(NdotH, th->spec_potentia);
 
         if (th->modus == LUX_TABULATA) {
@@ -575,15 +590,15 @@ color_t helvea_illuminare_thema(vec3_t punct, vec3_t norm, vec3_t oculus)
             NdotL = NdotL * 0.5 + 0.5;
 
         res.r += mat.r * NdotL * lux_intens_th[i].r
-               + spec * lux_intens_th[i].r * th->spec_vis;
+            + spec * lux_intens_th[i].r * th->spec_vis;
         res.g += mat.g * NdotL * lux_intens_th[i].g
-               + spec * lux_intens_th[i].g * th->spec_vis;
+            + spec * lux_intens_th[i].g * th->spec_vis;
         res.b += mat.b * NdotL * lux_intens_th[i].b
-               + spec * lux_intens_th[i].b * th->spec_vis;
+            + spec * lux_intens_th[i].b * th->spec_vis;
     }
 
     double fresnel = 1.0 - NdotV;
-    fresnel = fresnel * fresnel * fresnel * th->fresnel_vis;
+    fresnel        = fresnel * fresnel * fresnel * th->fresnel_vis;
     res.r += fresnel * th->fresnel_color.r;
     res.g += fresnel * th->fresnel_color.g;
     res.b += fresnel * th->fresnel_color.b;

@@ -22,7 +22,9 @@ typedef struct {
 
 planeta_perceptus_t planeta_perceptus_ex_ison(const char *ison);
 
-void planeta_perceptum_applicare(unsigned char *fen,
-                                 const planeta_perceptus_t *p);
+void planeta_perceptum_applicare(
+    unsigned char *fen,
+    const planeta_perceptus_t *p
+);
 
 #endif /* PERCEPTUS_H */

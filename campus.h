@@ -96,12 +96,16 @@ campus_t *campus_creare(int latitudo, int altitudo);
 void campus_destruere(campus_t *c);
 
 /* campum stellarum generare — instrumentum separatum a campo */
-void campus_generare(campus_t *c, const campus_parametri_t *p,
-                           const instrumentum_t *instrumentum);
+void campus_generare(
+    campus_t *c, const campus_parametri_t *p,
+    const instrumentum_t *instrumentum
+);
 
 /* pixel in campum toroidalem scribere (coordinatae modulantur) */
-void campus_pixel_scribere(campus_t *c, int x, int y,
-                          unsigned char r, unsigned char g, unsigned char b);
+void campus_pixel_scribere(
+    campus_t *c, int x, int y,
+    unsigned char r, unsigned char g, unsigned char b
+);
 
 /*
  * campus_regio_vacua — inspicit an regio circa (cx,cy) satis obscura sit.
@@ -111,16 +115,20 @@ void campus_pixel_scribere(campus_t *c, int x, int y,
 int campus_regio_vacua(const campus_t *c, int cx, int cy, int radius);
 
 /* sidus (64×64) in campum inserere ad positionem (x,y) — toroidale */
-void sidus_in_campum(campus_t *c, int cx, int cy,
-                           const unsigned char *fenestra);
+void sidus_in_campum(
+    campus_t *c, int cx, int cy,
+    const unsigned char *fenestra
+);
 
 /*
  * planeta (256×256) in campum inserere ad positionem (x,y) — toroidale.
  * scala: fractio magnitudinis (1.0 = 256px, 0.5 = 128px).
  * Planetae redduntur ultimi quia proximi sunt observatori.
  */
-void planeta_in_campum(campus_t *c, int cx, int cy,
-                       const unsigned char *fenestra, double scala);
+void planeta_in_campum(
+    campus_t *c, int cx, int cy,
+    const unsigned char *fenestra, double scala
+);
 
 /*
  * campus_ex_isonl_reddere — campum stellarum ex ISONL et instrumento reddit.
@@ -128,18 +136,24 @@ void planeta_in_campum(campus_t *c, int cx, int cy,
  * reddit campum paratum. Vocans campum per campus_destruere liberet.
  * Reddit NULL si error.
  */
-campus_t *campus_ex_isonl_reddere(const char *via_isonl,
-                                        const char *via_instrumentum);
+campus_t *campus_ex_isonl_reddere(
+    const char *via_isonl,
+    const char *via_instrumentum
+);
 
 /* post-processare: effectus instrumenti applicare ad campum */
-void isonl_post_processare(campus_t *c,
-                            const instrumentum_t *inst);
+void isonl_post_processare(
+    campus_t *c,
+    const instrumentum_t *inst
+);
 
 /* tabula dynamica: campum cum effectibus temporalibus reddere */
-campus_t *campus_tabulam_dynamicam(const campus_t *basis,
-                                         const instrumentum_t *inst,
-                                         int tabula,
-                                         int scala,
-                                         double dx, double dy);
+campus_t *campus_tabulam_dynamicam(
+    const campus_t *basis,
+    const instrumentum_t *inst,
+    int tabula,
+    int scala,
+    double dx, double dy
+);
 
 #endif /* CAMPUS_H */

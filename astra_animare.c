@@ -33,23 +33,25 @@
 #include <string.h>
 
 /* RGB campus → ARGB8888 buffer (quod phantasma expectat) */
-static void rgb_ad_argb(uint32_t *dest, const unsigned char *fons,
-                        int latitudo, int altitudo)
-{
+static void rgb_ad_argb(
+    uint32_t *dest, const unsigned char *fons,
+    int latitudo, int altitudo
+) {
     int n = latitudo * altitudo;
     for (int i = 0; i < n; i++) {
         int si = i * 3;
         dest[i] = 0xFF000000u
-                | ((uint32_t)fons[si + 0] << 16)
-                | ((uint32_t)fons[si + 1] << 8)
-                | ((uint32_t)fons[si + 2]);
+            | ((uint32_t)fons[si + 0] << 16)
+            | ((uint32_t)fons[si + 1] << 8)
+            | ((uint32_t)fons[si + 2]);
     }
 }
 
 int main(int argc, char **argv)
 {
     if (argc < 3) {
-        fprintf(stderr,
+        fprintf(
+            stderr,
             "Usus: astra_animare <stellae.isonl> <instrumentum.ison> [optiones]\n"
             "  -mp4 <via>      plica MP4\n"
             "  -gif <via>      plica GIF\n"
@@ -61,7 +63,8 @@ int main(int argc, char **argv)
             "  -wx <num>       revolutiones horizontales (loop, 0)\n"
             "  -wy <num>       revolutiones verticales (loop, 0)\n"
             "  -dx <val>       translatio horiz pixeles/tabula (linearis)\n"
-            "  -dy <val>       translatio vert pixeles/tabula (linearis)\n");
+            "  -dy <val>       translatio vert pixeles/tabula (linearis)\n"
+        );
         return 1;
     }
 
@@ -79,17 +82,31 @@ int main(int argc, char **argv)
     int usa_dx = 0;
 
     for (int i = 3; i < argc - 1; i++) {
-        if (strcmp(argv[i], "-mp4") == 0) via_mp4 = argv[++i];
-        else if (strcmp(argv[i], "-gif") == 0) via_gif = argv[++i];
-        else if (strcmp(argv[i], "-n") == 0) num_tab = atoi(argv[++i]);
-        else if (strcmp(argv[i], "-fps") == 0) fps = atoi(argv[++i]);
-        else if (strcmp(argv[i], "-scala") == 0) scala = atoi(argv[++i]);
-        else if (strcmp(argv[i], "-gif_scala") == 0) gif_scala = atoi(argv[++i]);
-        else if (strcmp(argv[i], "-gif_mora") == 0) gif_mora = atoi(argv[++i]);
-        else if (strcmp(argv[i], "-wx") == 0) wx = atoi(argv[++i]);
-        else if (strcmp(argv[i], "-wy") == 0) wy = atoi(argv[++i]);
-        else if (strcmp(argv[i], "-dx") == 0) { dx_lin = atof(argv[++i]); usa_dx = 1; }
-        else if (strcmp(argv[i], "-dy") == 0) { dy_lin = atof(argv[++i]); usa_dx = 1; }
+        if (strcmp(argv[i], "-mp4") == 0)
+            via_mp4 = argv[++i];
+        else if (strcmp(argv[i], "-gif") == 0)
+            via_gif = argv[++i];
+        else if (strcmp(argv[i], "-n") == 0)
+            num_tab = atoi(argv[++i]);
+        else if (strcmp(argv[i], "-fps") == 0)
+            fps = atoi(argv[++i]);
+        else if (strcmp(argv[i], "-scala") == 0)
+            scala = atoi(argv[++i]);
+        else if (strcmp(argv[i], "-gif_scala") == 0)
+            gif_scala = atoi(argv[++i]);
+        else if (strcmp(argv[i], "-gif_mora") == 0)
+            gif_mora = atoi(argv[++i]);
+        else if (strcmp(argv[i], "-wx") == 0)
+            wx = atoi(argv[++i]);
+        else if (strcmp(argv[i], "-wy") == 0)
+            wy = atoi(argv[++i]);
+        else if (strcmp(argv[i], "-dx") == 0) {
+            dx_lin = atof(argv[++i]);
+            usa_dx = 1;
+        }else if (strcmp(argv[i], "-dy") == 0) {
+            dy_lin = atof(argv[++i]);
+            usa_dx = 1;
+        }
     }
 
     if (!via_mp4 && !via_gif) {
@@ -113,27 +130,37 @@ int main(int argc, char **argv)
     if (instr_ison) {
         char *v;
         v = ison_da_chordam(instr_ison, "scintillatio");
-        if (v) { inst.scintillatio = atof(v); free(v); }
+        if (v) {
+            inst.scintillatio = atof(v);
+            free(v);
+        }
         v = ison_da_chordam(instr_ison, "refractio");
-        if (v) { inst.refractio = atof(v); free(v); }
+        if (v) {
+            inst.refractio = atof(v);
+            free(v);
+        }
         free(instr_ison);
     }
 
     int oL = basis->latitudo / scala;
     int oA = basis->altitudo / scala;
-    fprintf(stderr, "Animans: %d tabulas, %dx%d (scala %d), %.1f fps\n",
-            num_tab, oL, oA, scala, (double)fps);
+    fprintf(
+        stderr, "Animans: %d tabulas, %dx%d (scala %d), %.1f fps\n",
+        num_tab, oL, oA, scala, (double)fps
+    );
 
     /* inscriptores aperire */
     pfr_mp4_t *mp4 = NULL;
     pfr_gif_t *gif = NULL;
     if (via_mp4) {
         mp4 = pfr_mp4_initia(via_mp4, oL, oA, fps);
-        if (!mp4) fprintf(stderr, "MONITUM: MP4 aperire non possum\n");
+        if (!mp4)
+            fprintf(stderr, "MONITUM: MP4 aperire non possum\n");
     }
     if (via_gif) {
         gif = pfr_gif_initia(via_gif, oL, oA, gif_mora, gif_scala);
-        if (!gif) fprintf(stderr, "MONITUM: GIF aperire non possum\n");
+        if (!gif)
+            fprintf(stderr, "MONITUM: GIF aperire non possum\n");
     }
 
     uint32_t *argb = (uint32_t *)malloc((size_t)oL * oA * sizeof(uint32_t));
@@ -154,20 +181,29 @@ int main(int argc, char **argv)
         }
 
         campus_t *tab = campus_tabulam_dynamicam(
-            basis, &inst, f, scala, tx, ty);
+            basis, &inst, f, scala, tx, ty
+        );
 
         rgb_ad_argb(argb, tab->pixels, oL, oA);
 
-        if (mp4) pfr_mp4_tabulam_adde(mp4, argb);
-        if (gif) pfr_gif_tabulam_adde(gif, argb);
+        if (mp4)
+            pfr_mp4_tabulam_adde(mp4, argb);
+        if (gif)
+            pfr_gif_tabulam_adde(gif, argb);
 
         campus_destruere(tab);
     }
 
     fprintf(stderr, "\n");
 
-    if (mp4) { pfr_mp4_fini(mp4); fprintf(stderr, "MP4: %s\n", via_mp4); }
-    if (gif) { pfr_gif_fini(gif); fprintf(stderr, "GIF: %s\n", via_gif); }
+    if (mp4) {
+        pfr_mp4_fini(mp4);
+        fprintf(stderr, "MP4: %s\n", via_mp4);
+    }
+    if (gif) {
+        pfr_gif_fini(gif);
+        fprintf(stderr, "GIF: %s\n", via_gif);
+    }
 
     free(argb);
     campus_destruere(basis);

@@ -24,15 +24,17 @@ camera_t cameram_constituere(vec3_t positio, vec3_t scopus)
     return cam;
 }
 
-int pictura_proicere(const camera_t *cam, vec3_t p,
-                     double *scr_x, double *scr_y, double *prof,
-                     int latitudo, int altitudo)
-{
+int pictura_proicere(
+    const camera_t *cam, vec3_t p,
+    double *scr_x, double *scr_y, double *prof,
+    int latitudo, int altitudo
+) {
     vec3_t d = differentia(p, cam->positio);
     double z = productum_scalare(d, cam->ante);
-    if (z < 0.05) return 0;
+    if (z < 0.05)
+        return 0;
 
-    double f = cam->focalis / z;
+    double f     = cam->focalis / z;
     double scala = altitudo * 0.5;
 
     *scr_x = latitudo * 0.5 + productum_scalare(d, cam->dextrum) * f * scala;
@@ -70,12 +72,15 @@ void tabulam_purgare(tabula_t *t)
     }
 }
 
-void pixel_rgb(tabula_t *t, int x, int y,
-                       double prof, color_t c)
-{
-    if (x < 0 || x >= t->latitudo || y < 0 || y >= t->altitudo) return;
+void pixel_rgb(
+    tabula_t *t, int x, int y,
+    double prof, color_t c
+) {
+    if (x < 0 || x >= t->latitudo || y < 0 || y >= t->altitudo)
+        return;
     int idx = y * t->latitudo + x;
-    if (prof >= t->profunditatis[idx]) return;
+    if (prof >= t->profunditatis[idx])
+        return;
     t->profunditatis[idx] = prof;
 
     int base = idx * 3;
@@ -84,12 +89,15 @@ void pixel_rgb(tabula_t *t, int x, int y,
     t->imaginis[base + 2] = gamma_corrigere(c.b);
 }
 
-void pixel_bgra(tabula_t *t, int x, int y,
-                        double prof, color_t c)
-{
-    if (x < 0 || x >= t->latitudo || y < 0 || y >= t->altitudo) return;
+void pixel_bgra(
+    tabula_t *t, int x, int y,
+    double prof, color_t c
+) {
+    if (x < 0 || x >= t->latitudo || y < 0 || y >= t->altitudo)
+        return;
     int idx = y * t->latitudo + x;
-    if (prof >= t->profunditatis[idx]) return;
+    if (prof >= t->profunditatis[idx])
+        return;
     t->profunditatis[idx] = prof;
 
     int base = idx * 4;
@@ -103,11 +111,12 @@ void pixel_bgra(tabula_t *t, int x, int y,
  * fundum bitmap toroidale
  * ================================================================ */
 
-void fundum_implere(tabula_t *t,
-                            const unsigned char *bitmap,
-                            int bm_latitudo, int bm_altitudo,
-                            int delta_x, int delta_y)
-{
+void fundum_implere(
+    tabula_t *t,
+    const unsigned char *bitmap,
+    int bm_latitudo, int bm_altitudo,
+    int delta_x, int delta_y
+) {
     /* delta in [0, bm) normalizare */
     delta_x = ((delta_x % bm_latitudo) + bm_latitudo) % bm_latitudo;
     delta_y = ((delta_y % bm_altitudo) + bm_altitudo) % bm_altitudo;
@@ -149,12 +158,14 @@ void triangulum_reddere(
     double sx2, double sy2, double sz2, vec3_t p2, vec3_t n2,
     vec3_t oculus,
     illuminare_fn illum_fn,
-    pixel_fn pixel_fn)
-{
+    pixel_fn pixel_fn
+) {
     double area = (sx1 - sx0) * (sy2 - sy0) - (sx2 - sx0) * (sy1 - sy0);
-    if (fabs(area) < 0.5) return;
+    if (fabs(area) < 0.5)
+        return;
     /* backface culling */
-    if (area > 0.0) return;
+    if (area > 0.0)
+        return;
     double inv_area = 1.0 / area;
 
     int min_x = (int)floor(fmin(fmin(sx0, sx1), sx2));
@@ -162,10 +173,14 @@ void triangulum_reddere(
     int min_y = (int)floor(fmin(fmin(sy0, sy1), sy2));
     int max_y = (int)ceil (fmax(fmax(sy0, sy1), sy2));
 
-    if (min_x < 0) min_x = 0;
-    if (max_x >= t->latitudo) max_x = t->latitudo - 1;
-    if (min_y < 0) min_y = 0;
-    if (max_y >= t->altitudo) max_y = t->altitudo - 1;
+    if (min_x < 0)
+        min_x = 0;
+    if (max_x >= t->latitudo)
+        max_x = t->latitudo - 1;
+    if (min_y < 0)
+        min_y = 0;
+    if (max_y >= t->altitudo)
+        max_y = t->altitudo - 1;
 
     for (int y = min_y; y <= max_y; y++) {
         double py = y + 0.5;
@@ -173,22 +188,32 @@ void triangulum_reddere(
             double px = x + 0.5;
 
             double w0 = ((sx1 - px) * (sy2 - py) - (sx2 - px) * (sy1 - py))
-                        * inv_area;
+            * inv_area;
             double w1 = ((sx2 - px) * (sy0 - py) - (sx0 - px) * (sy2 - py))
-                        * inv_area;
+            * inv_area;
             double w2 = 1.0 - w0 - w1;
 
-            if (w0 < -0.001 || w1 < -0.001 || w2 < -0.001) continue;
+            if (w0 < -0.001 || w1 < -0.001 || w2 < -0.001)
+                continue;
 
             double z = w0 * sz0 + w1 * sz1 + w2 * sz2;
 
-            vec3_t punct = summa(summa(multiplicare(p0, w0),
-                                     multiplicare(p1, w1)),
-                               multiplicare(p2, w2));
+            vec3_t punct = summa(
+                summa(
+                    multiplicare(p0, w0),
+                    multiplicare(p1, w1)
+                ),
+                multiplicare(p2, w2)
+            );
             vec3_t norm  = normalizare(
-                         summa(summa(multiplicare(n0, w0),
-                                     multiplicare(n1, w1)),
-                               multiplicare(n2, w2)));
+                summa(
+                    summa(
+                        multiplicare(n0, w0),
+                        multiplicare(n1, w1)
+                    ),
+                    multiplicare(n2, w2)
+                )
+            );
 
             color_t c = illum_fn(punct, norm, oculus);
             pixel_fn(t, x, y, z, c);
@@ -206,8 +231,8 @@ void scaenam_reddere(
     int gradus_u, int gradus_v,
     const camera_t *cam,
     illuminare_fn illum_fn,
-    pixel_fn pixel_fn)
-{
+    pixel_fn pixel_fn
+) {
     for (int i = 0; i < gradus_u; i++) {
         for (int j = 0; j < gradus_v; j++) {
             size_t vi[4] = {
@@ -220,26 +245,35 @@ void scaenam_reddere(
             double sx[4], sy[4], sz[4];
             int omnes_visibiles = 1;
             for (int k = 0; k < 4; k++) {
-                if (!pictura_proicere(cam, puncta[vi[k]],
-                                      &sx[k], &sy[k], &sz[k],
-                                      t->latitudo, t->altitudo)) {
+                if (
+                    !pictura_proicere(
+                        cam, puncta[vi[k]],
+                        &sx[k], &sy[k], &sz[k],
+                        t->latitudo, t->altitudo
+                    )
+                ) {
                     omnes_visibiles = 0;
                     break;
                 }
             }
-            if (!omnes_visibiles) continue;
+            if (!omnes_visibiles)
+                continue;
 
-            triangulum_reddere(t,
+            triangulum_reddere(
+                t,
                 sx[0], sy[0], sz[0], puncta[vi[0]], normae[vi[0]],
                 sx[1], sy[1], sz[1], puncta[vi[1]], normae[vi[1]],
                 sx[2], sy[2], sz[2], puncta[vi[2]], normae[vi[2]],
-                cam->positio, illum_fn, pixel_fn);
+                cam->positio, illum_fn, pixel_fn
+            );
 
-            triangulum_reddere(t,
+            triangulum_reddere(
+                t,
                 sx[0], sy[0], sz[0], puncta[vi[0]], normae[vi[0]],
                 sx[2], sy[2], sz[2], puncta[vi[2]], normae[vi[2]],
                 sx[3], sy[3], sz[3], puncta[vi[3]], normae[vi[3]],
-                cam->positio, illum_fn, pixel_fn);
+                cam->positio, illum_fn, pixel_fn
+            );
         }
     }
 }

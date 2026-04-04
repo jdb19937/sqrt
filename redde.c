@@ -34,22 +34,25 @@ int main(int argc, char **argv)
     const char *via;
     if (argc >= 4) {
         via = argv[3];
-        f = fopen(via, "wb");
+        f   = fopen(via, "wb");
         if (!f) {
             fprintf(stderr, "ERROR: %s aperire non possum\n", via);
             return 1;
         }
     } else {
         via = "stdout";
-        f = stdout;
+        f   = stdout;
     }
 
     fprintf(stderr, "Imaginem scribens: %s\n", via);
     fprintf(f, "P6\n%d %d\n255\n", campus->latitudo, campus->altitudo);
-    fwrite(campus->pixels, 1,
-           (size_t)campus->latitudo * campus->altitudo * 3, f);
+    fwrite(
+        campus->pixels, 1,
+        (size_t)campus->latitudo * campus->altitudo * 3, f
+    );
 
-    if (f != stdout) fclose(f);
+    if (f != stdout)
+        fclose(f);
 
     campus_destruere(campus);
 

@@ -17,7 +17,10 @@
 static void scribe_ppm(const char *via, const unsigned char *rgba, int lat, int alt)
 {
     FILE *f = fopen(via, "wb");
-    if (!f) { fprintf(stderr, "ERROR: %s aperire non possum\n", via); return; }
+    if (!f) {
+        fprintf(stderr, "ERROR: %s aperire non possum\n", via);
+        return;
+    }
     fprintf(f, "P6\n%d %d\n255\n", lat, alt);
     for (int i = 0; i < lat * alt; i++) {
         unsigned char r = rgba[i * 4 + 0];
@@ -28,7 +31,9 @@ static void scribe_ppm(const char *via, const unsigned char *rgba, int lat, int 
         unsigned char br = (unsigned char)(r * a / 255);
         unsigned char bg = (unsigned char)(g * a / 255);
         unsigned char bb = (unsigned char)(b * a / 255);
-        fputc(br, f); fputc(bg, f); fputc(bb, f);
+        fputc(br, f);
+        fputc(bg, f);
+        fputc(bb, f);
     }
     fclose(f);
 }
@@ -36,18 +41,25 @@ static void scribe_ppm(const char *via, const unsigned char *rgba, int lat, int 
 int main(void)
 {
     unsigned char *fen = (unsigned char *)calloc(PLANETA_FENESTRA * PLANETA_FENESTRA * 4, 1);
-    if (!fen) { fprintf(stderr, "ERROR: memoria\n"); return 1; }
+    if (!fen) {
+        fprintf(stderr, "ERROR: memoria\n");
+        return 1;
+    }
 
     DIR *dir = opendir("astrae/planetae");
-    if (!dir) { fprintf(stderr, "ERROR: astrae/planetae/ aperire non possum\n"); return 1; }
+    if (!dir) {
+        fprintf(stderr, "ERROR: astrae/planetae/ aperire non possum\n");
+        return 1;
+    }
 
     struct dirent *ent;
     int n = 0;
 
     while ((ent = readdir(dir)) != NULL) {
         const char *nomen = ent->d_name;
-        size_t len = strlen(nomen);
-        if (len < 6 || strcmp(nomen + len - 5, ".ison") != 0) continue;
+        size_t len        = strlen(nomen);
+        if (len < 6 || strcmp(nomen + len - 5, ".ison") != 0)
+            continue;
 
         char via_ison[256];
         snprintf(via_ison, sizeof(via_ison), "astrae/planetae/%s", nomen);
@@ -59,7 +71,7 @@ int main(void)
         }
 
         char *per_raw = ison_da_crudum(ison, "perceptus");
-        planeta_t p = planeta_ex_ison(ison);
+        planeta_t p   = planeta_ex_ison(ison);
         free(ison);
 
         planeta_perceptus_t perc = planeta_perceptus_ex_ison(per_raw);

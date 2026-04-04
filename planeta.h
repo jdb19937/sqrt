@@ -149,12 +149,16 @@ typedef struct {
  * functiones
  * ================================================================ */
 
-void planeta_reddere(unsigned char *fenestra, const planeta_t *planeta,
-                     const planeta_perceptus_t *perceptus);
+void planeta_reddere(
+    unsigned char *fenestra, const planeta_t *planeta,
+    const planeta_perceptus_t *perceptus
+);
 
 planeta_t planeta_ex_ison(const char *ison);
 
-void planeta_instrumentum_applicare(const planeta_t *planeta,
-                                    instrumentum_t *instr);
+void planeta_instrumentum_applicare(
+    const planeta_t *planeta,
+    instrumentum_t *instr
+);
 
 #endif /* PLANETA_H */

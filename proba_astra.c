@@ -20,7 +20,8 @@ static int pixels_activos(const unsigned char *rgba, int n_pix)
 {
     int c = 0;
     for (int i = 0; i < n_pix; i++)
-        if (rgba[i * 4 + 3] > 0) c++;
+        if (rgba[i * 4 + 3] > 0)
+            c++;
     return c;
 }
 
@@ -49,7 +50,8 @@ int main(void)
     /* probatio: aliqui pixels non nigri */
     int activi = 0;
     for (int i = 0; i < 256 * 128 * 3; i++)
-        if (campus->pixels[i] > 0) activi++;
+        if (campus->pixels[i] > 0)
+            activi++;
 
     if (activi > 0) {
         fprintf(stderr, "  campus: %d pixels activi — BENE\n", activi);
@@ -111,11 +113,15 @@ int main(void)
     double tempp[] = {2500, 5800, 10000, 25000, 40000};
     for (int i = 0; i < 5; i++) {
         color_t col = sidus_temperatura_ad_colorem(tempp[i]);
-        fprintf(stderr, "  %7.0fK → R=%.2f G=%.2f B=%.2f\n",
-                tempp[i], col.r, col.g, col.b);
+        fprintf(
+            stderr, "  %7.0fK → R=%.2f G=%.2f B=%.2f\n",
+            tempp[i], col.r, col.g, col.b
+        );
     }
 
-    fprintf(stderr, "\n%s\n", errores == 0 ? "Omnes probationes praeterierunt."
-                                            : "ERRORES inventi!");
+    fprintf(
+        stderr, "\n%s\n", errores == 0 ? "Omnes probationes praeterierunt."
+        : "ERRORES inventi!"
+    );
     return errores;
 }

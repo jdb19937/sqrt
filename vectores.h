@@ -22,7 +22,9 @@
  * typi mathematici
  * ================================================================ */
 
-typedef struct { double x, y, z; } vec3_t;
+typedef struct {
+    double x, y, z;
+}vec3_t;
 
 /* ================================================================
  * operationes vectoriales (inline in capite)
@@ -70,7 +72,8 @@ static inline double magnitudo(vec3_t v)
 static inline vec3_t normalizare(vec3_t v)
 {
     double m = magnitudo(v);
-    if (m < 1e-15) return (vec3_t){0.0, 0.0, 1.0};
+    if (m < 1e-15)
+        return (vec3_t){0.0, 0.0, 1.0};
     return multiplicare(v, 1.0 / m);
 }
 

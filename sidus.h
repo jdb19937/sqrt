@@ -230,9 +230,11 @@ typedef struct {
  * alpha indicat quantum pixel a sidere afficitur.
  * ================================================================ */
 
-void sidus_reddere(unsigned char *fenestra,
-                         const sidus_t *sidus,
-                         const instrumentum_t *instrumentum);
+void sidus_reddere(
+    unsigned char *fenestra,
+    const sidus_t *sidus,
+    const instrumentum_t *instrumentum
+);
 
 /* colorem ex temperatura (Kelvin) per Planck approximare */
 color_t sidus_temperatura_ad_colorem(double kelvin);

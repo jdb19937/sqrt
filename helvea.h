@@ -37,24 +37,30 @@ extern const char *helvea_nomina_methodorum[HELVEA_NUMERUS_METHODORUM];
  * helvea_superficies — punctum superficiei.
  * methodus: algorithmum corrugationis eligit.
  */
-vec3_t helvea_superficies(double u, double v,
-                        double radius_maior, double radius_minor,
-                        helvea_methodus_t methodus);
+vec3_t helvea_superficies(
+    double u, double v,
+    double radius_maior, double radius_minor,
+    helvea_methodus_t methodus
+);
 
 /* norma per differentias finitas centrales */
-vec3_t helvea_norma(double u, double v,
-                  double radius_maior, double radius_minor,
-                  helvea_methodus_t methodus);
+vec3_t helvea_norma(
+    double u, double v,
+    double radius_maior, double radius_minor,
+    helvea_methodus_t methodus
+);
 
 /*
  * superficiem praecomputare.
  * vertices marginales copiantur ut superficies claudatur
  * (corrugatio non est periodica in [0,2π]).
  */
-void helvea_superficiem_computare(vec3_t *puncta, vec3_t *normae,
-                                  int gradus_u, int gradus_v,
-                                  double radius_maior, double radius_minor,
-                                  helvea_methodus_t methodus);
+void helvea_superficiem_computare(
+    vec3_t *puncta, vec3_t *normae,
+    int gradus_u, int gradus_v,
+    double radius_maior, double radius_minor,
+    helvea_methodus_t methodus
+);
 
 /* ================================================================
  * illuminatio simplex (Blinn-Phong, aurum)
