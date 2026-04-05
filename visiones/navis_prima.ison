@@ -1,0 +1,12 @@
+{
+  "nomen": "Navis Prima",
+  "genus": "navis",
+  "semen": 42,
+  "centrum_re": -1.7548,
+  "centrum_im": -0.0235,
+  "amplitudo": 0.02,
+  "iterationes": 1000,
+  "color_cyclus": 8.0,
+  "color_phase": 0.0,
+  "saturatio": 1.2
+}

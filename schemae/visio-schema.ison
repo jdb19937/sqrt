@@ -1,0 +1,41 @@
+{
+  "titulus": "visio",
+  "properties": {
+    "nomen":               {"type": "string"},
+    "genus":               {"type": "string"},
+    "semen":               {"type": "integer"},
+
+    "methodus":            {"type": "string"},
+    "thema":               {"type": "integer"},
+    "strata":              {"type": "integer"},
+    "radius_maior":        {"type": "number"},
+    "radius_minor":        {"type": "number"},
+    "gradus_u":            {"type": "integer"},
+    "gradus_v":            {"type": "integer"},
+    "distantia":           {"type": "number"},
+    "elevatio":            {"type": "number"},
+    "azimuthus":           {"type": "number"},
+
+    "centrum_re":          {"type": "number"},
+    "centrum_im":          {"type": "number"},
+    "amplitudo":           {"type": "number"},
+    "iterationes":         {"type": "integer"},
+    "color_cyclus":        {"type": "number"},
+    "color_phase":         {"type": "number"},
+    "saturatio":           {"type": "number"},
+
+    "ratio":               {"type": "number"},
+    "inclinatio":          {"type": "number"},
+    "lux_angulus":         {"type": "number"},
+    "lux_elevatio":        {"type": "number"},
+    "involucrum_r":        {"type": "number"},
+    "involucrum_g":        {"type": "number"},
+    "involucrum_b":        {"type": "number"},
+    "gondola_r":           {"type": "number"},
+    "gondola_g":           {"type": "number"},
+    "gondola_b":           {"type": "number"},
+    "fenestrae":           {"type": "number"},
+    "pinnae":              {"type": "number"}
+  },
+  "required": ["genus", "semen"]
+}
