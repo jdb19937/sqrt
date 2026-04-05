@@ -8,10 +8,10 @@ LDFLAGS = -lm `cat $(APOTHECA)/phantasma/nexus_phantasma`
 LIBISON = $(APOTHECA)/ison/libison.a
 LIBPHANTASMA = $(APOTHECA)/phantasma/libphantasma.a
 
-OBJECTA = pictura.o helvea.o astra.o sidus.o campus.o instrumentum.o \
+OBJECTA = pictura.o helvea.o sidus.o campus.o instrumentum.o \
           planeta.o aspectus.o perceptus.o visio.o
 BIBLIOTHECA = libsqrt.a
-CAPITA = astra.h sidus.h campus.h instrumentum.h planeta.h aspectus.h \
+CAPITA = sidus.h campus.h instrumentum.h planeta.h aspectus.h \
          perceptus.h color.h vectores.h visio.h pictura.h helvea.h bessel.h
 
 CAELAE = caelae/terra.isonl caelae/hubble.isonl caelae/jwst.isonl \
@@ -69,9 +69,6 @@ pictura.o: pictura.c $(CAPITA)
 
 helvea.o: helvea.c $(CAPITA)
 	$(CC) $(CFLAGS) -c -o helvea.o helvea.c
-
-astra.o: astra.c $(CAPITA)
-	$(CC) $(CFLAGS) -c -o astra.o astra.c
 
 sidus.o: sidus.c $(CAPITA)
 	$(CC) $(CFLAGS) -c -o sidus.o sidus.c

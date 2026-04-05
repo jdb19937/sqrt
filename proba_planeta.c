@@ -1,7 +1,7 @@
 /*
  * proba_planeta.c — reddit omnes planetas in PPM
  *
- * Legit omnes .ison plicas ex astrae/planetae/ directorio,
+ * Legit omnes .ison plicas ex planetae/ directorio,
  * reddit unumquemque in 512×512 imaginem.
  */
 
@@ -46,9 +46,9 @@ int main(void)
         return 1;
     }
 
-    DIR *dir = opendir("astrae/planetae");
+    DIR *dir = opendir("planetae");
     if (!dir) {
-        fprintf(stderr, "ERROR: astrae/planetae/ aperire non possum\n");
+        fprintf(stderr, "ERROR: planetae/ aperire non possum\n");
         return 1;
     }
 
@@ -62,7 +62,7 @@ int main(void)
             continue;
 
         char via_ison[256];
-        snprintf(via_ison, sizeof(via_ison), "astrae/planetae/%s", nomen);
+        snprintf(via_ison, sizeof(via_ison), "planetae/%s", nomen);
 
         char *ison = ison_lege_plicam(via_ison);
         if (!ison) {

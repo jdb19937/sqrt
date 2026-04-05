@@ -140,7 +140,8 @@ static void navis_reddere(unsigned char *fenestra, const visio_navis_t *n)
                 double zi2 = 2.0 * azr * azi + ci;
                 zr         = zr2;
                 zi         = zi2;
-                if (zr * zr + zi * zi > 256.0)
+                double r2 = zr * zr + zi * zi;
+                if (r2 > 256.0 || r2 != r2)
                     break;
                 iter++;
             }
@@ -154,19 +155,51 @@ static void navis_reddere(unsigned char *fenestra, const visio_navis_t *n)
                 fenestra[di + 3] = 255;
             } else {
                 /* smooth coloring */
-                double mu = (double)iter - log2(log2(zr * zr + zi * zi)) + 4.0;
+                double r2 = zr * zr + zi * zi;
+                if (r2 < 1.0) r2 = 1.0;
+                double lr = log2(r2);
+                if (lr < 1.0) lr = 1.0;
+                double mu = (double)iter - log2(lr) + 4.0;
                 double t  = mu / cyc + pha;
 
-                /* palette per sinusoidas */
-                double r = 0.5 + 0.5 * cos(DUO_PI * (t + 0.0));
-                double g = 0.5 + 0.5 * cos(DUO_PI * (t + 0.33));
-                double b = 0.5 + 0.5 * cos(DUO_PI * (t + 0.67));
-
-                /* saturatio */
-                double lum = 0.299 * r + 0.587 * g + 0.114 * b;
-                r = lum + (r - lum) * sat;
-                g = lum + (g - lum) * sat;
-                b = lum + (b - lum) * sat;
+                /* palette bichroma: caeruleum profundum ↔ ignis aureus */
+                double s = fmod(t, 1.0);
+                if (s < 0.0) s += 1.0;
+                double r, g, b;
+                if (s < 0.15) {
+                    /* nigrum → caeruleum profundum */
+                    double q = s / 0.15;
+                    r = 0.02 * q;
+                    g = 0.04 * q;
+                    b = 0.18 * q;
+                } else if (s < 0.4) {
+                    /* caeruleum profundum → caeruleum lucidum */
+                    double q = (s - 0.15) / 0.25;
+                    r = 0.02 + 0.08 * q;
+                    g = 0.04 + 0.30 * q;
+                    b = 0.18 + 0.55 * q;
+                } else if (s < 0.55) {
+                    /* caeruleum → aurantium (transitus) */
+                    double q = (s - 0.4) / 0.15;
+                    r = 0.10 + 0.70 * q;
+                    g = 0.34 - 0.04 * q;
+                    b = 0.73 - 0.68 * q;
+                } else if (s < 0.8) {
+                    /* aurantium → flavum lucidum */
+                    double q = (s - 0.55) / 0.25;
+                    r = 0.80 + 0.20 * q;
+                    g = 0.30 + 0.50 * q;
+                    b = 0.05 + 0.05 * q;
+                } else {
+                    /* flavum → album → nigrum (reditus) */
+                    double q = (s - 0.8) / 0.2;
+                    r = 1.00 - 0.85 * q;
+                    g = 0.80 - 0.70 * q;
+                    b = 0.10 - 0.05 * q;
+                }
+                r *= sat;
+                g *= sat;
+                b *= sat;
 
                 fenestra[di + 0] = gamma_corrigere(r);
                 fenestra[di + 1] = gamma_corrigere(g);
@@ -335,19 +368,21 @@ static void zeppelinus_reddere(unsigned char *fenestra, const visio_zeppelinus_t
     /* pinnae (tres, posteriores) */
     double p_off = a * 0.78;
 
-    /* camera */
-    double cam_dist = a * 2.8;
+    /* camera — semper centrata, FOV ex ratio ut fenestram impleat */
+    double elev     = z->elevatio != 0 ? z->elevatio : 0.15;
+    double cam_dist = a * 2.5;
     vec3_t cam_pos = vec3(
-        cam_dist * cos(0.15) * cos(-0.3),
-        cam_dist * cos(0.15) * sin(-0.3),
-        cam_dist * sin(0.15)
+        -cam_dist * cos(elev),
+        0.0,
+        cam_dist * sin(elev)
     );
     vec3_t scopus   = vec3(0, 0, 0);
     vec3_t cam_ante = normalizare(differentia(scopus, cam_pos));
     vec3_t cam_dext = normalizare(productum_vectoriale(cam_ante, vec3(0, 0, 1)));
     vec3_t cam_surs = productum_vectoriale(cam_dext, cam_ante);
 
-    (void)z->basis.semen;
+    /* FOV automatica: a/cam_dist ut corpus fenestram impleat */
+    double fov = (a * 1.15) / cam_dist;
 
     for (int py = 0; py < FEN; py++) {
         for (int px = 0; px < FEN; px++) {
@@ -358,9 +393,9 @@ static void zeppelinus_reddere(unsigned char *fenestra, const visio_zeppelinus_t
                 summa(
                     summa(
                         cam_ante,
-                        multiplicare(cam_dext, u * 1.2)
+                        multiplicare(cam_dext, u * fov)
                     ),
-                    multiplicare(cam_surs, -v * 1.2)
+                    multiplicare(cam_surs, -v * fov)
                 )
             );
 
@@ -550,9 +585,9 @@ visio_t *visio_ex_ison(const char *ison)
         nv->basis.genus = VISIO_NAVIS;
         nv->basis.semen = (unsigned)ison_pares_n(pp, n, "semen", 42);
 
-        nv->centrum_re   = ison_pares_f(pp, n, "centrum_re", -1.7548);
-        nv->centrum_im   = ison_pares_f(pp, n, "centrum_im", -0.0235);
-        nv->amplitudo    = ison_pares_f(pp, n, "amplitudo", 0.02);
+        nv->centrum_re   = ison_pares_f(pp, n, "centrum_re", -1.7557);
+        nv->centrum_im   = ison_pares_f(pp, n, "centrum_im", -0.0175);
+        nv->amplitudo    = ison_pares_f(pp, n, "amplitudo", 0.08);
         nv->iterationes  = (int)ison_pares_n(pp, n, "iterationes", 1000);
         nv->color_cyclus = ison_pares_f(pp, n, "color_cyclus", 8.0);
         nv->color_phase  = ison_pares_f(pp, n, "color_phase", 0.0);
@@ -584,6 +619,7 @@ visio_t *visio_ex_ison(const char *ison)
             pp, n, "gondola_r", "gondola_g", "gondola_b",
             0.25, 0.18, 0.12
         );
+        z->elevatio  = ison_pares_f(pp, n, "elevatio", 0.15);
         z->fenestrae = ison_pares_f(pp, n, "fenestrae", 6.0);
         z->pinnae    = ison_pares_f(pp, n, "pinnae", 0.4);
 

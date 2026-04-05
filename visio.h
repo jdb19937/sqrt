@@ -96,6 +96,7 @@ typedef struct {
     double  lux_elevatio;    /* elevatio lucis (radiani) */
     color_t involucrum;      /* color involucri */
     color_t gondola;         /* color gondolae */
+    double  elevatio;        /* elevatio camerae (radiani, praef. 0.15) */
     double  fenestrae;       /* numerus fenestrarum gondolae */
     double  pinnae;          /* magnitudo pinnarum 0..1 */
 } visio_zeppelinus_t;

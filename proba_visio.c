@@ -1,7 +1,7 @@
 /*
  * proba_visio.c — reddit omnes visiones in PPM
  *
- * Legit omnes .ison plicas ex astrae/visiones/ directorio,
+ * Legit omnes .ison plicas ex visiones/ directorio,
  * reddit unumquamque in 2048x2048 imaginem.
  */
 
@@ -47,9 +47,9 @@ int main(void)
         return 1;
     }
 
-    DIR *dir = opendir("astrae/visiones");
+    DIR *dir = opendir("visiones");
     if (!dir) {
-        fprintf(stderr, "ERROR: astrae/visiones/ aperire non possum\n");
+        fprintf(stderr, "ERROR: visiones/ aperire non possum\n");
         free(fen);
         return 1;
     }
@@ -64,7 +64,7 @@ int main(void)
             continue;
 
         char via_ison[256];
-        snprintf(via_ison, sizeof(via_ison), "astrae/visiones/%s", nomen);
+        snprintf(via_ison, sizeof(via_ison), "visiones/%s", nomen);
 
         char *ison = ison_lege_plicam(via_ison);
         if (!ison) {

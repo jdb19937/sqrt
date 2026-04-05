@@ -11,8 +11,10 @@ astra_animare
 caele
 redde
 proba
+proba_visio
 *.isonl
 *.o
 *.ppm
 *.mp4
 *.gif
+libsqrt.a
