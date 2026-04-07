@@ -1,7 +1,7 @@
 {
-  "latitudo": 2048,
-  "altitudo": 1024,
-  "numerus_stellarum": 120000,
+  "latitudo": 4096,
+  "altitudo": 4096,
+  "numerus_stellarum": 500000,
   "densitas_galaxiae": 0.80,
   "inclinatio_galaxiae": 0.22,
   "latitudo_galaxiae": 0.12,
@@ -15,14 +15,14 @@
   "numerus_planetarum": 0,
   "planetae_temp_min": 4200,
   "planetae_temp_max": 5800,
-  "numerus_galaxiarum": 200,
+  "numerus_galaxiarum": 800,
   "max_galaxiae": 0,
 
   "planetae": [
     {
       "nomen": "Nebula Diffusa",
       "genus": "nebula",
-      "x": 900, "y": 480, "scala": 2.8,
+      "x": 1800, "y": 960, "scala": 2.8,
       "radius": 0.88,
       "semen": 31415,
       "temperatura": 4000,
@@ -36,7 +36,7 @@
     {
       "nomen": "Terra",
       "genus": "saxosum",
-      "x": 1200, "y": 512, "scala": 0.5,
+      "x": 2400, "y": 1024, "scala": 0.5,
       "perceptus": {
         "aspectus":   { "situs": 0.45, "angulus": 3.41, "lumen": 1.5 },
         "coaspectus": { "situs": 0.35, "angulus": 1.84, "lumen": 0.6 },
@@ -63,7 +63,7 @@
     {
       "nomen": "Luna",
       "genus": "saxosum",
-      "x": 1260, "y": 430, "scala": 0.175,
+      "x": 2520, "y": 860, "scala": 0.175,
       "perceptus": {
         "aspectus":   { "situs": 0.45, "angulus": 3.31, "lumen": 1.5 },
         "coaspectus": { "situs": 0.35, "angulus": 1.95, "lumen": 0.6 },
@@ -81,9 +81,122 @@
       "pressio_kPa": 0.0
     },
     {
+      "nomen": "Mars",
+      "genus": "saxosum",
+      "x": 3400, "y": 2800, "scala": 0.35,
+      "perceptus": {
+        "aspectus":   { "situs": 0.30, "angulus": 3.85, "lumen": 1.2 },
+        "acuitas": 0.7, "detallum": 0.40, "granum": 0.10
+      },
+      "radius": 0.9,
+      "inclinatio": 0.4396,
+      "rotatio": 5.2,
+      "semen": 50211,
+      "silicata": 0.30,
+      "ferrum": 0.55,
+      "carbo": 0.05,
+      "scala": 1.0,
+      "craterae": 0.45,
+      "pressio_kPa": 0.6,
+      "co2": 0.953,
+      "n2": 0.027,
+      "pulvis": 0.6,
+      "nubes": 0.04,
+      "polaris": 0.06
+    },
+    {
+      "nomen": "Jupiter",
+      "genus": "gaseosum",
+      "x": 600, "y": 3200, "scala": 0.45,
+      "perceptus": {
+        "aspectus":   { "situs": 0.35, "angulus": 4.10, "lumen": 0.8 },
+        "acuitas": 0.6, "detallum": 0.30, "granum": 0.06
+      },
+      "radius": 0.9,
+      "inclinatio": 0.0547,
+      "rotatio": 0.0,
+      "semen": 5971,
+      "pressio_kPa": 0,
+      "h2": 0.90,
+      "he": 0.10,
+      "nh3": 0.003,
+      "fasciae": 12,
+      "fasciae_contrast": 0.75,
+      "maculae": 1,
+      "macula_lat": -0.38,
+      "macula_lon": 0.3,
+      "macula_radius": 0.15,
+      "macula_obscuritas": 0.8
+    },
+    {
+      "nomen": "Venus",
+      "genus": "saxosum",
+      "x": 1100, "y": 500, "scala": 0.30,
+      "perceptus": {
+        "aspectus":   { "situs": 0.55, "angulus": 3.20, "lumen": 1.8 },
+        "acuitas": 0.5, "detallum": 0.25, "granum": 0.08
+      },
+      "radius": 0.9,
+      "inclinatio": 0.046,
+      "rotatio": 1.2,
+      "semen": 20099,
+      "silicata": 0.50,
+      "ferrum": 0.20,
+      "tectonica": 0.5,
+      "vulcanismus": 0.4,
+      "pressio_kPa": 9200.0,
+      "co2": 0.965,
+      "n2": 0.035,
+      "nubes": 0.98,
+      "pulvis": 0.3
+    },
+    {
+      "nomen": "Saturnus",
+      "genus": "gaseosum",
+      "x": 3800, "y": 700, "scala": 0.40,
+      "perceptus": {
+        "aspectus":   { "situs": 0.40, "angulus": 4.50, "lumen": 0.6 },
+        "acuitas": 0.6, "detallum": 0.25, "granum": 0.07
+      },
+      "radius": 0.9,
+      "inclinatio": 0.4667,
+      "rotatio": 0.0,
+      "semen": 6833,
+      "pressio_kPa": 0,
+      "h2": 0.96,
+      "he": 0.03,
+      "nh3": 0.01,
+      "fasciae": 10,
+      "fasciae_contrast": 0.35
+    },
+    {
+      "nomen": "Neptunus",
+      "genus": "glaciale",
+      "x": 200, "y": 1800, "scala": 0.25,
+      "perceptus": {
+        "aspectus":   { "situs": 0.50, "angulus": 5.00, "lumen": 0.4 },
+        "acuitas": 0.5, "detallum": 0.20, "granum": 0.10
+      },
+      "radius": 0.9,
+      "inclinatio": 0.4943,
+      "rotatio": 0.0,
+      "semen": 8241,
+      "pressio_kPa": 0,
+      "h2": 0.80,
+      "he": 0.19,
+      "ch4": 0.015,
+      "fasciae": 6,
+      "fasciae_contrast": 0.20,
+      "maculae": 1,
+      "macula_lat": -0.34,
+      "macula_lon": 4.20,
+      "macula_radius": 0.10,
+      "macula_obscuritas": 0.6
+    },
+    {
       "nomen": "Sol Caeruleus",
       "genus": "sol",
-      "x": 1050, "y": 950, "scala": 0.5,
+      "x": 2100, "y": 1900, "scala": 0.5,
       "radius": 0.88,
       "semen": 55555,
       "fusio": 1.0,
@@ -100,7 +213,7 @@
     {
       "nomen": "Sol",
       "genus": "sol",
-      "x": 350, "y": 280, "scala": 1.0,
+      "x": 700, "y": 560, "scala": 1.0,
       "radius": 0.88,
       "semen": 77777,
       "fusio": 1.0,

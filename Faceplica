@@ -18,7 +18,7 @@ CAELAE = caelae/terra.isonl caelae/hubble.isonl caelae/jwst.isonl \
          caelae/nuclei.isonl caelae/vacuum.isonl caelae/mortis.isonl \
          caelae/binarium.isonl
 
-omnia: torus_planus torus_animare torus_specta proba_astra caele redde astra_animare proba proba_planeta proba_caelae proba_visio
+omnia: torus_planus torus_animare torus_specta proba_astra caele genera redde astra_animare proba proba_planeta proba_caelae proba_visio
 
 omnia: $(NOMEN)
 
@@ -125,6 +125,9 @@ proba_visio: proba_visio.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
 caele: caele.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ caele.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
 
+genera: genera.c $(LIBISON)
+	$(CC) $(CFLAGS) -o $@ genera.c $(LIBISON) -lm
+
 redde: redde.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ redde.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
 
@@ -132,7 +135,7 @@ astra_animare: astra_animare.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPIT
 	$(CC) $(CFLAGS) -o $@ astra_animare.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
 purga:
-	rm -f torus_planus torus_animare torus_specta proba_astra proba_planeta proba_caelae proba_visio caele redde astra_animare proba
+	rm -f torus_planus torus_animare torus_specta proba_astra proba_planeta proba_caelae proba_visio caele genera redde astra_animare proba
 	rm -f $(OBJECTA) $(BIBLIOTHECA)
 	rm -f caelae/*.ppm caelae/*.isonl
 

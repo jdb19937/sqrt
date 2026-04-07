@@ -25,15 +25,373 @@
 #include "instrumentum.h"
 #include "sidus.h"
 #include "campus.h"
+#include "ison.h"
 
 #include "phantasma.h"
 #include "computo.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #define LATITUDO_IMG  1024
 #define ALTITUDO_IMG  1024
+
+/* ================================================================
+ * catalogum siderum — ex ISONL extractum
+ * ================================================================ */
+
+#define SIDERA_MAX 200000
+
+typedef struct {
+    int    x, y;
+    double temperatura;
+    double magnitudo;
+    char   genus[24];
+} sidus_registrum_t;
+
+static sidus_registrum_t sidera[SIDERA_MAX];
+static int numerus_siderum = 0;
+
+static void catalogum_linea(const char *linea, void *ctx)
+{
+    (void)ctx;
+    char *sidus_raw = ison_da_crudum(linea, "sidus");
+    if (!sidus_raw)
+        return;
+    if (numerus_siderum >= SIDERA_MAX) {
+        free(sidus_raw);
+        return;
+    }
+
+    sidus_registrum_t *s = &sidera[numerus_siderum];
+    s->x           = (int)ison_da_n(sidus_raw, "x", 0);
+    s->y           = (int)ison_da_n(sidus_raw, "y", 0);
+    s->temperatura = ison_da_f(sidus_raw, "temperatura", 5000);
+    s->magnitudo   = ison_da_f(sidus_raw, "magnitudo", 6.0);
+
+    char *g = ison_da_chordam(sidus_raw, "genus");
+    if (g) {
+        strncpy(s->genus, g, 23);
+        s->genus[23] = '\0';
+        free(g);
+    } else
+        strcpy(s->genus, "sequentia");
+
+    free(sidus_raw);
+    numerus_siderum++;
+}
+
+/* indices 256 siderum lucidissimorum (magnitudo minima = lucidissimum) */
+static int sidera_lucida[256];
+static int numerus_lucidorum = 0;
+
+static int cmp_magnitudo(const void *a, const void *b)
+{
+    double ma = sidera[*(const int *)a].magnitudo;
+    double mb = sidera[*(const int *)b].magnitudo;
+    return (ma < mb) ? -1 : (ma > mb) ? 1 : 0;
+}
+
+static void sidera_lucida_computare(void)
+{
+    int *indices = (int *)malloc((size_t)numerus_siderum * sizeof(int));
+    if (!indices) {
+        numerus_lucidorum = 0;
+        return;
+    }
+    for (int i = 0; i < numerus_siderum; i++)
+        indices[i] = i;
+    qsort(indices, (size_t)numerus_siderum, sizeof(int), cmp_magnitudo);
+    numerus_lucidorum = numerus_siderum < 256 ? numerus_siderum : 256;
+    for (int i = 0; i < numerus_lucidorum; i++)
+        sidera_lucida[i] = indices[i];
+    free(indices);
+}
+
+static void catalogum_legere(const char *via_isonl)
+{
+    numerus_siderum = 0;
+    char *isonl     = ison_lege_plicam(via_isonl);
+    if (!isonl)
+        return;
+    ison_pro_quaque_linea_s(isonl, catalogum_linea, NULL);
+    free(isonl);
+    sidera_lucida_computare();
+    fprintf(
+        stderr, "Catalogum: %d sidera, %d lucida.\n",
+        numerus_siderum, numerus_lucidorum
+    );
+}
+
+/* inveni sidus proximum inter 100 lucidissima, intra radium 40px */
+static int inveni_sidus(int cx, int cy, int cam_lat, int cam_alt)
+{
+    int optimus  = -1;
+    int dist_min = 999999999;
+
+    for (int i = 0; i < numerus_lucidorum; i++) {
+        int si = sidera_lucida[i];
+        int dx = sidera[si].x - cx;
+        int dy = sidera[si].y - cy;
+        if (dx >  cam_lat / 2)
+            dx -= cam_lat;
+        if (dx < -cam_lat / 2)
+            dx += cam_lat;
+        if (dy >  cam_alt / 2)
+            dy -= cam_alt;
+        if (dy < -cam_alt / 2)
+            dy += cam_alt;
+        int d2 = dx * dx + dy * dy;
+        if (d2 < 40 * 40 && d2 < dist_min) {
+            dist_min = d2;
+            optimus  = si;
+        }
+    }
+    return optimus;
+}
+
+/* inveni cosidus — sidus lucidum propinquum */
+static int inveni_cosidus(int prim, int cam_lat, int cam_alt)
+{
+    sidus_registrum_t *p = &sidera[prim];
+    int optimus  = -1;
+    int dist_min = 999999999;
+
+    for (int i = 0; i < numerus_siderum; i++) {
+        if (i == prim)
+            continue;
+        if (sidera[i].magnitudo > 3.0)
+            continue;
+
+        int dx = sidera[i].x - p->x;
+        int dy = sidera[i].y - p->y;
+        if (dx >  cam_lat / 2)
+            dx -= cam_lat;
+        if (dx < -cam_lat / 2)
+            dx += cam_lat;
+        if (dy >  cam_alt / 2)
+            dy -= cam_alt;
+        if (dy < -cam_alt / 2)
+            dy += cam_alt;
+        int d2 = dx * dx + dy * dy;
+        if (d2 < 20 * 20 && d2 < dist_min) {
+            dist_min = d2;
+            optimus  = i;
+        }
+    }
+    return optimus;
+}
+
+/* ================================================================
+ * curvatura — animatio warp
+ * ================================================================ */
+
+#define CURV_TABULAE 36
+
+static void hsv_ad_rgb(
+    double h, double sat, double v,
+    unsigned char *r, unsigned char *g, unsigned char *b
+) {
+    double c  = v * sat;
+    double hp = fmod(h * 6.0, 6.0);
+    if (hp < 0)
+        hp += 6.0;
+    double x = c * (1.0 - fabs(fmod(hp, 2.0) - 1.0));
+    double m = v - c;
+    double r1, g1, b1;
+    if (hp < 1) {
+        r1 = c;
+        g1 = x;
+        b1 = 0;
+    } else if (hp < 2) {
+        r1 = x;
+        g1 = c;
+        b1 = 0;
+    } else if (hp < 3) {
+        r1 = 0;
+        g1 = c;
+        b1 = x;
+    } else if (hp < 4) {
+        r1 = 0;
+        g1 = x;
+        b1 = c;
+    } else if (hp < 5) {
+        r1 = x;
+        g1 = 0;
+        b1 = c;
+    } else {
+        r1 = c;
+        g1 = 0;
+        b1 = x;
+    }
+    *r = (unsigned char)((r1 + m) * 255);
+    *g = (unsigned char)((g1 + m) * 255);
+    *b = (unsigned char)((b1 + m) * 255);
+}
+
+static unsigned int curv_semen = 1;
+static unsigned int curv_alea(void)
+{
+    curv_semen ^= curv_semen << 13;
+    curv_semen ^= curv_semen >> 17;
+    curv_semen ^= curv_semen << 5;
+    return curv_semen;
+}
+static double curv_alea_f(void)
+{
+    return (double)(curv_alea() & 0xFFFFFF) / (double)0x1000000;
+}
+
+/* una linea curvatiae — origo prope centrum, directio libera */
+typedef struct {
+    double ox, oy;       /* origo */
+    double dx, dy;       /* directio (normalizata) */
+    double longitudo;    /* longitudo maxima */
+    double velocitas;    /* multiplicator progressus */
+    int    latitudo;     /* pixeles */
+    unsigned char r, g, b;
+} curv_linea_t;
+
+#define CURV_LINEAE_MAX 300
+static curv_linea_t curv_lineae[CURV_LINEAE_MAX];
+static int curv_n_linearum = 0;
+
+static void curvatura_lineas_generare(int lat_img, int alt_img)
+{
+    int cx      = lat_img / 2;
+    int cy      = alt_img / 2;
+    double diag = sqrt((double)(cx * cx + cy * cy));
+
+    curv_n_linearum = 180 + (int)(curv_alea_f() * 120);
+    if (curv_n_linearum > CURV_LINEAE_MAX)
+        curv_n_linearum = CURV_LINEAE_MAX;
+
+    for (int i = 0; i < curv_n_linearum; i++) {
+        curv_linea_t *l = &curv_lineae[i];
+
+        /* origo: circa centrum, dispersio ~80px */
+        l->ox = cx + (curv_alea_f() - 0.5) * 160.0;
+        l->oy = cy + (curv_alea_f() - 0.5) * 160.0;
+
+        /* directio: omnino libera */
+        double ang = curv_alea_f() * DUO_PI;
+        l->dx      = cos(ang);
+        l->dy      = sin(ang);
+
+        l->longitudo = diag * (0.6 + curv_alea_f() * 0.8);
+        l->velocitas = 0.6 + curv_alea_f() * 0.8;
+        l->latitudo  = 1 + (int)(curv_alea_f() * 2.5);
+
+        /* colores: praecipue caerulei/albi/violacei, rari calidi */
+        unsigned char cr, cg, cb;
+        double h = curv_alea_f();
+        if (h < 0.45)
+            hsv_ad_rgb(
+                0.55 + curv_alea_f() * 0.25,
+                0.25 + curv_alea_f() * 0.5,
+                0.7 + curv_alea_f() * 0.3, &cr, &cg, &cb
+            );
+        else if (h < 0.7)
+            hsv_ad_rgb(
+                0.58 + curv_alea_f() * 0.05,
+                0.03 + curv_alea_f() * 0.12,
+                0.85 + curv_alea_f() * 0.15, &cr, &cg, &cb
+            );
+        else if (h < 0.85)
+            hsv_ad_rgb(
+                0.72 + curv_alea_f() * 0.15,
+                0.35 + curv_alea_f() * 0.45,
+                0.6 + curv_alea_f() * 0.4, &cr, &cg, &cb
+            );
+        else
+            hsv_ad_rgb(
+                curv_alea_f() * 0.08 + 0.95,
+                0.5 + curv_alea_f() * 0.4,
+                0.6 + curv_alea_f() * 0.4, &cr, &cg, &cb
+            );
+
+        l->r = cr;
+        l->g = cg;
+        l->b = cb;
+    }
+}
+
+static void curvatura_reddere(tabula_t *t, int tabula)
+{
+    double p = (double)tabula / CURV_TABULAE;
+
+    /* genera lineas in prima tabula */
+    if (tabula == 0) {
+        curv_semen = 77701u;
+        curvatura_lineas_generare(t->latitudo, t->altitudo);
+    }
+
+    for (int i = 0; i < curv_n_linearum; i++) {
+        curv_linea_t *l = &curv_lineae[i];
+        double prog     = p * l->velocitas;
+        double l_cur    = l->longitudo * prog * prog;
+        double vis_base = 0.25 + 0.75 * p;
+
+        /* linea ab origine in directionem */
+        for (double rr = 0; rr < l_cur; rr += 0.5) {
+            double vis = (1.0 - rr / l_cur) * vis_base;
+
+            int bx = (int)(l->ox + rr * l->dx);
+            int by = (int)(l->oy + rr * l->dy);
+
+            for (int w = -(l->latitudo / 2); w <= l->latitudo / 2; w++) {
+                int px = bx + (int)(w * l->dy);
+                int py = by - (int)(w * l->dx);
+                if (px < 0 || px >= t->latitudo)
+                    continue;
+                if (py < 0 || py >= t->altitudo)
+                    continue;
+
+                int idx = (py * t->latitudo + px) * 4;
+                int nb  = t->imaginis[idx + 0] + (int)(l->b * vis);
+                int ng  = t->imaginis[idx + 1] + (int)(l->g * vis);
+                int nr  = t->imaginis[idx + 2] + (int)(l->r * vis);
+                if (nb > 255)
+                    nb = 255;
+                if (ng > 255)
+                    ng = 255;
+                if (nr > 255)
+                    nr = 255;
+                t->imaginis[idx + 0] = (unsigned char)nb;
+                t->imaginis[idx + 1] = (unsigned char)ng;
+                t->imaginis[idx + 2] = (unsigned char)nr;
+            }
+        }
+    }
+
+    /* flash album ad finem */
+    if (p > 0.7) {
+        double album = (p - 0.7) / 0.3;
+        album *= album * album;
+        unsigned char a = (unsigned char)(album * 255);
+        for (int y = 0; y < t->altitudo; y++) {
+            for (int x = 0; x < t->latitudo; x++) {
+                int idx = (y * t->latitudo + x) * 4;
+                int b   = t->imaginis[idx + 0] + a;
+                int g   = t->imaginis[idx + 1] + a;
+                int r   = t->imaginis[idx + 2] + a;
+                if (b > 255)
+                    b = 255;
+                if (g > 255)
+                    g = 255;
+                if (r > 255)
+                    r = 255;
+                t->imaginis[idx + 0] = (unsigned char)b;
+                t->imaginis[idx + 1] = (unsigned char)g;
+                t->imaginis[idx + 2] = (unsigned char)r;
+            }
+        }
+    }
+}
 #define GRADUS_U_INIT 300
 #define GRADUS_V_INIT 150
 #define GRADUS_MIN    40
@@ -303,7 +661,7 @@ int main(int argc, char **argv)
     /* positio in toro T² — duo anguli libere volventes */
     double theta       = 0.6;    /* toroidalis (horizontalis) */
     double phi         = 0.4;    /* poloidalis (verticalis) */
-    double distantia   = 3.2;
+    double distantia   = 6.5;
     double angulus_rot  = 0.0;
     double celeritas    = 0.36;
     int    axis_index   = 1;
@@ -340,6 +698,15 @@ int main(int argc, char **argv)
     double orbita_angulus_init = 0;
     char orbita_nomen[256] = {0};
 
+    /* catalogum siderum legere */
+    catalogum_legere(via_isonl);
+
+    /* curvatura (warp) status */
+    int    curvatura_activa = 0;
+    int    curv_tabula      = 0;
+    pid_t  curv_pid         = 0;
+    int    curv_generatum   = 0;
+
     /* indicium status in terminali */
     char status_nuntius[128] = "";
     int tabulae_fps = 0;
@@ -372,6 +739,121 @@ int main(int argc, char **argv)
                         status_nuntius, sizeof(status_nuntius),
                         "Orbita cancellata"
                     );
+                }
+            } else if (
+                eventus.typus == PFR_MURIS_INF
+                && eventus.muris.plectrum == 1
+                && !curvatura_activa
+            ) {
+                /* click sinister — naviga ad sidus */
+                int mx = eventus.muris.x;
+                int my = eventus.muris.y;
+
+                /* solum si click in fundo (non in toro) */
+                int idx_click = my * LATITUDO_IMG + mx;
+                if (
+                    mx >= 0 && mx < LATITUDO_IMG
+                    && my >= 0 && my < ALTITUDO_IMG
+                    && tab.profunditatis[idx_click] > 1e20
+                    && numerus_siderum > 0
+                ) {
+                    /* campus coordinatae */
+                    int delta_cx = (int)(theta / DUO_PI * campus->latitudo);
+                    int delta_cy = (int)(phi   / DUO_PI * campus->altitudo);
+                    int campus_cx = (
+                        (mx + delta_cx) % campus->latitudo
+                        + campus->latitudo
+                    ) % campus->latitudo;
+                    int campus_cy = (
+                        (my + delta_cy) % campus->altitudo
+                        + campus->altitudo
+                    ) % campus->altitudo;
+
+                    int si = inveni_sidus(
+                        campus_cx, campus_cy,
+                        campus->latitudo, campus->altitudo
+                    );
+                    if (si >= 0) {
+                        sidus_registrum_t *s = &sidera[si];
+                        unsigned int semen_novum =
+                            (unsigned int)(
+                                s->x * 7919 + s->y * 6271
+                                + (int)(s->temperatura)
+                            );
+
+                        /* cosidus? */
+                        int ci = inveni_cosidus(
+                            si, campus->latitudo, campus->altitudo
+                        );
+                        int habet_co = (ci >= 0 && (semen_novum & 0xFF) < 25);
+
+                        /* scribe sidus ad /tmp */
+                        {
+                            FILE *fp = fopen("/tmp/sqrt_sidus.ison", "w");
+                            if (fp) {
+                                fprintf(
+                                    fp,
+                                    "{\n"
+                                    "  \"genus\": \"%s\",\n"
+                                    "  \"temperatura\": %.0f\n"
+                                    "}\n",
+                                    s->genus, s->temperatura
+                                );
+                                fclose(fp);
+                            }
+                        }
+                        if (habet_co) {
+                            FILE *fp = fopen("/tmp/sqrt_cosidus.ison", "w");
+                            if (fp) {
+                                fprintf(
+                                    fp,
+                                    "{\n"
+                                    "  \"genus\": \"%s\",\n"
+                                    "  \"temperatura\": %.0f\n"
+                                    "}\n",
+                                    sidera[ci].genus, sidera[ci].temperatura
+                                );
+                                fclose(fp);
+                            }
+                        }
+
+                        /* fork: genera + caele in fundo */
+                        curv_pid = fork();
+                        if (curv_pid == 0) {
+                            char mandatum[512];
+                            if (habet_co)
+                                snprintf(
+                                    mandatum, sizeof(mandatum),
+                                    "./genera /tmp/sqrt_sidus.ison"
+                                    " /tmp/sqrt_cosidus.ison %u"
+                                    " > /tmp/sqrt_campus.ison"
+                                    " && ./caele /tmp/sqrt_campus.ison"
+                                    " > /tmp/sqrt_caelae.isonl",
+                                    semen_novum
+                                );
+                            else
+                                snprintf(
+                                    mandatum, sizeof(mandatum),
+                                    "./genera /tmp/sqrt_sidus.ison %u"
+                                    " > /tmp/sqrt_campus.ison"
+                                    " && ./caele /tmp/sqrt_campus.ison"
+                                    " > /tmp/sqrt_caelae.isonl",
+                                    semen_novum
+                                );
+                            _exit(system(mandatum));
+                        }
+
+                        curvatura_activa = 1;
+                        curv_tabula      = 0;
+                        curv_generatum   = 0;
+
+                        snprintf(
+                            status_nuntius, sizeof(status_nuntius),
+                            "★ CURVATURA: %s T=%.0fK %s",
+                            s->genus, s->temperatura,
+                            habet_co ? "(binarium)" : ""
+                        );
+                    }
                 }
             } else if (eventus.typus == PFR_CLAVIS_INF) {
                 switch (eventus.clavis.signum.symbolum) {
@@ -767,9 +1249,109 @@ int main(int argc, char **argv)
             helvea_themata[helvea_index_thematis].posteriza_niv
         );
 
+        /* curvatura animatio */
+        if (curvatura_activa) {
+            /* inspice si generatio finita */
+            if (!curv_generatum && curv_pid > 0) {
+                int wstat;
+                if (waitpid(curv_pid, &wstat, WNOHANG) > 0)
+                    curv_generatum = 1;
+            }
+
+            curvatura_reddere(&tab, curv_tabula);
+            curv_tabula++;
+
+            /* fini curvatura cum animatio et generatio ambae perfectae */
+            if (curv_tabula >= CURV_TABULAE && curv_generatum) {
+                campus_destruere(campus);
+                campus = campus_ex_isonl_reddere(
+                    "/tmp/sqrt_caelae.isonl", via_instr
+                );
+                if (campus) {
+                    catalogum_legere("/tmp/sqrt_caelae.isonl");
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "Systema novum: %d sidera", numerus_siderum
+                    );
+                } else {
+                    /* fallback: restitue campus originale */
+                    campus = campus_ex_isonl_reddere(via_isonl, via_instr);
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "ERRATUM: campus reddere non possum"
+                    );
+                }
+                curvatura_activa = 0;
+                curv_pid         = 0;
+            }
+        }
+
         pfr_texturam_renova(textura, NULL, tab.imaginis, LATITUDO_IMG * 4);
         pfr_purga(pictor);
         pfr_texturam_pinge(pictor, textura, NULL, NULL);
+
+        /* cursor muris — figitur ad sidus proximum */
+        {
+            int mx, my;
+            pfr_muris_positio(&mx, &my);
+            if (
+                mx >= 0 && mx < LATITUDO_IMG
+                && my >= 0 && my < ALTITUDO_IMG
+                && !curvatura_activa
+                && numerus_siderum > 0
+            ) {
+                /* converte ad campus coordinatas */
+                int dcx = (int)(theta / DUO_PI * campus->latitudo);
+                int dcy = (int)(phi   / DUO_PI * campus->altitudo);
+                int ccx = (
+                    (mx + dcx) % campus->latitudo
+                    + campus->latitudo
+                ) % campus->latitudo;
+                int ccy = (
+                    (my + dcy) % campus->altitudo
+                    + campus->altitudo
+                ) % campus->altitudo;
+
+                int si = inveni_sidus(
+                    ccx, ccy,
+                    campus->latitudo, campus->altitudo
+                );
+                if (si >= 0) {
+                    /* campus → screen */
+                    int sx = (
+                        (sidera[si].x - dcx) % campus->latitudo +
+                        campus->latitudo
+                    ) % campus->latitudo;
+                    int sy = (
+                        (sidera[si].y - dcy) % campus->altitudo +
+                        campus->altitudo
+                    ) % campus->altitudo;
+
+                    if (
+                        sx >= 0 && sx < LATITUDO_IMG &&
+                        sy >= 0 && sy < ALTITUDO_IMG
+                    ) {
+                        /* crux */
+                        pfr_colorem_pone(pictor, 120, 255, 120, 200);
+                        for (int i = -10; i <= 10; i++) {
+                            if (i >= -2 && i <= 2)
+                                continue;
+                            pfr_punctum_pinge(pictor, sx + i, sy);
+                            pfr_punctum_pinge(pictor, sx, sy + i);
+                        }
+                        /* circulus */
+                        for (int a = 0; a < 40; a++) {
+                            double ang = (double)a / 40.0 * DUO_PI;
+                            pfr_punctum_pinge(
+                                pictor,
+                                sx + (int)(14.0 * cos(ang)),
+                                sy + (int)(14.0 * sin(ang))
+                            );
+                        }
+                    }
+                }
+            }
+        }
 
         /* indicium inscriptionis — circulus ruber */
         if (inscr_mp4) {
