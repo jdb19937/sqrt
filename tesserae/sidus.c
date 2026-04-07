@@ -5,7 +5,7 @@
  */
 
 #include "sidus.h"
-#include "instrumentum.h"
+#include "../instrumentum.h"
 
 #include <math.h>
 #include <stdio.h>

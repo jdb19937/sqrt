@@ -9,10 +9,10 @@
 #ifndef VISIO_H
 #define VISIO_H
 
-#include "helvea.h"
-#include "color.h"
-
 #include <math.h>
+
+#include "../helvea.h"
+#include "../color.h"
 
 /* ================================================================
  * constantes

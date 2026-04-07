@@ -3,7 +3,7 @@
  */
 
 #include "perceptus.h"
-#include "planeta.h"
+#include "tessera.h"
 
 #include <math.h>
 #include <stdlib.h>

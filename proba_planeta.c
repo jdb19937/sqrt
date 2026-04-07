@@ -5,7 +5,7 @@
  * reddit unumquemque in 512×512 imaginem.
  */
 
-#include "planeta.h"
+#include "tessera.h"
 #include "perceptus.h"
 #include "ison.h"
 

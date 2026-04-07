@@ -6,7 +6,8 @@
  */
 
 #include "visio.h"
-#include "pictura.h"
+#include "../pictura.h"
+
 #include "ison.h"
 
 #include <math.h>

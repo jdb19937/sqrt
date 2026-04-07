@@ -8,11 +8,14 @@ LDFLAGS = -lm `cat $(APOTHECA)/phantasma/nexus_phantasma`
 LIBISON = $(APOTHECA)/ison/libison.a
 LIBPHANTASMA = $(APOTHECA)/phantasma/libphantasma.a
 
-OBJECTA = pictura.o helvea.o sidus.o campus.o instrumentum.o \
-          planeta.o aspectus.o perceptus.o visio.o
+OBJECTA = pictura.o helvea.o campus.o instrumentum.o \
+          aspectus.o perceptus.o \
+          tesserae/sidus.o tesserae/planeta.o tesserae/visio.o
 BIBLIOTHECA = libsqrt.a
-CAPITA = sidus.h campus.h instrumentum.h planeta.h aspectus.h \
-         perceptus.h color.h vectores.h visio.h pictura.h helvea.h bessel.h
+CAPITA = campus.h instrumentum.h aspectus.h \
+         perceptus.h color.h vectores.h pictura.h helvea.h bessel.h \
+         tesserae/sidus.h tesserae/planeta.h tesserae/visio.h \
+         tessera.h tessella.h
 
 CAELAE = caelae/terra.isonl caelae/hubble.isonl caelae/jwst.isonl \
          caelae/nuclei.isonl caelae/vacuum.isonl caelae/mortis.isonl \
@@ -64,32 +67,8 @@ $(LIBPHANTASMA):
 
 # objecta
 
-pictura.o: pictura.c $(CAPITA)
-	$(CC) $(CFLAGS) -c -o pictura.o pictura.c
-
-helvea.o: helvea.c $(CAPITA)
-	$(CC) $(CFLAGS) -c -o helvea.o helvea.c
-
-sidus.o: sidus.c $(CAPITA)
-	$(CC) $(CFLAGS) -c -o sidus.o sidus.c
-
-campus.o: campus.c $(CAPITA)
-	$(CC) $(CFLAGS) -c -o campus.o campus.c
-
-instrumentum.o: instrumentum.c $(CAPITA)
-	$(CC) $(CFLAGS) -c -o instrumentum.o instrumentum.c
-
-aspectus.o: aspectus.c $(CAPITA)
-	$(CC) $(CFLAGS) -c -o aspectus.o aspectus.c
-
-perceptus.o: perceptus.c $(CAPITA)
-	$(CC) $(CFLAGS) -c -o perceptus.o perceptus.c
-
-planeta.o: planeta.c $(CAPITA)
-	$(CC) $(CFLAGS) -c -o planeta.o planeta.c
-
-visio.o: visio.c $(CAPITA)
-	$(CC) $(CFLAGS) -c -o visio.o visio.c
+%.o: %.c $(CAPITA)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 # bibliotheca
 
@@ -98,7 +77,7 @@ libsqrt.a: $(OBJECTA)
 
 # programmata
 
-torus_planus: torus_planus.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
+torus_planus: torus_planus.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ torus_planus.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
 
 torus_animare: torus_animare.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)

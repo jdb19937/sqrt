@@ -30,8 +30,8 @@
 #ifndef SIDUS_H
 #define SIDUS_H
 
-#include "color.h"
-#include "instrumentum.h"
+#include "../color.h"
+#include "../instrumentum.h"
 
 #include <math.h>
 #define SIDUS_FENESTRA  64      /* latitudo et altitudo fenestrae sideris */

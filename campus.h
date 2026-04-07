@@ -13,9 +13,8 @@ typedef struct {
     int            altitudo;
 } campus_t;
 
-#include "sidus.h"
+#include "tessera.h"
 #include "instrumentum.h"
-#include "planeta.h"
 
 /* ================================================================
  * campus stellarum

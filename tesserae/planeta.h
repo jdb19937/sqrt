@@ -10,9 +10,9 @@
 #ifndef PLANETA_H
 #define PLANETA_H
 
-#include "perceptus.h"
-#include "color.h"
-#include "instrumentum.h"
+#include "../perceptus.h"
+#include "../color.h"
+#include "../instrumentum.h"
 
 #include <math.h>
 
