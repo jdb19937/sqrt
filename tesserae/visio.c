@@ -512,15 +512,15 @@ static void zeppelinus_reddere(unsigned char *fenestra, const visio_zeppelinus_t
 
 void visio_reddere(unsigned char *fenestra, const visio_t *visio)
 {
-    switch (visio->genus) {
+    switch (visio->p.genus) {
     case VISIO_TORUS:
-        torus_reddere(fenestra, (const visio_torus_t *)visio);
+        torus_reddere(fenestra, &visio->g.torus);
         break;
     case VISIO_NAVIS:
-        navis_reddere(fenestra, (const visio_navis_t *)visio);
+        navis_reddere(fenestra, &visio->g.navis);
         break;
     case VISIO_ZEPPELINUS:
-        zeppelinus_reddere(fenestra, (const visio_zeppelinus_t *)visio);
+        zeppelinus_reddere(fenestra, &visio->g.zeppelinus);
         break;
     }
 }

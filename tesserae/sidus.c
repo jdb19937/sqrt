@@ -205,7 +205,7 @@ static void fen_spicula(
 
 static void reddere_nanum_album(
     unsigned char *fen,
-    const sidus_t *s,
+    const sidulum_t *s,
     const instrumentum_t *instr
 ) {
     color_t col = sidus_temperatura_ad_colorem(s->temperatura);
@@ -224,7 +224,7 @@ static void reddere_nanum_album(
 
 static void reddere_sequentia(
     unsigned char *fen,
-    const sidus_t *s,
+    const sidulum_t *s,
     const instrumentum_t *instr
 ) {
     color_t col = sidus_temperatura_ad_colorem(s->temperatura);
@@ -264,7 +264,7 @@ static void reddere_sequentia(
 
 static void reddere_gigas_rubrum(
     unsigned char *fen,
-    const sidus_t *s,
+    const sidulum_t *s,
     const instrumentum_t *instr
 ) {
     color_t col = sidus_temperatura_ad_colorem(s->temperatura);
@@ -300,7 +300,7 @@ static void reddere_gigas_rubrum(
 
 static void reddere_supergigas(
     unsigned char *fen,
-    const sidus_t *s,
+    const sidulum_t *s,
     const instrumentum_t *instr
 ) {
     color_t col = sidus_temperatura_ad_colorem(s->temperatura);
@@ -350,7 +350,7 @@ static void reddere_supergigas(
 
 static void reddere_neutronium(
     unsigned char *fen,
-    const sidus_t *s,
+    const sidulum_t *s,
     const instrumentum_t *instr
 ) {
     (void)instr;
@@ -410,7 +410,7 @@ static void reddere_neutronium(
 
 static void reddere_crystallinum(
     unsigned char *fen,
-    const sidus_t *s,
+    const sidulum_t *s,
     const instrumentum_t *instr
 ) {
     (void)instr;
@@ -1097,33 +1097,33 @@ void sidus_reddere(
 ) {
     memset(fenestra, 0, FEN * FEN * 4);
 
-    switch (sidus->genus) {
+    switch (sidus->p.genus) {
     case SIDUS_NANUM_ALBUM:
-        reddere_nanum_album(fenestra, sidus, instrumentum);
+        reddere_nanum_album(fenestra, &sidus->p, instrumentum);
         break;
     case SIDUS_SEQUENTIA:
-        reddere_sequentia(fenestra, sidus, instrumentum);
+        reddere_sequentia(fenestra, &sidus->p, instrumentum);
         break;
     case SIDUS_GIGAS_RUBRUM:
-        reddere_gigas_rubrum(fenestra, sidus, instrumentum);
+        reddere_gigas_rubrum(fenestra, &sidus->p, instrumentum);
         break;
     case SIDUS_SUPERGIGAS:
-        reddere_supergigas(fenestra, sidus, instrumentum);
+        reddere_supergigas(fenestra, &sidus->p, instrumentum);
         break;
     case SIDUS_NEUTRONIUM:
-        reddere_neutronium(fenestra, sidus, instrumentum);
+        reddere_neutronium(fenestra, &sidus->p, instrumentum);
         break;
     case SIDUS_CRYSTALLINUM:
-        reddere_crystallinum(fenestra, sidus, instrumentum);
+        reddere_crystallinum(fenestra, &sidus->p, instrumentum);
         break;
     case SIDUS_MAGNETAR:
-        reddere_magnetar(fenestra, (const sidus_magnetar_t *)sidus, instrumentum);
+        reddere_magnetar(fenestra, &sidus->g.magnetar, instrumentum);
         break;
     case SIDUS_GALAXIA:
-        reddere_galaxia(fenestra, (const sidus_galaxia_t *)sidus, instrumentum);
+        reddere_galaxia(fenestra, &sidus->g.galaxia, instrumentum);
         break;
     case SIDUS_VAGANS:
-        reddere_vagans(fenestra, (const sidus_vagans_t *)sidus, instrumentum);
+        reddere_vagans(fenestra, &sidus->g.vagans, instrumentum);
         break;
     default:
         break;

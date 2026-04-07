@@ -11,7 +11,7 @@
 #include "../sidus.h"
 
 typedef struct {
-    sidus_t basis;
+    sidulum_t basis;
     double  phase;           /* semen aleatorium pro orientatione */
 } sidus_magnetar_t;
 

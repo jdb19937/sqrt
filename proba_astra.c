@@ -75,22 +75,22 @@ int main(void)
         sidus_t sidus;
         instrumentum_t *instr;
     } specimina[] = {
-        {"nanum_album",      {SIDUS_NANUM_ALBUM,  1.0, 25000,   0, 0}, &instr_lucida},
-        {"sequentia",        {SIDUS_SEQUENTIA,     0.5, 5800,    0, 0}, &instr_lucida},
-        {"gigas_rubrum",     {SIDUS_GIGAS_RUBRUM,  0.8, 3200,    0, 0}, &instr_lucida},
-        {"supergigas",       {SIDUS_SUPERGIGAS,    0.2, 3500,    0, 0}, &instr_lucida},
-        {"neutronium",       {SIDUS_NEUTRONIUM,    1.0, 500000,  0, 0}, &instr_nulla},
-        {"crystallinum",     {SIDUS_CRYSTALLINUM,  0.5, 8000,    0, 0}, &instr_nulla},
-        {"magnetar",         {SIDUS_MAGNETAR,      0.5, 5000000, 0, 0}, &instr_nulla},
-        {"magnetar_2",       {SIDUS_MAGNETAR,      1.2, 5000000, 0, 0}, &instr_nulla},
-        {"gal_elliptica",    {SIDUS_GALAXIA,       4.0, 8000,    GALAXIA_ELLIPTICA, 0.5}, &instr_nulla},
-        {"gal_spiralis",     {SIDUS_GALAXIA,       3.5, 7000,    GALAXIA_SPIRALIS, 1.2}, &instr_nulla},
-        {"gal_barrata",      {SIDUS_GALAXIA,       4.2, 5000,    GALAXIA_SPIRALIS_BARRATA, 2.8}, &instr_nulla},
-        {"gal_lenticularis", {SIDUS_GALAXIA,       4.5, 6000,    GALAXIA_LENTICULARIS, 0.8}, &instr_nulla},
-        {"gal_irregularis",  {SIDUS_GALAXIA,       4.0, 9000,    GALAXIA_IRREGULARIS, 3.5}, &instr_nulla},
-        {"gal_edge_on",      {SIDUS_GALAXIA,       3.8, 500,     GALAXIA_SPIRALIS, 0.0}, &instr_nulla},
-        {"planeta_plenus",   {SIDUS_VAGANS,        1.0, 5500,    0.0, 0.5}, &instr_nulla},
-        {"planeta_falcatus", {SIDUS_VAGANS,        1.5, 4500,    0.35, 0.8}, &instr_nulla},
+        {"nanum_album",      {.p = {SIDUS_NANUM_ALBUM,  1.0, 25000}},   &instr_lucida},
+        {"sequentia",        {.p = {SIDUS_SEQUENTIA,     0.5, 5800}},    &instr_lucida},
+        {"gigas_rubrum",     {.p = {SIDUS_GIGAS_RUBRUM,  0.8, 3200}},    &instr_lucida},
+        {"supergigas",       {.p = {SIDUS_SUPERGIGAS,    0.2, 3500}},    &instr_lucida},
+        {"neutronium",       {.p = {SIDUS_NEUTRONIUM,    1.0, 500000}},  &instr_nulla},
+        {"crystallinum",     {.p = {SIDUS_CRYSTALLINUM,  0.5, 8000}},    &instr_nulla},
+        {"magnetar",         {.g.magnetar = {{SIDUS_MAGNETAR, 0.5, 5000000}, 0}},   &instr_nulla},
+        {"magnetar_2",       {.g.magnetar = {{SIDUS_MAGNETAR, 1.2, 5000000}, 0}},   &instr_nulla},
+        {"gal_elliptica",    {.g.galaxia = {{SIDUS_GALAXIA, 4.0, 8000},    GALAXIA_ELLIPTICA, 0.5}},          &instr_nulla},
+        {"gal_spiralis",     {.g.galaxia = {{SIDUS_GALAXIA, 3.5, 7000},    GALAXIA_SPIRALIS, 1.2}},           &instr_nulla},
+        {"gal_barrata",      {.g.galaxia = {{SIDUS_GALAXIA, 4.2, 5000},    GALAXIA_SPIRALIS_BARRATA, 2.8}},   &instr_nulla},
+        {"gal_lenticularis", {.g.galaxia = {{SIDUS_GALAXIA, 4.5, 6000},    GALAXIA_LENTICULARIS, 0.8}},       &instr_nulla},
+        {"gal_irregularis",  {.g.galaxia = {{SIDUS_GALAXIA, 4.0, 9000},    GALAXIA_IRREGULARIS, 3.5}},        &instr_nulla},
+        {"gal_edge_on",      {.g.galaxia = {{SIDUS_GALAXIA, 3.8, 500},     GALAXIA_SPIRALIS, 0.0}},           &instr_nulla},
+        {"planeta_plenus",   {.g.vagans = {{SIDUS_VAGANS,   1.0, 5500},    0.0, 0.5}},  &instr_nulla},
+        {"planeta_falcatus", {.g.vagans = {{SIDUS_VAGANS,   1.5, 4500},    0.35, 0.8}}, &instr_nulla},
     };
 
     int n_spec = (int)(sizeof(specimina) / sizeof(specimina[0]));

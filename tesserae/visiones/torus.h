@@ -9,7 +9,7 @@
 #include "../../helvea.h"
 
 typedef struct {
-    visio_t            basis;
+    visiuncula_t       basis;
     helvea_methodus_t  methodus;       /* HELVEA_BORRELLI etc. */
     int                thema;          /* index in helvea_themata[] */
     int                strata;         /* profunditas corrugationis */

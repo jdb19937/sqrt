@@ -36,14 +36,14 @@ typedef enum {
     PLANETA_NEBULA       /* nubes gasei procedurale */
 } planeta_genus_t;
 
-/* proprietates communes omnium planetarum */
+/* proprietates communes omnium planetarum (diminutiva) */
 typedef struct {
     planeta_genus_t genus;
     double     radius;           /* 0.0-1.0: fractio fenestrae */
     double     inclinatio;       /* inclinatio axialis (radiani) */
     double     rotatio;          /* longitudo centralis visibilis (radiani) */
     unsigned   semen;            /* semen procedurale */
-} planeta_t;
+} planetella_t;
 
 /* ================================================================
  * genera planetarum
@@ -55,6 +55,27 @@ typedef struct {
 #include "planetae/parvum.h"
 #include "planetae/sol.h"
 #include "planetae/nebula.h"
+
+/* ================================================================
+ * planeta_t — unio omnium generum planetarum
+ *
+ * Continet quodlibet genus planetae in acervo.
+ * Accessio basis: planeta.planetella.genus, planeta.planetella.radius, ...
+ * Accessio generis: planeta.saxosum.silicata, planeta.gaseosum.fasciae, ...
+ * ================================================================ */
+
+typedef union {
+    planetella_t p;
+
+    union {
+        planeta_saxosum_t  saxosum;
+        planeta_gaseosum_t gaseosum;
+        planeta_glaciale_t glaciale;
+        planeta_parvum_t   parvum;
+        planeta_sol_t      sol;
+        planeta_nebula_t   nebula;
+    } g;
+} planeta_t;
 
 /* ================================================================
  * functiones

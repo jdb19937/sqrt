@@ -11,7 +11,7 @@
 #include "../planeta.h"
 
 typedef struct {
-    planeta_t basis;
+    planetella_t basis;
 
     /* compositio superficiei (fractiones, summa <= 1) */
     double     silicata;         /* SiO2 / silicates */

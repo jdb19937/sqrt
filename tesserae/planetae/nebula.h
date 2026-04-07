@@ -11,7 +11,7 @@
 #include "../planeta.h"
 
 typedef struct {
-    planeta_t basis;
+    planetella_t basis;
 
     /* emissio */
     double     temperatura;      /* color corporis nigri (K); 0 = 5000K */

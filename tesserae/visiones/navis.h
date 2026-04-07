@@ -11,7 +11,7 @@
 #include "../visio.h"
 
 typedef struct {
-    visio_t basis;
+    visiuncula_t basis;
     double  centrum_re;      /* centrum regionis (reale) */
     double  centrum_im;      /* centrum regionis (imaginarium) */
     double  amplitudo;       /* latitudo regionis in plano complexo */

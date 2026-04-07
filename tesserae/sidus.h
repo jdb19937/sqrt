@@ -207,12 +207,12 @@ typedef enum {
     GALAXIA_NUMERUS
 } galaxia_morphologia_t;
 
-/* proprietates communes omnium siderum */
+/* proprietates communes omnium siderum (diminutiva) */
 typedef struct {
     sidus_genus_t genus;
     double        magnitudo;     /* magnitudo apparens (0=lucidissimum, 6=vix visibile) */
     double        temperatura;   /* temperatura coloris (Kelvin), 2000-40000 */
-} sidus_t;
+} sidulum_t;
 
 /* ================================================================
  * genera siderum
@@ -227,6 +227,30 @@ typedef struct {
 #include "sidera/magnetar.h"
 #include "sidera/galaxia.h"
 #include "sidera/vagans.h"
+
+/* ================================================================
+ * sidus_t — unio omnium generum siderum
+ *
+ * Continet quodlibet genus sideris in acervo.
+ * Accessio basis: sidus.sidulum.genus, sidus.sidulum.magnitudo, ...
+ * Accessio generis: sidus.vagans.phase, sidus.galaxia.morphologia, ...
+ * ================================================================ */
+
+typedef union {
+    sidulum_t p;
+
+    union {
+        sidus_nanum_album_t  nanum_album;
+        sidus_sequentia_t    sequentia;
+        sidus_gigas_rubrum_t gigas_rubrum;
+        sidus_supergigas_t   supergigas;
+        sidus_neutronium_t   neutronium;
+        sidus_crystallinum_t crystallinum;
+        sidus_magnetar_t     magnetar;
+        sidus_galaxia_t      galaxia;
+        sidus_vagans_t       vagans;
+    } g;
+} sidus_t;
 
 /* ================================================================
  * sidus reddere

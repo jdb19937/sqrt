@@ -10,7 +10,7 @@
 #include "../planeta.h"
 
 typedef struct {
-    planeta_t basis;
+    planetella_t basis;
 
     /* compositio superficiei */
     double     silicata;

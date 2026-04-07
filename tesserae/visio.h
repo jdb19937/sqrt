@@ -30,13 +30,13 @@ typedef enum {
 #define VISIO_NUMERUS_GENERUM 3
 
 /* ================================================================
- * visio_t — basis communis (primum membrum cuiusque subtypi)
+ * visiuncula_t — basis communis (diminutiva)
  * ================================================================ */
 
 typedef struct {
     visio_genus_t genus;
     unsigned      semen;
-} visio_t;
+} visiuncula_t;
 
 /* ================================================================
  * genera visionum
@@ -47,18 +47,36 @@ typedef struct {
 #include "visiones/zeppelinus.h"
 
 /* ================================================================
+ * visio_t — unio omnium generum visionum
+ *
+ * Continet quodlibet genus visionis in acervo.
+ * Accessio basis: visio.visiuncula.genus, visio.visiuncula.semen
+ * Accessio generis: visio.torus.methodus, visio.navis.amplitudo, ...
+ * ================================================================ */
+
+typedef union {
+    visiuncula_t p;
+
+    union {
+        visio_torus_t      torus;
+        visio_navis_t      navis;
+        visio_zeppelinus_t zeppelinus;
+    } g;
+} visio_t;
+
+/* ================================================================
  * functiones
  * ================================================================ */
 
 /*
  * visio_reddere — reddit visionem in fenestram 2048x2048 RGBA.
- * Dispatch per genus. visio debet ad subtypum rectum punctare.
+ * Dispatch per genus.
  */
 void visio_reddere(unsigned char *fenestra, const visio_t *visio);
 
 /*
  * visio_ex_ison — legit visionem ex chorda ISON.
- * Reddit visio_t* ad subtypum allocatum (vocans liberet per free()).
+ * Reddit visio_t* allocatum (vocans liberet per free()).
  */
 visio_t *visio_ex_ison(const char *ison);
 

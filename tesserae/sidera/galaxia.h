@@ -11,9 +11,9 @@
 #include "../sidus.h"
 
 typedef struct {
-    sidus_t                basis;
+    sidulum_t              basis;
     galaxia_morphologia_t  morphologia;    /* classificatio Hubble */
-    double                 angulus_phase;   /* angulus positionis in caelo */
+    double                 angulus_phase;  /* angulus positionis in caelo */
 } sidus_galaxia_t;
 
 #endif /* SIDUS_GALAXIA_H */

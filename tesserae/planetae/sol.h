@@ -12,7 +12,7 @@
 #include "../planeta.h"
 
 typedef struct {
-    planeta_t basis;
+    planetella_t basis;
 
     /* fusio stellaris */
     double     fusio;            /* intensitas fusionis [0,1] */

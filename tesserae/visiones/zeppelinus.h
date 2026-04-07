@@ -12,7 +12,7 @@
 #include "../../color.h"
 
 typedef struct {
-    visio_t basis;
+    visiuncula_t basis;
     double  ratio;           /* ratio longitudinis ad diametrum */
     double  inclinatio;      /* angulus inclinationis (radiani) */
     double  azimuthus;       /* rotatio circa axem verticalem */

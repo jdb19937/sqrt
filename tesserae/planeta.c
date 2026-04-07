@@ -1484,13 +1484,13 @@ void planeta_reddere(
     const planeta_perceptus_t *perceptus
 ) {
     memset(fenestra, 0, FEN * FEN * 4);
-    switch (planeta->genus) {
-    case PLANETA_SAXOSUM:  reddere_saxosum(fenestra, (const planeta_saxosum_t *)planeta, perceptus);  break;
-    case PLANETA_GASEOSUM: reddere_gaseosum(fenestra, (const planeta_gaseosum_t *)planeta, perceptus); break;
-    case PLANETA_GLACIALE: reddere_glaciale(fenestra, (const planeta_glaciale_t *)planeta, perceptus); break;
-    case PLANETA_PARVUM:   reddere_parvum(fenestra, (const planeta_parvum_t *)planeta, perceptus);   break;
-    case PLANETA_SOL:      reddere_sol(fenestra, (const planeta_sol_t *)planeta);                 break;
-    case PLANETA_NEBULA:   reddere_nebula(fenestra, (const planeta_nebula_t *)planeta);              break;
+    switch (planeta->p.genus) {
+    case PLANETA_SAXOSUM:  reddere_saxosum(fenestra, &planeta->g.saxosum, perceptus);  break;
+    case PLANETA_GASEOSUM: reddere_gaseosum(fenestra, &planeta->g.gaseosum, perceptus); break;
+    case PLANETA_GLACIALE: reddere_glaciale(fenestra, &planeta->g.glaciale, perceptus); break;
+    case PLANETA_PARVUM:   reddere_parvum(fenestra, &planeta->g.parvum, perceptus);   break;
+    case PLANETA_SOL:      reddere_sol(fenestra, &planeta->g.sol);                     break;
+    case PLANETA_NEBULA:   reddere_nebula(fenestra, &planeta->g.nebula);               break;
     }
 }
 
@@ -1577,7 +1577,7 @@ planeta_t *planeta_ex_ison(const char *ison)
         p->pulvis           = ison_f(ison, "pulvis", 0.0);
         p->nubes            = ison_f(ison, "nubes", 0.0);
         p->polaris          = ison_f(ison, "polaris", 0.0);
-        return &p->basis;
+        return (planeta_t *)p;
     }
     case PLANETA_GASEOSUM: {
         planeta_gaseosum_t *p = calloc(1, sizeof(*p));
@@ -1602,7 +1602,7 @@ planeta_t *planeta_ex_ison(const char *ison)
         p->luminositas      = ison_f(ison, "luminositas", 1.0);
         p->corona           = ison_f(ison, "corona", 0.0);
         p->granulatio       = ison_f(ison, "granulatio", 0.0);
-        return &p->basis;
+        return (planeta_t *)p;
     }
     case PLANETA_GLACIALE: {
         planeta_glaciale_t *p = calloc(1, sizeof(*p));
@@ -1621,7 +1621,7 @@ planeta_t *planeta_ex_ison(const char *ison)
         p->macula_lat       = ison_f(ison, "macula_lat", 0.0);
         p->macula_lon       = ison_f(ison, "macula_lon", 0.0);
         p->macula_radius    = ison_f(ison, "macula_radius", 0.1);
-        return &p->basis;
+        return (planeta_t *)p;
     }
     case PLANETA_PARVUM: {
         planeta_parvum_t *p = calloc(1, sizeof(*p));
@@ -1652,7 +1652,7 @@ planeta_t *planeta_ex_ison(const char *ison)
         p->pulvis           = ison_f(ison, "pulvis", 0.0);
         p->nubes            = ison_f(ison, "nubes", 0.0);
         p->polaris          = ison_f(ison, "polaris", 0.0);
-        return &p->basis;
+        return (planeta_t *)p;
     }
     case PLANETA_SOL: {
         planeta_sol_t *p = calloc(1, sizeof(*p));
@@ -1669,7 +1669,7 @@ planeta_t *planeta_ex_ison(const char *ison)
         p->he               = ison_f(ison, "he", 0.0);
         p->ch4              = ison_f(ison, "ch4", 0.0);
         p->nh3              = ison_f(ison, "nh3", 0.0);
-        return &p->basis;
+        return (planeta_t *)p;
     }
     case PLANETA_NEBULA: {
         planeta_nebula_t *p = calloc(1, sizeof(*p));
@@ -1681,7 +1681,7 @@ planeta_t *planeta_ex_ison(const char *ison)
         p->carbo            = ison_f(ison, "carbo", 0.0);
         p->tectonica        = ison_f(ison, "tectonica", 0.5);
         p->nubes            = ison_f(ison, "nubes", 0.4);
-        return &p->basis;
+        return (planeta_t *)p;
     }
     default: {
         planeta_saxosum_t *p = calloc(1, sizeof(*p));
@@ -1690,7 +1690,7 @@ planeta_t *planeta_ex_ison(const char *ison)
         p->basis.inclinatio = ison_f(ison, "inclinatio", 0.0);
         p->basis.rotatio    = ison_f(ison, "rotatio", 0.0);
         p->basis.semen      = (unsigned)ison_f(ison, "semen", 42);
-        return &p->basis;
+        return (planeta_t *)p;
     }
     }
 

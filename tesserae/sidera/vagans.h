@@ -11,7 +11,7 @@
 #include "../sidus.h"
 
 typedef struct {
-    sidus_t basis;
+    sidulum_t basis;
     double  phase;           /* illuminatio: 0=plenus, 1=novus */
     double  angulus_phase;   /* angulus illuminationis */
 } sidus_vagans_t;
