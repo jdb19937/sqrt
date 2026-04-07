@@ -197,7 +197,6 @@ extern const char *sidus_nomina_generum[SIDUS_NUMERUS];
 
 /*
  * Morphologia galaxiae — classificatio Hubble (1926).
- * valores in campo "phase" sideris cum genus == SIDUS_GALAXIA.
  */
 typedef enum {
     GALAXIA_ELLIPTICA,          /* E0-E7: spheroidalis */
@@ -208,19 +207,26 @@ typedef enum {
     GALAXIA_NUMERUS
 } galaxia_morphologia_t;
 
-/* proprietates sideris.
- * campi "phase" et "angulus_phase" polysemici sunt:
- *   SIDUS_VAGANS:  phase = illuminatio (0=plenus, 1=novus),
- *                   angulus_phase = angulus illuminationis.
- *   SIDUS_GALAXIA:  phase = morphologia (galaxia_morphologia_t),
- *                   angulus_phase = angulus positionis in caelo. */
+/* proprietates communes omnium siderum */
 typedef struct {
     sidus_genus_t genus;
     double        magnitudo;     /* magnitudo apparens (0=lucidissimum, 6=vix visibile) */
     double        temperatura;   /* temperatura coloris (Kelvin), 2000-40000 */
-    double        phase;         /* phase planetae vel morphologia galaxiae */
-    double        angulus_phase; /* angulus illuminationis vel positionis */
 } sidus_t;
+
+/* ================================================================
+ * genera siderum
+ * ================================================================ */
+
+#include "sidera/nanum_album.h"
+#include "sidera/sequentia.h"
+#include "sidera/gigas_rubrum.h"
+#include "sidera/supergigas.h"
+#include "sidera/neutronium.h"
+#include "sidera/crystallinum.h"
+#include "sidera/magnetar.h"
+#include "sidera/galaxia.h"
+#include "sidera/vagans.h"
 
 /* ================================================================
  * sidus reddere

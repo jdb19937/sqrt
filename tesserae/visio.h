@@ -11,9 +11,6 @@
 
 #include <math.h>
 
-#include "../helvea.h"
-#include "../color.h"
-
 /* ================================================================
  * constantes
  * ================================================================ */
@@ -42,64 +39,12 @@ typedef struct {
 } visio_t;
 
 /* ================================================================
- * visio_torus_t — torus planus corrugatus (per helvea)
- *
- * Adhibet codicem helvea existentem: superficiem, illuminationem,
- * themata. Parametri camerae et corrugationis exponuntur.
+ * genera visionum
  * ================================================================ */
 
-typedef struct {
-    visio_t            basis;
-    helvea_methodus_t  methodus;       /* HELVEA_BORRELLI etc. */
-    int                thema;          /* index in helvea_themata[] */
-    int                strata;         /* profunditas corrugationis (0=praefinitum) */
-    double             radius_maior;   /* R tori (praefinitum 1.0) */
-    double             radius_minor;   /* r tori (praefinitum 0.42) */
-    int                gradus_u;       /* resolutio u (praefinitum 800) */
-    int                gradus_v;       /* resolutio v (praefinitum 400) */
-    double             distantia;      /* distantia camerae (praefinitum 3.5) */
-    double             elevatio;       /* angulus elevationis (radiani) */
-    double             azimuthus;      /* angulus azimuthi (radiani) */
-} visio_torus_t;
-
-/* ================================================================
- * visio_navis_t — navis ardens (burning ship fractal)
- *
- * Fractale "burning ship": z_{n+1} = (|Re(z_n)| + i|Im(z_n)|)^2 + c
- * Michalski & Życzkowski (2003). Focus ad primam navem minimam.
- * ================================================================ */
-
-typedef struct {
-    visio_t basis;
-    double  centrum_re;      /* centrum regionis (reale) */
-    double  centrum_im;      /* centrum regionis (imaginarium) */
-    double  amplitudo;       /* latitudo regionis in plano complexo */
-    int     iterationes;     /* maximum iterationum */
-    double  color_cyclus;    /* periodus cycli coloris */
-    double  color_phase;     /* phase initialis coloris */
-    double  saturatio;       /* saturatio colorum 0..2 */
-} visio_navis_t;
-
-/* ================================================================
- * visio_zeppelinus_t — zeppelinus aerius
- *
- * Corpus ellipsoidale cum gondola et pinnis.
- * Illuminatio Phong simplex.
- * ================================================================ */
-
-typedef struct {
-    visio_t basis;
-    double  ratio;           /* ratio longitudinis ad diametrum (praef. 4.0) */
-    double  inclinatio;      /* angulus inclinationis (radiani) */
-    double  azimuthus;       /* rotatio circa axem verticalem */
-    double  lux_angulus;     /* directio lucis (radiani) */
-    double  lux_elevatio;    /* elevatio lucis (radiani) */
-    color_t involucrum;      /* color involucri */
-    color_t gondola;         /* color gondolae */
-    double  elevatio;        /* elevatio camerae (radiani, praef. 0.15) */
-    double  fenestrae;       /* numerus fenestrarum gondolae */
-    double  pinnae;          /* magnitudo pinnarum 0..1 */
-} visio_zeppelinus_t;
+#include "visiones/torus.h"
+#include "visiones/navis.h"
+#include "visiones/zeppelinus.h"
 
 /* ================================================================
  * functiones

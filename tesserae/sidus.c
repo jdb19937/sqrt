@@ -485,19 +485,19 @@ static void reddere_crystallinum(
  * in duos modos polares separat (Heisenberg-Euler 1936). */
 static void reddere_magnetar(
     unsigned char *fen,
-    const sidus_t *s,
+    const sidus_magnetar_t *s,
     const instrumentum_t *instr
 ) {
     (void)instr;
-    double luciditas = pow(10.0, -s->magnitudo * 0.4) * 3.0;
+    double luciditas = pow(10.0, -s->basis.magnitudo * 0.4) * 3.0;
 
     /* semen ex magnitudo et temperatura derivatum — unicum per sidus.
      * antea: semen ex sola temperatura, sed magnetares omnes T=5×10⁶ K
      * habent, ergo omnes eandem orientationem reddebant.
      * nunc magnitudinem addimus ut variatio inter magnetares oriatur. */
     semen_g = (unsigned int)(
-        s->temperatura * 71
-        + s->magnitudo * 100003 + s->phase * 70001
+        s->basis.temperatura * 71
+        + s->basis.magnitudo * 100003 + s->phase * 70001
     );
 
     /* axis magneticus — angulus aleatorius per plenum circulum.
@@ -689,20 +689,20 @@ static void reddere_magnetar(
  */
 static void reddere_galaxia(
     unsigned char *fen,
-    const sidus_t *s,
+    const sidus_galaxia_t *s,
     const instrumentum_t *instr
 ) {
     (void)instr;
 
     /* semen unicum ex omnibus proprietatibus */
     semen_g = (unsigned int)(
-        s->temperatura * 137
-        + s->magnitudo * 100003 + s->phase * 7001
+        s->basis.temperatura * 137
+        + s->basis.magnitudo * 100003 + (double)s->morphologia * 7001
         + s->angulus_phase * 50021
     );
 
-    galaxia_morphologia_t morph = (galaxia_morphologia_t)(int)s->phase;
-    double luciditas = pow(10.0, -s->magnitudo * 0.4) * 2.5;
+    galaxia_morphologia_t morph = s->morphologia;
+    double luciditas = pow(10.0, -s->basis.magnitudo * 0.4) * 2.5;
     double ang = s->angulus_phase;   /* angulus positionis in caelo */
     double ca = cos(ang), sa = sin(ang);
 
@@ -710,7 +710,7 @@ static void reddere_galaxia(
      * distributio uniformis in cos(i) (orientationes aleatoriae
      * in spatio 3D, Hubble 1926). ergo i = arccos(r) ubi r ∈ [0,1].
      * implementamus per "temperatura" campi: T/10000 dat cos(i). */
-    double cos_incl = s->temperatura / 10000.0;
+    double cos_incl = s->basis.temperatura / 10000.0;
     if (cos_incl < 0.05)
         cos_incl = 0.05;
     if (cos_incl > 1.0)
@@ -1015,14 +1015,14 @@ static void reddere_galaxia(
 
 static void reddere_vagans(
     unsigned char *fen,
-    const sidus_t *s,
+    const sidus_vagans_t *s,
     const instrumentum_t *instr
 ) {
     (void)instr;
-    color_t col = sidus_temperatura_ad_colorem(s->temperatura);
+    color_t col = sidus_temperatura_ad_colorem(s->basis.temperatura);
 
     /* vagans: discus maior, matte, cum falce (phase) */
-    double radius = 8.0 + pow(10.0, -s->magnitudo * 0.4) * 6.0;
+    double radius = 8.0 + pow(10.0, -s->basis.magnitudo * 0.4) * 6.0;
     if (radius > 25.0)
         radius = 25.0;
 
@@ -1117,13 +1117,13 @@ void sidus_reddere(
         reddere_crystallinum(fenestra, sidus, instrumentum);
         break;
     case SIDUS_MAGNETAR:
-        reddere_magnetar(fenestra, sidus, instrumentum);
+        reddere_magnetar(fenestra, (const sidus_magnetar_t *)sidus, instrumentum);
         break;
     case SIDUS_GALAXIA:
-        reddere_galaxia(fenestra, sidus, instrumentum);
+        reddere_galaxia(fenestra, (const sidus_galaxia_t *)sidus, instrumentum);
         break;
     case SIDUS_VAGANS:
-        reddere_vagans(fenestra, sidus, instrumentum);
+        reddere_vagans(fenestra, (const sidus_vagans_t *)sidus, instrumentum);
         break;
     default:
         break;

@@ -1,12 +1,12 @@
-APOTHECA ?= .
+PREFIX = /opt/apotheca
 
 CC      ?= cc
 AR      ?= ar
-CFLAGS  ?= -Wall -Wextra -pedantic -std=c99 -O2 -I$(APOTHECA)/ison -I$(APOTHECA)/phantasma
-LDFLAGS = -lm `cat $(APOTHECA)/phantasma/nexus_phantasma`
+CFLAGS  ?= -Wall -Wextra -pedantic -std=c99 -O2 -I$(PREFIX)/include/ison -I$(PREFIX)/include/phantasma
+LDFLAGS = -lm `cat $(PREFIX)/lib/nexus_phantasma`
 
-LIBISON = $(APOTHECA)/ison/libison.a
-LIBPHANTASMA = $(APOTHECA)/phantasma/libphantasma.a
+LIBISON = $(PREFIX)/lib/libison.a
+LIBPHANTASMA = $(PREFIX)/lib/libphantasma.a
 
 OBJECTA = pictura.o helvea.o campus.o instrumentum.o \
           aspectus.o perceptus.o \
@@ -50,20 +50,6 @@ caelae/binarium.isonl: campi/binarium.ison caele
 
 lude: torus_specta caelae/terra.isonl
 	./torus_specta
-
-para:
-	git submodule update --init ison phantasma
-	$(FACE) -C ison
-	$(FACE) -C phantasma
-
-expara:
-	git submodule deinit -f ison phantasma
-
-$(LIBISON):
-        $(FACE) -C $(APOTHECA)/ison
-
-$(LIBPHANTASMA):
-	$(FACE) -C $(APOTHECA)/phantasma
 
 # objecta
 
@@ -113,6 +99,13 @@ redde: redde.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
 astra_animare: astra_animare.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ astra_animare.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
+colloca: omnia
+	install -d $(PREFIX)/bin $(PREFIX)/lib $(PREFIX)/include/sqrt/tesserae
+	install -m 755 torus_planus torus_animare torus_specta caele genera redde astra_animare $(PREFIX)/bin/
+	install -m 644 $(BIBLIOTHECA) $(PREFIX)/lib/
+	install -m 644 campus.h instrumentum.h aspectus.h perceptus.h color.h vectores.h pictura.h helvea.h bessel.h tessera.h tessella.h $(PREFIX)/include/sqrt/
+	install -m 644 tesserae/sidus.h tesserae/planeta.h tesserae/visio.h $(PREFIX)/include/sqrt/tesserae/
+
 purga:
 	rm -f torus_planus torus_animare torus_specta proba_astra proba_planeta proba_caelae proba_visio caele genera redde astra_animare proba
 	rm -f $(OBJECTA) $(BIBLIOTHECA)
@@ -121,4 +114,4 @@ purga:
 linte:
 	insinulint -c *.c *.h
 
-.PHONY: omnia purga caelae lude linte
+.PHONY: omnia colloca purga caelae lude linte
