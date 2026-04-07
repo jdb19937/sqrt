@@ -7,25 +7,30 @@
 
 #include "tessella.h"
 
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "tessella.h"
 #include "tesserae/sidus.h"
 #include "tesserae/planeta.h"
 #include "tesserae/visio.h"
 
+/* phyla tessera */
+typedef enum {
+    SIDUS,
+    PLANETA,
+    VISIO
+} tesserarius_t;
+
 typedef struct tessera {
-    tessella_t t;
+    tesserarius_t qui;
 
-    /* unio phylum — quodque phylum iam genera sua continet */
     union {
-        /* diminutivae (accessio communis tantum) */
-        sidulum_t     sidulum;
-        planetella_t  planetella;
-        visiuncula_t  visiuncula;
-
-        /* plena (cum generibus) */
-        sidus_t       sidus;
-        planeta_t     planeta;
-        visio_t       visio;
-    } g;
+        sidus_t   sidus;
+        planeta_t planeta;
+        visio_t   visio;
+    } ubi;
 } tessera_t;
 
 #endif /* TESSERA_H */

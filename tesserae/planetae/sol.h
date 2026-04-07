@@ -12,25 +12,29 @@
 #include "../planeta.h"
 
 typedef struct {
-    planetella_t basis;
-
     /* fusio stellaris */
-    double     fusio;            /* intensitas fusionis [0,1] */
-    double     temperatura;      /* temperatura photosphaericae (K) */
-    double     luminositas;      /* multiplicator fulgoris */
-    double     corona;           /* extensio coronae [0,1] */
-    double     granulatio;       /* granulatio convectiva [0,1] */
+    double fusio;            /* intensitas fusionis [0,1] */
+    double temperatura;      /* temperatura photosphaericae (K) */
+    double luminositas;      /* multiplicator fulgoris */
+    double corona;           /* extensio coronae [0,1] */
+    double granulatio;       /* granulatio convectiva [0,1] */
 
     /* maculae (sunspots) */
-    int        maculae;
-    double     macula_radius;
-    double     macula_obscuritas;
+    int    maculae;
+    double macula_radius;
+    double macula_obscuritas;
 
     /* compositio pro temperatura_ex_compositione */
-    double     h2;
-    double     he;
-    double     ch4;
-    double     nh3;
-} planeta_sol_t;
+    double h2;
+    double he;
+    double ch4;
+    double nh3;
+} soliculum_t;
+
+typedef struct {
+    tessella_t   avi;
+    planetella_t pro;
+    soliculum_t  res;
+} sol_t;
 
 #endif /* PLANETA_SOL_H */

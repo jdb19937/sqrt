@@ -9,6 +9,8 @@
 #ifndef VISIO_H
 #define VISIO_H
 
+#include "../tessella.h"
+
 #include <math.h>
 
 /* ================================================================
@@ -25,7 +27,7 @@ typedef enum {
     VISIO_TORUS,       /* torus planus quadratus corrugatus */
     VISIO_NAVIS,       /* navis ardens (burning ship fractal) */
     VISIO_ZEPPELINUS   /* zeppelinus aerius */
-} visio_genus_t;
+} visualis_t;
 
 #define VISIO_NUMERUS_GENERUM 3
 
@@ -34,7 +36,6 @@ typedef enum {
  * ================================================================ */
 
 typedef struct {
-    visio_genus_t genus;
     unsigned      semen;
 } visiuncula_t;
 
@@ -54,14 +55,14 @@ typedef struct {
  * Accessio generis: visio.torus.methodus, visio.navis.amplitudo, ...
  * ================================================================ */
 
-typedef union {
-    visiuncula_t p;
+typedef struct {
+    visualis_t qui;
 
     union {
-        visio_torus_t      torus;
-        visio_navis_t      navis;
-        visio_zeppelinus_t zeppelinus;
-    } g;
+        torus_t      torus;
+        navis_t      navis;
+        zeppelinus_t zeppelinus;
+    } ubi;
 } visio_t;
 
 /* ================================================================

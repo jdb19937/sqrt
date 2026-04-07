@@ -11,9 +11,14 @@
 #include "../sidus.h"
 
 typedef struct {
-    sidulum_t basis;
-    double  phase;           /* illuminatio: 0=plenus, 1=novus */
-    double  angulus_phase;   /* angulus illuminationis */
-} sidus_vagans_t;
+    double phase;       /* illuminatio: 0=plenus, 1=novus */
+    double angulus;     /* angulus illuminationis */
+} vaganulus_t;
+
+typedef struct {
+    tessella_t  avi;
+    sidulum_t   pro;
+    vaganulus_t res;
+} vagans_t;
 
 #endif /* SIDUS_VAGANS_H */

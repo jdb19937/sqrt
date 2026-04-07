@@ -30,10 +30,12 @@
 #ifndef SIDUS_H
 #define SIDUS_H
 
+#include "../tessella.h"
 #include "../color.h"
 #include "../instrumentum.h"
 
 #include <math.h>
+
 #define SIDUS_FENESTRA  64      /* latitudo et altitudo fenestrae sideris */
 
 /*
@@ -191,27 +193,14 @@ typedef enum {
     SIDUS_GALAXIA,          /* galaxia distans */
     SIDUS_VAGANS,
     SIDUS_NUMERUS
-} sidus_genus_t;
+} sidereus_t;
 
 extern const char *sidus_nomina_generum[SIDUS_NUMERUS];
 
-/*
- * Morphologia galaxiae — classificatio Hubble (1926).
- */
-typedef enum {
-    GALAXIA_ELLIPTICA,          /* E0-E7: spheroidalis */
-    GALAXIA_SPIRALIS,           /* Sa-Sd: brachia spiralia */
-    GALAXIA_SPIRALIS_BARRATA,   /* SBa-SBd: cum barra centrali */
-    GALAXIA_LENTICULARIS,       /* S0: discus sine brachiis */
-    GALAXIA_IRREGULARIS,        /* Irr: asymmetrica */
-    GALAXIA_NUMERUS
-} galaxia_morphologia_t;
-
 /* proprietates communes omnium siderum (diminutiva) */
 typedef struct {
-    sidus_genus_t genus;
-    double        magnitudo;     /* magnitudo apparens (0=lucidissimum, 6=vix visibile) */
-    double        temperatura;   /* temperatura coloris (Kelvin), 2000-40000 */
+    double   magnitudo;     /* magnitudo apparens (0=lucidissimum, 6=vix visibile) */
+    double   temperatura;   /* temperatura coloris (Kelvin), 2000-40000 */
 } sidulum_t;
 
 /* ================================================================
@@ -236,20 +225,20 @@ typedef struct {
  * Accessio generis: sidus.vagans.phase, sidus.galaxia.morphologia, ...
  * ================================================================ */
 
-typedef union {
-    sidulum_t p;
+typedef struct {
+    sidereus_t qui;
 
     union {
-        sidus_nanum_album_t  nanum_album;
-        sidus_sequentia_t    sequentia;
-        sidus_gigas_rubrum_t gigas_rubrum;
-        sidus_supergigas_t   supergigas;
-        sidus_neutronium_t   neutronium;
-        sidus_crystallinum_t crystallinum;
-        sidus_magnetar_t     magnetar;
-        sidus_galaxia_t      galaxia;
-        sidus_vagans_t       vagans;
-    } g;
+        nanum_album_t  nanum_album;
+        sequentia_t    sequentia;
+        gigas_rubrum_t gigas_rubrum;
+        supergigas_t   supergigas;
+        neutronium_t   neutronium;
+        crystallinum_t crystallinum;
+        magnetar_t     magnetar;
+        galaxia_t      galaxia;
+        vagans_t       vagans;
+    } ubi;
 } sidus_t;
 
 /* ================================================================

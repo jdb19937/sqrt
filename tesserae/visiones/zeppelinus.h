@@ -12,7 +12,6 @@
 #include "../../color.h"
 
 typedef struct {
-    visiuncula_t basis;
     double  ratio;           /* ratio longitudinis ad diametrum */
     double  inclinatio;      /* angulus inclinationis (radiani) */
     double  azimuthus;       /* rotatio circa axem verticalem */
@@ -23,6 +22,12 @@ typedef struct {
     double  elevatio;        /* elevatio camerae (radiani) */
     double  fenestrae;       /* numerus fenestrarum gondolae */
     double  pinnae;          /* magnitudo pinnarum 0..1 */
-} visio_zeppelinus_t;
+} zeppelinulus_t;
+
+typedef struct {
+    tessella_t           avi;
+    visiuncula_t         pro;
+    zeppelinulus_t res;
+} zeppelinus_t;
 
 #endif /* VISIO_ZEPPELINUS_H */

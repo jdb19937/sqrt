@@ -10,43 +10,47 @@
 #include "../planeta.h"
 
 typedef struct {
-    planetella_t basis;
-
     /* compositio superficiei */
-    double     silicata;
-    double     ferrum;
-    double     sulphur;
-    double     carbo;
-    double     glacies;
-    double     glacies_co2;
-    double     malachita;
+    double silicata;
+    double ferrum;
+    double sulphur;
+    double carbo;
+    double glacies;
+    double glacies_co2;
+    double malachita;
 
     /* aqua liquida */
-    double     aqua;
-    double     aqua_profunditas;
+    double aqua;
+    double aqua_profunditas;
 
     /* terrain */
-    int        continentes;
-    double     scala;
-    double     tectonica;
-    double     craterae;
-    double     maria;
-    double     vulcanismus;
+    int    continentes;
+    double scala;
+    double tectonica;
+    double craterae;
+    double maria;
+    double vulcanismus;
 
     /* atmosphaera */
-    double     pressio_kPa;
-    double     n2;
-    double     o2;
-    double     co2;
-    double     ch4;
-    double     h2;
-    double     he;
-    double     nh3;
-    double     pulvis;
-    double     nubes;
+    double pressio_kPa;
+    double n2;
+    double o2;
+    double co2;
+    double ch4;
+    double h2;
+    double he;
+    double nh3;
+    double pulvis;
+    double nubes;
 
     /* glacies polaris */
-    double     polaris;
-} planeta_parvum_t;
+    double polaris;
+} parvulum_t;
+
+typedef struct {
+    tessella_t   avi;
+    planetella_t pro;
+    parvulum_t   res;
+} parvum_t;
 
 #endif /* PLANETA_PARVUM_H */

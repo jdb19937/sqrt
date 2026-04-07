@@ -8,7 +8,13 @@
 #include "../sidus.h"
 
 typedef struct {
-    sidulum_t basis;
-} sidus_crystallinum_t;
+    int res;
+} crystallulum_t;
+
+typedef struct {
+    tessella_t     avi;
+    sidulum_t      pro;
+    crystallulum_t res;
+} crystallinum_t;
 
 #endif /* SIDUS_CRYSTALLINUM_H */

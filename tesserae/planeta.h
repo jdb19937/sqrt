@@ -10,6 +10,7 @@
 #ifndef PLANETA_H
 #define PLANETA_H
 
+#include "../tessella.h"
 #include "../perceptus.h"
 #include "../color.h"
 #include "../instrumentum.h"
@@ -34,15 +35,14 @@ typedef enum {
     PLANETA_PARVUM,      /* Pluto, Ceres, lunae parvae */
     PLANETA_SOL,         /* stella proxima — fusio completa */
     PLANETA_NEBULA       /* nubes gasei procedurale */
-} planeta_genus_t;
+} planetarius_t;
 
 /* proprietates communes omnium planetarum (diminutiva) */
 typedef struct {
-    planeta_genus_t genus;
-    double     radius;           /* 0.0-1.0: fractio fenestrae */
-    double     inclinatio;       /* inclinatio axialis (radiani) */
-    double     rotatio;          /* longitudo centralis visibilis (radiani) */
-    unsigned   semen;            /* semen procedurale */
+    double          radius;           /* 0.0-1.0: fractio fenestrae */
+    double          inclinatio;       /* inclinatio axialis (radiani) */
+    double          rotatio;          /* longitudo centralis visibilis (radiani) */
+    unsigned        semen;            /* semen procedurale */
 } planetella_t;
 
 /* ================================================================
@@ -64,17 +64,17 @@ typedef struct {
  * Accessio generis: planeta.saxosum.silicata, planeta.gaseosum.fasciae, ...
  * ================================================================ */
 
-typedef union {
-    planetella_t p;
+typedef struct {
+    planetarius_t qui;
 
     union {
-        planeta_saxosum_t  saxosum;
-        planeta_gaseosum_t gaseosum;
-        planeta_glaciale_t glaciale;
-        planeta_parvum_t   parvum;
-        planeta_sol_t      sol;
-        planeta_nebula_t   nebula;
-    } g;
+        saxosum_t  saxosum;
+        gaseosum_t gaseosum;
+        glaciale_t glaciale;
+        parvum_t   parvum;
+        sol_t      sol;
+        nebula_t   nebula;
+    } ubi;
 } planeta_t;
 
 /* ================================================================

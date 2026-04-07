@@ -11,20 +11,24 @@
 #include "../planeta.h"
 
 typedef struct {
-    planetella_t basis;
-
     /* emissio */
-    double     temperatura;      /* color corporis nigri (K); 0 = 5000K */
-    double     luminositas;      /* mensura emissionis */
+    double temperatura;      /* color corporis nigri (K); 0 = 5000K */
+    double luminositas;      /* mensura emissionis */
 
     /* linea emissionis */
-    double     h2;               /* intensitas Ha [0,1] */
-    double     o2;               /* intensitas OIII [0,1] */
+    double h2;               /* intensitas Ha [0,1] */
+    double o2;               /* intensitas OIII [0,1] */
 
     /* structura */
-    double     carbo;            /* fractio nubeculae absorbentis [0,1] */
-    double     tectonica;        /* turbulentia [0,1] */
-    double     nubes;            /* densitas filamentorum [0,1] */
-} planeta_nebula_t;
+    double carbo;            /* fractio nubeculae absorbentis [0,1] */
+    double tectonica;        /* turbulentia [0,1] */
+    double nubes;            /* densitas filamentorum [0,1] */
+} nebulula_t;
+
+typedef struct {
+    tessella_t   avi;
+    planetella_t pro;
+    nebulula_t   res;
+} nebula_t;
 
 #endif /* PLANETA_NEBULA_H */

@@ -8,7 +8,13 @@
 #include "../sidus.h"
 
 typedef struct {
-    sidulum_t basis;
-} sidus_supergigas_t;
+    int res;
+} supergigulum_t;
+
+typedef struct {
+    tessella_t     avi;
+    sidulum_t      pro;
+    supergigulum_t res;
+} supergigas_t;
 
 #endif /* SIDUS_SUPERGIGAS_H */

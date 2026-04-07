@@ -8,7 +8,13 @@
 #include "../sidus.h"
 
 typedef struct {
-    sidulum_t basis;
-} sidus_sequentia_t;
+    int res;
+} sequentiola_t;
+
+typedef struct {
+    tessella_t    avi;
+    sidulum_t     pro;
+    sequentiola_t res;
+} sequentia_t;
 
 #endif /* SIDUS_SEQUENTIA_H */

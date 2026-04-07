@@ -21,7 +21,7 @@ CAELAE = caelae/terra.isonl caelae/hubble.isonl caelae/jwst.isonl \
          caelae/nuclei.isonl caelae/vacuum.isonl caelae/mortis.isonl \
          caelae/binarium.isonl
 
-omnia: torus_planus torus_animare torus_specta proba_astra caele genera redde astra_animare proba proba_planeta proba_caelae proba_visio
+omnia: torus_planus torus_animare torus_specta proba_astra caele genera redde astra_animare proba_planeta proba_caelae proba_visio
 
 omnia: $(NOMEN)
 

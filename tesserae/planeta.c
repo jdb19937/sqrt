@@ -459,73 +459,6 @@ static double crater_field(
 }
 
 /* ================================================================
- * continentes — terrain procedurale
- *
- * Continentes procedurales per multi-octave FBM cum domain warping.
- * Numerus continentium controllat distributionem terrae:
- *   0: nulla terra (oceanus totus)
- *   1: pangaea (una massa magna)
- *   2-3: continentes magni
- *   5-7: Terra-simile
- *   >10: archipelagus
- *
- * Tectonica: complexitas litoralis (plate boundaries, fjords).
- * Scala: magnitudo featurum.
- *
- * Ref: Perlin, K. (1985). "An image synthesizer."
- *   SIGGRAPH '85. pp. 287-296.
- * ================================================================ */
-
-static double continent_mask(double lon, double lat, const planeta_saxosum_t *p)
-{
-    if (p->aqua < 0.01)
-        return 1.0; /* nulla aqua → tota terra */
-
-    double sc = fmax(0.3, p->scala);
-    double ox = (p->basis.semen & 0xFF) * 0.13;
-    double oy = ((p->basis.semen >> 8) & 0xFF) * 0.13;
-
-    /* blobs continentales — massae magnae terrae */
-    double elevatio = 0.0;
-    unsigned s = p->basis.semen * 7919 + 77777;
-    int nc = fmax(1, p->continentes);
-    for (int c = 0; c < nc; c++) {
-        s = s * 1103515245 + 12345;
-        double blon = (s >> 8 & 0xFFFF) / 65536.0 * DPI;
-        s = s * 1103515245 + 12345;
-        double blat = ((s >> 8 & 0xFFFF) / 65536.0 - 0.5) * PI * 0.85;
-        s = s * 1103515245 + 12345;
-        double brad = (1.0 + (s >> 8 & 0xFF) / 255.0 * 1.2) * sc / pow(nc, 0.35);
-
-        double dl = lat - blat;
-        double dn = lon - blon;
-        if (dn > PI)
-            dn -= DPI;
-        if (dn < -PI)
-            dn += DPI;
-        double dd   = sqrt(dl * dl + dn * dn * cos(lat) * cos(lat));
-        double blob = fmax(0.0, 1.0 - dd / brad);
-        blob        = blob * blob;
-        elevatio    = fmax(elevatio, blob);
-    }
-
-    /* detallum litorale per FBM */
-    double nx   = lon / DPI * 5.0 * sc;
-    double ny   = (lat / PI + 0.5) * 2.5 * sc;
-    double warp = 1.0 + p->tectonica * 3.0;
-    double det  = fbm_warp(nx + ox, ny + oy, 7, 0.55, warp);
-
-    /* combinatio */
-    double terrain = elevatio * 0.70 + det * 0.30;
-
-    /* limen maris: aqua est fractio sub aqua.
-     * terrain ∈ [0, ~0.9]. Invertimus: terra ubi terrain altior.
-     * Exemplum: aqua=0.71 → ~29% pixels supra limen. */
-    double limen = p->aqua * 0.30;
-    return (terrain > limen) ? 1.0 : 0.0;
-}
-
-/* ================================================================
  * temperatura → RGB (Tanner Helland 2012, errore < 1% in 1000-40000K)
  * ================================================================ */
 
@@ -566,914 +499,15 @@ static double temperatura_ex_compositione(double h2, double he, double ch4)
 }
 
 /* ================================================================
- * fusio — applicatur supra quodcumque genus post renderitionem
- *
- * Transitus continuus: fusio=0 → planeta ordinarius, fusio=1 → stella.
- *
- * Effectus:
- *   1. Limb darkening Eddington supra illuminationem existentem
- *   2. Blend versus colorem stellarem ex temperatura
- *   3. Fulgor internus (lux e toto corpore)
- *   4. Corona (pixeles extra discum)
+ * renderers per genus — inclusi ex tabellis separatis
  * ================================================================ */
 
-static void aplicare_fusionem(unsigned char *fen, const planeta_gaseosum_t *p)
-{
-    if (p->fusio < 0.001)
-        return;
-    double f   = p->fusio;
-    double rad = p->basis.radius * SEMI;
-    double t_f = (p->temperatura > 100.0) ? p->temperatura
-        : temperatura_ex_compositione(p->h2, p->he, p->ch4);
-    color_t scol = temperatura_ad_colorem_f(t_f);
-
-    /* --- discus: limb darkening + blend + fulgor --- */
-    for (int py = 0; py < FEN; py++) {
-        for (int px = 0; px < FEN; px++) {
-            double dx = px - SEMI, dy = py - SEMI;
-            double d2 = dx * dx + dy * dy;
-            if (d2 > rad * rad)
-                continue;
-            int fi = (py * FEN + px) * 4;
-            if (fen[fi + 3] == 0)
-                continue;
-
-            double mu   = sqrt(1.0 - d2 / (rad * rad));
-            double limb = 0.4 + 0.6 * mu;  /* Eddington */
-
-            double cr = fen[fi + 0] / 255.0;
-            double cg = fen[fi + 1] / 255.0;
-            double cb = fen[fi + 2] / 255.0;
-
-            /* aplica limb darkening proportionaliter ad fusionem */
-            cr = cr * (1.0 - f) + cr * limb * f;
-            cg = cg * (1.0 - f) + cg * limb * f;
-            cb = cb * (1.0 - f) + cb * limb * f;
-
-            /* blend versus colorem stellarem */
-            double bv = f * 0.75;
-            cr        = cr * (1.0 - bv) + scol.r * bv;
-            cg        = cg * (1.0 - bv) + scol.g * bv;
-            cb        = cb * (1.0 - bv) + scol.b * bv;
-
-            /* fulgor internus: minima luciditas e fusione */
-            double fl = f * 0.25;
-            if (cr < fl * scol.r)
-                cr = fl * scol.r;
-            if (cg < fl * scol.g)
-                cg = fl * scol.g;
-            if (cb < fl * scol.b)
-                cb = fl * scol.b;
-
-            fen[fi + 0] = (unsigned char)fmin(255.0, cr * 255.0);
-            fen[fi + 1] = (unsigned char)fmin(255.0, cg * 255.0);
-            fen[fi + 2] = (unsigned char)fmin(255.0, cb * 255.0);
-            fen[fi + 3] = 255;
-        }
-    }
-
-    /* --- corona per fusionem --- */
-    if (p->corona < 0.001)
-        return;
-    double corona_ext = rad + (SEMI * 1.5 - rad) * p->corona * f;
-
-    if (corona_ext <= rad)
-        return;
-    color_t ccol = temperatura_ad_colorem_f(t_f * 1.05);  /* corona paullo calidior */
-
-    for (int py = 0; py < FEN; py++) {
-        for (int px = 0; px < FEN; px++) {
-            double dx = px - SEMI, dy = py - SEMI;
-            double d  = sqrt(dx * dx + dy * dy);
-            if (d <= rad || d > corona_ext)
-                continue;
-            double t   = (d - rad) / (corona_ext - rad);
-            double cf  = p->corona * f * exp(-t * t * 5.0) * 0.85;
-            double ang = atan2(dy, dx);
-            double nv = fbm(
-                cos(ang) * 3.0 + (double)(p->basis.semen % 19) * 0.1,
-                sin(ang) * 3.0 + 4.7, 3, 0.6
-            );
-            cf *= 0.35 + nv;
-            if (cf < 0.003)
-                continue;
-            if (cf > 1.0)
-                cf = 1.0;
-            int fi = (py * FEN + px) * 4;
-            unsigned char ca = (unsigned char)(cf * 255.0);
-            /* additiva saturans supra existentem */
-            int nr      = fen[fi + 0] + (int)(ccol.r * cf * 255.0);
-            int ng      = fen[fi + 1] + (int)(ccol.g * cf * 255.0);
-            int nb      = fen[fi + 2] + (int)(ccol.b * cf * 0.88 * 255.0);
-            fen[fi + 0] = (unsigned char)fmin(255, nr);
-            fen[fi + 1] = (unsigned char)fmin(255, ng);
-            fen[fi + 2] = (unsigned char)fmin(255, nb);
-            if (fen[fi + 3] < ca)
-                fen[fi + 3] = ca;
-        }
-    }
-}
-
-/* ================================================================
- * reddere_sol — stella proxima, fusio completa
- *
- * Discus cum limb darkening Eddington (I = 0.4 + 0.6μ),
- * granulatio convectiva (fbm), maculae (sunspots in fascia ±37°),
- * corona structurata angulariter.
- * ================================================================ */
-
-static void reddere_sol(unsigned char *fen, const planeta_sol_t *p)
-{
-    double radius = p->basis.radius * SEMI;
-    double t_f = (p->temperatura > 100.0) ? p->temperatura
-        : temperatura_ex_compositione(p->h2, p->he, p->ch4);
-    color_t col = temperatura_ad_colorem_f(t_f);
-    double lux  = (p->luminositas > 0.001) ? p->luminositas : 1.0;
-
-    double corona_v   = p->corona;
-    double corona_ext = radius + (SEMI * 1.8 - radius) * corona_v * 0.75;
-
-    for (int py = 0; py < FEN; py++) {
-        for (int px = 0; px < FEN; px++) {
-            double dx = px - SEMI, dy = py - SEMI;
-            double d2 = dx * dx + dy * dy;
-            double d  = sqrt(d2);
-
-            int fi = (py * FEN + px) * 4;
-
-            if (d <= radius) {
-                /* ---- discus solis ---- */
-                double mu     = sqrt(1.0 - d2 / (radius * radius));
-                double bright = 0.4 + 0.6 * mu;  /* Eddington */
-
-                /* granulatio — cellulae convectionis */
-                if (p->granulatio > 0.001) {
-                    double nx    = dx / radius * 7.0 + (double)(p->basis.semen % 31);
-                    double ny    = dy / radius * 7.0 + 5.3;
-                    double grain = fbm(nx, ny, 3, 0.55);
-                    bright *= 1.0 + (grain - 0.5) * p->granulatio * 0.28;
-                }
-
-                /* maculae (sunspots) in fascia aequatoriali */
-                for (int k = 0; k < p->maculae && k < 8; k++) {
-                    double hx = hash2((int)(p->basis.semen) + k * 41,     1);
-                    double hy = hash2((int)(p->basis.semen) + k * 41,     2);
-                    double hs = hash2((int)(p->basis.semen) + k * 41,     3);
-                    double cx = (hx - 0.5) * 1.5 * radius;
-                    double cy = (hy - 0.5) * 0.75 * radius;
-                    double mr = (0.04 + hs * 0.09) * radius
-                    * fmax(0.1, p->macula_radius * 4.0);
-                    double sdx = dx - cx, sdy = dy - cy;
-                    double sd  = sqrt(sdx * sdx + sdy * sdy);
-                    if (sd < mr) {
-                        double t = sd / mr;
-                        bright *= 1.0 - (1.0 - t * t)
-                        * fmin(0.75, fabs(p->macula_obscuritas));
-                    }
-                }
-
-                bright = fmax(0.0, bright) * lux;
-
-                fen[fi + 0] = (unsigned char)fmin(255.0, col.r * bright * 255.0);
-                fen[fi + 1] = (unsigned char)fmin(255.0, col.g * bright * 255.0);
-                fen[fi + 2] = (unsigned char)fmin(255.0, col.b * bright * 255.0);
-                fen[fi + 3] = 255;
-
-            } else if (corona_v > 0.001 && d <= corona_ext) {
-                /* ---- corona ---- */
-                double t    = (d - radius) / (corona_ext - radius);
-                double base = corona_v * exp(-t * t * 5.0) * 0.9;
-                double ang  = atan2(dy, dx);
-                double nv   = fbm(
-                    cos(ang) * 3.0 + (double)(p->basis.semen % 17) * 0.1,
-                    sin(ang) * 3.0 + 5.2, 3, 0.6
-                );
-                double cf = fmin(1.0, base * (0.35 + nv) * lux);
-                if (cf < 0.003)
-                    continue;
-
-                fen[fi + 0] = (unsigned char)fmin(255.0, col.r * cf * 255.0);
-                fen[fi + 1] = (unsigned char)fmin(255.0, col.g * cf * 255.0);
-                fen[fi + 2] = (unsigned char)fmin(255.0, col.b * cf * 0.85 * 255.0);
-                fen[fi + 3] = (unsigned char)(cf * 255.0);
-            }
-        }
-    }
-}
-
-/* ================================================================
- * renderers
- * ================================================================ */
-
-static void reddere_saxosum(
-    unsigned char *fen, const planeta_saxosum_t *p,
-    const planeta_perceptus_t *perc
-) {
-    double rad      = p->basis.radius;
-    double pnorm    = fmin(1.0, p->pressio_kPa / 101.0); /* [0,1] normalized */
-    color_t atm_col = color_atmosphaerae(p->n2, p->o2, p->co2, p->ch4, p->h2, p->he, p->nh3, p->pulvis, p->ferrum, p->sulphur);
-
-    for (int py = 0; py < FEN; py++) {
-        for (int px = 0; px < FEN; px++) {
-            double lon, lat;
-            if (
-                !pixel_ad_sphaeram(
-                    px, py, rad, p->basis.inclinatio, p->basis.rotatio,
-                    &lon, &lat
-                )
-            )
-                continue;
-
-            double illum = illuminatio(px, py, rad, perc->aspectus.situs, perc->aspectus.angulus) * perc->aspectus.lumen;
-            if (perc->coaspectus.lumen > 0.001)
-                illum += illuminatio(px, py, rad, perc->coaspectus.situs, perc->coaspectus.angulus) * perc->coaspectus.lumen;
-            if (illum < 0.003) {
-                /* latus obscurum — opacum nigrum ne stellae transluceant */
-                fen_pixel(fen, px, py, 0.0, 0.0, 0.0, 1.0);
-                continue;
-            }
-
-            /* coordinatae strepitus — scala pro detallo ad 256px */
-            double nx = lon / DPI * 10.0;
-            double ny = (lat / PI + 0.5) * 5.0;
-
-            /* variatio localis [-0.3, 0.3] */
-            double var = (fbm(nx * 3.0 + p->basis.semen * 0.01, ny * 3.0, 5, 0.5) - 0.5) * 0.6;
-
-            /* terra an aqua? */
-            int terra = 1;
-            if (p->aqua > 0.01)
-                terra = (int)continent_mask(lon, lat, p);
-
-            color_t col;
-
-            if (terra) {
-                col = color_superficiei(p->silicata, p->ferrum, p->sulphur, p->carbo, p->glacies, p->glacies_co2, p->malachita, var);
-
-                /* biomes: variatio coloris intra continentes ex latitudine.
-                 * Si malachita praesens (vegetatio), modulatur per lat:
-                 *   tropicae (|lat|<25°): viridis saturatus
-                 *   temperatae (25-55°): viridis moderatus
-                 *   boreales (55-70°): viridis obscurior
-                 *   aridae (deserta): flavum-brunneum per strepitum
-                 * Hoc producit variegatam superficiem non uniformem. */
-                if (p->malachita > 0.1) {
-                    double abs_lat = fabs(lat) / (PI * 0.5);
-
-                    /* ariditas: deserta per strepitum (non omnia virides) */
-                    double arid = fbm(nx * 1.5 + 33.0, ny * 1.5 + 17.0, 4, 0.5);
-                    arid        = fmax(0.0, arid - 0.35) * 2.5; /* 0..1 */
-                    /* deserta magis ad aequatorem lateralem (~30°) */
-                    double desert_band = exp(-(abs_lat - 0.35) * (abs_lat - 0.35) * 40.0);
-                    arid *= desert_band;
-
-                    if (arid > 0.3) {
-                        /* deserta: ferrum/silicata colores */
-                        color_t desert = {0.65, 0.50, 0.32, 1.0};
-                        col = miscere(col, desert, fmin(1.0, arid * 0.8));
-                    }
-
-                    /* latitudo modulat verdorem */
-                    double green_mod = 1.0;
-                    if (abs_lat < 0.3)
-                        green_mod = 1.2; /* tropicae: saturatior */
-                    else if (abs_lat < 0.65)
-                        green_mod = 1.0; /* temperatae */
-                    else if (abs_lat < 0.85)
-                        green_mod = 0.6; /* boreales: tundra */
-                    else
-                        green_mod = 0.2; /* arcticae: vix */
-
-                    col.g *= (0.7 + 0.3 * green_mod);
-                }
-
-                /* multi-scale textura superficiei.
-                 * Tres scalae: macro (regiones), meso (montanae), micro (rugositas).
-                 * Variatio chromatica — non solum luminositas sed color
-                 * variat per canalem independenter. */
-                double tex_macro = fbm_warp(nx * 2.0 + 7.0, ny * 2.0 + 3.0, 5, 0.5, 1.2);
-                double tex_meso  = ridged(nx * 5.0 + 11.0, ny * 5.0 + 5.0, 4, 0.5);
-                double tex_micro = fbm(nx * 15.0 + 23.0, ny * 15.0 + 19.0, 4, 0.45);
-                double tex_finis = strepitus2(nx * 40.0 + 61.0, ny * 40.0 + 67.0);
-
-                /* luminositas: macro + meso + micro + finis (pixel-scala) */
-                double lum = 0.50 + 0.22 * tex_macro + 0.13 * tex_meso
-                    + 0.09 * tex_micro + 0.06 * tex_finis;
-
-                /* variatio chromatica: canalem separatim perturbat.
-                 * R perturbatur per unam noise, G per aliam, B per tertiam.
-                 * Hoc dat variationem coloris subtiliter non-uniformem. */
-                double chr_r = fbm(nx * 4.0 + 31.0, ny * 4.0 + 37.0, 3, 0.4);
-                double chr_g = fbm(nx * 4.0 + 43.0, ny * 4.0 + 47.0, 3, 0.4);
-                double chr_b = fbm(nx * 4.0 + 53.0, ny * 4.0 + 59.0, 3, 0.4);
-                col.r *= lum * (0.85 + 0.15 * chr_r);
-                col.g *= lum * (0.85 + 0.15 * chr_g);
-                col.b *= lum * (0.85 + 0.15 * chr_b);
-
-                /* maria basaltica (lava plains — dark, smooth) */
-                if (p->maria > 0.01) {
-                    double mare = fbm_warp(nx * 0.6 + 3.7, ny * 0.6 + 1.2, 6, 0.5, 1.5);
-                    if (mare < p->maria) {
-                        double mt    = fmin(1.0, (p->maria - mare) / fmax(0.01, p->maria) * 3.0);
-                        color_t dark = col;
-                        dark.r *= 0.35;
-                        dark.g *= 0.35;
-                        dark.b *= 0.38;
-                        col = miscere(col, dark, mt);
-                    }
-                }
-
-                /* craterae */
-                if (p->craterae > 0.01) {
-                    double bright;
-                    double depth = crater_field(
-                        lon, lat, p->craterae,
-                        p->basis.semen + 777, &bright
-                    );
-                    double lmod = 1.0 + depth * 1.0;
-                    lmod        = fmax(0.4, fmin(1.5, lmod));
-                    col.r *= lmod;
-                    col.g *= lmod;
-                    col.b *= lmod;
-                    col.r = fmin(1.0, col.r + bright * 0.8);
-                    col.g = fmin(1.0, col.g + bright * 0.8);
-                    col.b = fmin(1.0, col.b + bright * 0.75);
-                }
-
-                /* vulcanismus */
-                if (p->vulcanismus > 0.01) {
-                    double v   = fbm_warp(nx * 2.0 + 11.0, ny * 2.0 + 7.0, 5, 0.6, 2.5);
-                    double thr = 1.0 - p->vulcanismus * 0.3;
-                    if (v > thr) {
-                        double t = (v - thr) / (1.0 - thr);
-                        t        = t * t;
-                        /* lava blackbody: ~1000K=red, ~1500K=orange, ~2000K=yellow */
-                        color_t lava;
-                        if (t < 0.4) {
-                            double t2 = t / 0.4;
-                            lava = (color_t){0.8 * t2, 0.15 * t2, 0.02, 1.0};
-                        } else {
-                            double t2 = (t - 0.4) / 0.6;
-                            lava = (color_t){0.8 + 0.2 * t2, 0.15 + 0.55 * t2, 0.02 + 0.2 * t2, 1.0};
-                        }
-                        col   = miscere(col, lava, t);
-                        illum = fmax(illum, t * 0.8);
-                    }
-                }
-            } else {
-                /* oceanus: color ex profunditate.
-                 * Litora: aqua vadosa caeruleum clarum (scattering per arenam).
-                 * Profunditas per distantiam a litore. */
-                double depth_var = fbm(nx * 1.2 + 20.0, ny * 1.2 + 20.0, 5, 0.5);
-
-                /* distantia a litore: approximatur per terra_elev valorem.
-                 * terrain prope limen = litus, longe infra = profundum */
-                double sc_l = fmax(0.3, p->scala);
-                double ox_l = (p->basis.semen & 0xFF) * 0.13;
-                double oy_l = ((p->basis.semen >> 8) & 0xFF) * 0.13;
-                double nx_l = lon / DPI * 5.0 * sc_l;
-                double ny_l = (lat / PI + 0.5) * 2.5 * sc_l;
-                double terra_val = fbm_warp(
-                    nx_l + ox_l, ny_l + oy_l, 5, 0.55,
-                    1.0 + p->tectonica * 3.0
-                ) * 0.30;
-                /* blob contributo */
-                unsigned s_l    = p->basis.semen * 7919 + 77777;
-                int nc_l        = fmax(1, p->continentes);
-                double blob_max = 0.0;
-                for (int c = 0; c < nc_l; c++) {
-                    s_l         = s_l * 1103515245 + 12345;
-                    double blon = (s_l >> 8 & 0xFFFF) / 65536.0 * DPI;
-                    s_l         = s_l * 1103515245 + 12345;
-                    double blat = ((s_l >> 8 & 0xFFFF) / 65536.0 - 0.5) * PI * 0.85;
-                    s_l         = s_l * 1103515245 + 12345;
-                    double brad = (1.0 + (s_l >> 8 & 0xFF) / 255.0 * 1.2) * sc_l / pow(nc_l, 0.35);
-                    double dl   = lat - blat, dn = lon - blon;
-                    if (dn > PI)
-                        dn -= DPI;
-                    if (dn < -PI)
-                        dn += DPI;
-                    double dd   = sqrt(dl * dl + dn * dn * cos(lat) * cos(lat));
-                    double blob = fmax(0.0, 1.0 - dd / brad);
-                    blob_max    = fmax(blob_max, blob * blob);
-                }
-                double terra_totum  = terra_val + blob_max * 0.70;
-                double limen_l      = p->aqua * 0.30;
-                double dist_litoris = limen_l - terra_totum; /* >0 = sub aqua */
-
-                double prof;
-                if (dist_litoris < 0.05) {
-                    /* vadosa: prope litus */
-                    prof = dist_litoris / 0.05 * 0.3;
-                } else {
-                    prof = 0.3 + (p->aqua_profunditas * 0.5 + depth_var * 0.2);
-                }
-                prof = fmax(0.0, fmin(1.0, prof));
-                col  = color_aquae(prof, var);
-
-                /* specularis: reflexio solaris */
-                double dx   = (px - SEMI) / (rad * SEMI);
-                double dy   = (py - SEMI) / (rad * SEMI);
-                double sx   = dx + cos(perc->aspectus.angulus) * 0.20;
-                double sy   = dy + sin(perc->aspectus.angulus) * 0.20;
-                double spec = exp(-(sx * sx + sy * sy) * 6.0);
-                spec *= (1.0 - perc->aspectus.situs) * 0.35;
-                col.r = fmin(1.0, col.r + spec);
-                col.g = fmin(1.0, col.g + spec * 0.95);
-                col.b = fmin(1.0, col.b + spec * 0.85);
-
-                /* micro undae oceani */
-                double wave = strepitus2(nx * 30.0 + 91.0, ny * 30.0 + 97.0);
-                col.r *= 0.95 + 0.05 * wave;
-                col.g *= 0.95 + 0.05 * wave;
-                col.b *= 0.96 + 0.04 * wave;
-            }
-
-            /* calottae polares */
-            if (p->polaris > 0.01) {
-                double abs_lat = fabs(lat) / (PI * 0.5);
-                double lim     = 1.0 - p->polaris;
-                double gn      = fbm(nx * 2.5, ny * 2.5, 4, 0.5) * 0.1;
-                if (abs_lat > lim - gn) {
-                    double t = fmin(1.0, (abs_lat - lim + gn) * 8.0);
-                    color_t ice = {0.90, 0.92, 0.96, 1.0};
-                    if (p->glacies_co2 > p->glacies)
-                        ice = (color_t){0.94, 0.93, 0.91, 1.0};
-                    col = miscere(col, ice, t);
-                }
-            }
-
-            /* nubes */
-            if (p->nubes > 0.01 && p->pressio_kPa > 0.3) {
-                double cn = fbm_warp(nx * 1.0 + 50.0, ny * 1.0 + 50.0, 7, 0.55, 2.0);
-                /* stratum secundum nubium minorum */
-                double cn2 = fbm(nx * 2.5 + 80.0, ny * 2.5 + 80.0, 5, 0.5);
-                cn         = cn * 0.65 + cn2 * 0.35;
-
-                double thr = 1.0 - p->nubes * 0.6;
-                if (cn > thr) {
-                    double t = (cn - thr) / fmax(0.01, 1.0 - thr);
-                    t        = t * t; /* margines molles */
-                    /* color nubium ex compositione atmosphaerae */
-                    color_t nub = {0.95, 0.95, 0.97, 1.0};  /* H₂O default */
-                    if (p->co2 > 0.5)
-                        nub = (color_t){0.94, 0.88, 0.68, 1.0}; /* H₂SO₄ Venus */
-                    if (p->ch4 > 0.01)
-                        nub = (color_t){0.93, 0.95, 0.98, 1.0}; /* CH₄ cirrus */
-                    col = miscere(col, nub, t * 0.70);
-                }
-            }
-
-            /* bump mapping: terrain elevatio modulat normalem superficiei */
-            if (terra) {
-                double h = 0.002;
-                double e_here = fbm_warp(
-                    nx + (p->basis.semen & 0xFF) * 0.13,
-                    ny + ((p->basis.semen >> 8) & 0xFF) * 0.13,
-                    5, 0.5, 1.0 + p->tectonica * 3.0
-                );
-                double nx_e = (lon + h) / DPI * 10.0;
-                double ny_n = ((lat + h) / PI + 0.5) * 5.0;
-                double e_east = fbm_warp(
-                    nx_e + (p->basis.semen & 0xFF) * 0.13,
-                    ny + ((p->basis.semen >> 8) & 0xFF) * 0.13,
-                    5, 0.5, 1.0 + p->tectonica * 3.0
-                );
-                double e_north = fbm_warp(
-                    nx + (p->basis.semen & 0xFF) * 0.13,
-                    ny_n + ((p->basis.semen >> 8) & 0xFF) * 0.13,
-                    5, 0.5, 1.0 + p->tectonica * 3.0
-                );
-                double dlon_b = (e_east - e_here) * 8.0;
-                double dlat_b = (e_north - e_here) * 8.0;
-                double bump   = -dlon_b * cos(perc->aspectus.angulus) - dlat_b * sin(perc->aspectus.angulus);
-                illum *= fmax(0.3, 1.0 + bump * 0.6);
-            }
-
-            /* umbrae nubium: offset in directione lucis simulat umbram proiectam */
-            if (p->nubes > 0.05 && p->pressio_kPa > 0.3 && illum > 0.1) {
-                double umbra_dx = cos(perc->aspectus.angulus) * 0.03;
-                double umbra_dy = sin(perc->aspectus.angulus) * 0.03;
-                double shadow_lon = lon + umbra_dx;
-                double shadow_lat = lat + umbra_dy;
-                double snx = shadow_lon / DPI * 10.0;
-                double sny = (shadow_lat / PI + 0.5) * 5.0;
-                double scn = fbm_warp(snx * 0.1 + 50.0, sny * 0.1 + 50.0, 7, 0.55, 2.0);
-                double scn2 = fbm(snx * 0.25 + 80.0, sny * 0.25 + 80.0, 5, 0.5);
-                scn = scn * 0.65 + scn2 * 0.35;
-                double sthr = 1.0 - p->nubes * 0.6;
-                if (scn > sthr) {
-                    double shadow_t = (scn - sthr) / fmax(0.01, 1.0 - sthr);
-                    shadow_t        = shadow_t * shadow_t;
-                    illum *= 1.0 - shadow_t * 0.35;
-                }
-            }
-
-            col.r *= illum;
-            col.g *= illum;
-            col.b *= illum;
-
-            /* atmosphaera limbus: crescit cum pressione */
-            if (pnorm > 0.003) {
-                double dx   = (px - SEMI) / (rad * SEMI);
-                double dy   = (py - SEMI) / (rad * SEMI);
-                double edge = sqrt(dx * dx + dy * dy);
-                double atm  = pow(edge, 4.0) * pnorm * 0.6;
-                col         = miscere(col, atm_col, fmin(0.7, atm));
-            }
-
-            fen_pixel(fen, px, py, col.r, col.g, col.b, 1.0);
-        }
-    }
-
-    /* atmospheric halo outside disk */
-    if (pnorm > 0.02) {
-        double halo_ext = rad * (1.0 + pnorm * 0.07);
-        for (int py = 0; py < FEN; py++) {
-            for (int px = 0; px < FEN; px++) {
-                double dx       = (px - SEMI) / (halo_ext * SEMI);
-                double dy       = (py - SEMI) / (halo_ext * SEMI);
-                double r2       = dx * dx + dy * dy;
-                double interior = rad / halo_ext;
-                if (r2 < interior * interior || r2 >= 1.0)
-                    continue;
-                double d  = sqrt(r2);
-                double al = (1.0 - (d - interior) / (1.0 - interior));
-                al        = al * al * al * pnorm * 0.4;
-                double il = illuminatio(
-                    px, py, halo_ext, perc->aspectus.situs, perc->aspectus.angulus
-                ) * perc->aspectus.lumen;
-                if (perc->coaspectus.lumen > 0.001)
-                    il += illuminatio(
-                        px, py, halo_ext, perc->coaspectus.situs, perc->coaspectus.angulus
-                    ) * perc->coaspectus.lumen;
-                al *= fmax(0.1, il);
-                fen_pixel(fen, px, py, atm_col.r, atm_col.g, atm_col.b, al);
-            }
-        }
-    }
-}
-
-static void reddere_gaseosum(
-    unsigned char *fen, const planeta_gaseosum_t *p,
-    const planeta_perceptus_t *perc
-) {
-    double rad      = p->basis.radius;
-    color_t atm_col = color_atmosphaerae(p->n2, p->o2, p->co2, p->ch4, p->h2, p->he, p->nh3, p->pulvis, 0, 0);
-
-    /* colores zonarum/cingulorum ex atmosphaera derivati */
-    color_t zona = atm_col;
-    zona.r       = fmin(1.0, zona.r * 1.4 + 0.12);
-    zona.g       = fmin(1.0, zona.g * 1.4 + 0.10);
-    zona.b       = fmin(1.0, zona.b * 1.3 + 0.06);
-    color_t belt = atm_col;
-    belt.r *= 0.60;
-    belt.g *= 0.48;
-    belt.b *= 0.40;
-
-    for (int py = 0; py < FEN; py++) {
-        for (int px = 0; px < FEN; px++) {
-            double lon, lat;
-            if (
-                !pixel_ad_sphaeram(
-                    px, py, rad, p->basis.inclinatio, p->basis.rotatio,
-                    &lon, &lat
-                )
-            )
-                continue;
-
-            double illum = illuminatio(px, py, rad, perc->aspectus.situs, perc->aspectus.angulus) * perc->aspectus.lumen;
-            if (perc->coaspectus.lumen > 0.001)
-                illum += illuminatio(px, py, rad, perc->coaspectus.situs, perc->coaspectus.angulus) * perc->coaspectus.lumen;
-            if (illum < 0.003) {
-                /* latus obscurum — opacum nigrum ne stellae transluceant */
-                fen_pixel(fen, px, py, 0.0, 0.0, 0.0, 1.0);
-                continue;
-            }
-
-            double band_y = lat / (PI * 0.5);
-            double nx     = lon / DPI * 8.0;
-            double ny     = (band_y + 1.0) * 2.0;
-
-            /* banded structure */
-            double band = sin(band_y * PI * p->fasciae * 0.5);
-
-            /* turbulence within bands — multi-scale */
-            double turb1 = fbm_warp(
-                nx + p->basis.semen * 0.003, ny, 6, 0.5,
-                1.5 * p->fasciae_contrast
-            );
-            double turb2 = fbm(nx * 2.0 + band_y * 5.0, ny * 0.3, 4, 0.45);
-            band += (turb1 - 0.5) * 0.8 * p->fasciae_contrast;
-            band += (turb2 - 0.5) * 0.3;
-
-            /* vortices fluxus zonalis ad limites fasciarum */
-            double flow        = ridged(nx * 1.5 + band_y * 2.0, band_y * 3.0, 3, 0.5);
-            double at_boundary = 1.0 - fabs(band) * 2.0;
-            at_boundary        = fmax(0.0, at_boundary);
-            band += (flow - 0.5) * 0.4 * at_boundary;
-
-            double t    = fmax(0.0, fmin(1.0, band * 0.5 + 0.5));
-            color_t col = miscere(belt, zona, t);
-
-            /* textura nubium multi-scala */
-            double tex1 = fbm(nx * 4.0, ny * 4.0, 4, 0.45);
-            double tex2 = fbm(nx * 10.0 + 31.0, ny * 10.0 + 37.0, 3, 0.4);
-            double tex3 = strepitus2(nx * 25.0 + 71.0, ny * 25.0 + 73.0);
-            double tex  = tex1 * 0.5 + tex2 * 0.3 + tex3 * 0.2;
-            /* variatio chromatica inter fascias */
-            double chr = fbm(nx * 3.0 + 41.0, ny * 6.0 + 43.0, 3, 0.4);
-            col.r *= 0.80 + 0.20 * tex;
-            col.g *= 0.80 + 0.20 * tex * (0.9 + 0.1 * chr);
-            col.b *= 0.82 + 0.18 * tex * (0.85 + 0.15 * chr);
-
-            /* maculae — storm vortices */
-            for (int mi = 0; mi < p->maculae; mi++) {
-                double mlat = p->macula_lat * PI * 0.5;
-                double mlon = p->macula_lon + mi * 1.8;
-                double mrad = p->macula_radius * (1.0 - mi * 0.25);
-                if (mrad < 0.02)
-                    continue;
-
-                double dlat = lat - mlat;
-                double dlon = lon - mlon;
-                if (dlon > PI)
-                    dlon -= DPI;
-                if (dlon < -PI)
-                    dlon += DPI;
-                double md = sqrt(dlat * dlat * 2.5 + dlon * dlon) / (mrad * PI);
-                if (md >= 1.0)
-                    continue;
-
-                double mt = 1.0 - md * md;
-                /* spiral structure inside vortex */
-                double ang    = atan2(dlat, dlon);
-                double spiral = sin(ang * 2.0 - md * 8.0 + p->basis.semen * 0.1);
-                spiral        = spiral * 0.5 + 0.5;
-                double vort   = fbm(md * 5.0 + ang * 0.4, ang * 0.5 + md * 3.0, 4, 0.5);
-                mt *= (0.5 + 0.3 * spiral + 0.2 * vort);
-
-                /* color tempestatis: chromophorae organicae (phosphorus,
-                 * sulphur composita) dant colorem rubrum/brunneum.
-                 * Macula Rubra Magna: vortex anticyclonicus persistens,
-                 * coloratus per upwelling composita ex profunditate.
-                 * Ref: Simon-Miller et al. (2001) Icarus 154:459-474 */
-                double dark = p->macula_obscuritas;
-                color_t mc;
-                mc.r = fmin(1.0, 0.65 + dark * 0.15);
-                mc.g = fmax(0.0, 0.30 - dark * 0.10);
-                mc.b = fmax(0.0, 0.18 - dark * 0.10);
-                mc.a = 1.0;
-                col  = miscere(col, mc, mt * 0.90);
-            }
-
-            /* limbi obscuratio fortis pro gigantibus gaseouis */
-            double dx = (px - SEMI) / (rad * SEMI);
-            double dy = (py - SEMI) / (rad * SEMI);
-            double dz = sqrt(fmax(0.0, 1.0 - dx * dx - dy * dy));
-            double ld = 0.30 + 0.70 * pow(dz, 0.35);
-
-            col.r *= illum * ld;
-            col.g *= illum * ld;
-            col.b *= illum * ld;
-
-            fen_pixel(fen, px, py, col.r, col.g, col.b, 1.0);
-        }
-    }
-
-    aplicare_fusionem(fen, p);
-}
-
-static void reddere_glaciale(
-    unsigned char *fen, const planeta_glaciale_t *p,
-    const planeta_perceptus_t *perc
-) {
-    double rad   = p->basis.radius;
-    color_t base = color_atmosphaerae(p->n2, p->o2, p->co2, p->ch4, p->h2, p->he, p->nh3, p->pulvis, 0, 0);
-    /* gigantes glaciales clariores quam color purus atmosphaerae */
-    base.r = fmin(1.0, base.r * 1.2 + 0.08);
-    base.g = fmin(1.0, base.g * 1.2 + 0.08);
-    base.b = fmin(1.0, base.b * 1.15 + 0.10);
-
-    for (int py = 0; py < FEN; py++) {
-        for (int px = 0; px < FEN; px++) {
-            double lon, lat;
-            if (
-                !pixel_ad_sphaeram(
-                    px, py, rad, p->basis.inclinatio, p->basis.rotatio,
-                    &lon, &lat
-                )
-            )
-                continue;
-
-            double illum = illuminatio(px, py, rad, perc->aspectus.situs, perc->aspectus.angulus) * perc->aspectus.lumen;
-            if (perc->coaspectus.lumen > 0.001)
-                illum += illuminatio(px, py, rad, perc->coaspectus.situs, perc->coaspectus.angulus) * perc->coaspectus.lumen;
-            if (illum < 0.003) {
-                /* latus obscurum — opacum nigrum ne stellae transluceant */
-                fen_pixel(fen, px, py, 0.0, 0.0, 0.0, 1.0);
-                continue;
-            }
-
-            double nx   = lon / DPI * 4.0;
-            double ny   = (lat / PI + 0.5) * 2.0;
-            color_t col = base;
-
-            /* subtle bands */
-            if (p->fasciae > 0) {
-                double band_y = lat / (PI * 0.5);
-                double band   = sin(band_y * PI * p->fasciae * 0.5);
-                double turb   = fbm(nx + p->basis.semen * 0.01, ny, 4, 0.5);
-                band += (turb - 0.5) * 0.3;
-                band = band * 0.5 + 0.5;
-                band = fmax(0.0, fmin(1.0, band));
-                /* subtle brightening/darkening */
-                double mod = 0.92 + 0.08 * band * p->fasciae_contrast;
-                col.r *= mod;
-                col.g *= mod;
-                col.b *= mod + 0.02;
-            }
-
-            /* spots */
-            for (int mi = 0; mi < p->maculae; mi++) {
-                double mlat = p->macula_lat * PI * 0.5;
-                double mlon = p->macula_lon;
-                double dlat = lat - mlat;
-                double dlon = lon - mlon;
-                if (dlon > PI)
-                    dlon -= DPI;
-                if (dlon < -PI)
-                    dlon += DPI;
-                double md = sqrt(dlat * dlat * 1.5 + dlon * dlon) / (p->macula_radius * PI);
-                if (md < 1.0) {
-                    double mt = (1.0 - md * md);
-                    mt *= mt;
-                    col.r *= (1.0 - mt * 0.35);
-                    col.g *= (1.0 - mt * 0.25);
-                    col.b *= (1.0 - mt * 0.10);
-                }
-            }
-
-            /* texture */
-            double tex = fbm(nx * 4.0, ny * 4.0, 3, 0.4) * 0.04 + 0.98;
-            col.r *= tex;
-            col.g *= tex;
-            col.b *= tex;
-
-            /* heavy limb darkening + atmospheric edge */
-            double dx = (px - SEMI) / (rad * SEMI);
-            double dy = (py - SEMI) / (rad * SEMI);
-            double dz = sqrt(fmax(0.0, 1.0 - dx * dx - dy * dy));
-            double ld = 0.25 + 0.75 * pow(dz, 0.30);
-            double edge = pow(1.0 - dz, 1.5) * 0.45;
-            color_t edge_col = base;
-            edge_col.r = fmin(1.0, edge_col.r * 1.3);
-            edge_col.g = fmin(1.0, edge_col.g * 1.3);
-            edge_col.b = fmin(1.0, edge_col.b * 1.2);
-            col = miscere(col, edge_col, fmin(0.7, edge));
-
-            col.r *= illum * ld;
-            col.g *= illum * ld;
-            col.b *= illum * ld;
-
-            fen_pixel(fen, px, py, col.r, col.g, col.b, 1.0);
-        }
-    }
-}
-
-static void reddere_parvum(
-    unsigned char *fen, const planeta_parvum_t *p,
-    const planeta_perceptus_t *perc
-) {
-    reddere_saxosum(fen, (const planeta_saxosum_t *)p, perc);
-}
-
-/* ================================================================
- * reddere_nebula — nubes gasei procedurale
- *
- * Non sphaericum: forma ex fbm angulari, densitas ex fbm_warp.
- * Alpha et fulgor simul ex mensura emissionis (densitas × luminositas):
- *   ubi densior, ibi et opacior et lucidior — EM ∝ n²·dl.
- * Color ex temperatura Planckiana + lineis emissionis:
- *   h2  → Hα  (λ=656nm), rubrum/roseum
- *   o2  → OIII (λ=501nm), cyaneum
- * Carbo definit fractiones nubeculae absorbentis (tenebra stellaris).
- *
- * Parametri ex planeta_t:
- *   temperatura  — color corporis nigri (K); 0 → 5000K
- *   luminositas  — mensura emissionis: scalat alpha et fulgorem simul
- *   h2           — intensitas Hα [0,1]
- *   o2           — intensitas OIII [0,1]
- *   carbo        — fractio nubeculae absorbentis [0,1]
- *   tectonica    — turbulentia (warp intensitas) [0,1]
- *   nubes        — densitas filamentorum [0,1]
- * Perceptus: ignoratur — nebula per se lucet, illuminatio externa non adhibetur.
- * ================================================================ */
-
-static void reddere_nebula(unsigned char *fen, const planeta_nebula_t *p)
-{
-    double ox = (double)( p->basis.semen        & 0xFF) * 0.37;
-    double oy = (double)((p->basis.semen >>  8) & 0xFF) * 0.37;
-    double oz = (double)((p->basis.semen >> 16) & 0xFF) * 0.37;
-
-    double rad       = p->basis.radius * SEMI;
-    double lum       = (p->luminositas > 0.001) ? p->luminositas : 1.0;
-    double turb      = (p->tectonica  > 0.0)   ? p->tectonica   : 0.5;
-    double fil       = (p->nubes      > 0.0)   ? p->nubes       : 0.4;
-    double dark_frac = p->carbo;
-
-    double t_K   = (p->temperatura > 100.0) ? p->temperatura : 5000.0;
-    color_t base = temperatura_ad_colorem_f(t_K);
-
-    double ha   = p->h2;   /* H-alpha: λ=656nm, rubrum */
-    double oiii = p->o2;   /* OIII:    λ=501nm, cyaneum */
-
-    for (int py = 0; py < FEN; py++) {
-        for (int px = 0; px < FEN; px++) {
-            double dx = (px - SEMI) / rad;
-            double dy = (py - SEMI) / rad;
-            double r2 = dx * dx + dy * dy;
-            if (r2 > 5.0)
-                continue;
-
-            /* forma: terminus angulariter modulatus — non circulus */
-            double phi     = atan2(dy, dx);
-            double shape   = fbm(cos(phi) * 1.2 + ox, sin(phi) * 1.2 + oy, 3, 0.6);
-            double local_r = 0.7 + shape * 0.6;   /* [0.7, 1.3] */
-            double d_norm  = sqrt(r2) / local_r;
-            if (d_norm > 1.8)
-                continue;
-
-            double involucrum = exp(-d_norm * d_norm * 1.8);
-
-            /* densitas gasei ex fbm_warp */
-            double density = fbm_warp(
-                dx * 2.5 + ox, dy * 2.5 + oy,
-                5, 0.58, turb * 1.5
-            );
-            /* filamenta ex strepitu cresto */
-            double filament = ridged(dx * 3.8 + ox + 5.3, dy * 3.8 + oy + 3.7, 4, 0.55);
-            density         = density * (1.0 - fil * 0.6) + filament * fil * 0.6;
-            density         = fmax(0.0, fmin(1.0, density)) * involucrum;
-
-            /* nubecula absorbens — tenebra stellaris */
-            if (dark_frac > 0.001) {
-                double dark = fbm_warp(
-                    dx * 2.6 + oz, dy * 2.6 + oz + 11.1,
-                    4, 0.65, turb * 0.7
-                );
-                dark *= exp(-d_norm * d_norm * 2.5);
-                double limen = 1.0 - dark_frac;
-                if (dark > limen) {
-                    double prof     = (dark - limen) / fmax(0.01, dark_frac);
-                    double opacitas = fmin(1.0, prof * prof * lum * 3.0);
-                    if (opacitas > 0.05) {
-                        int fi      = (py * FEN + px) * 4;
-                        fen[fi + 0] = 0;
-                        fen[fi + 1] = 0;
-                        fen[fi + 2] = 0;
-                        fen[fi + 3] = (unsigned char)(opacitas * 255.0);
-                        continue;
-                    }
-                }
-            }
-
-            /* mensura emissionis: densitas × luminositas
-             * alpha et fulgor ex eodem — EM ∝ n²·dl (optice tenue) */
-            double em = density * lum;
-            if (em < 0.005)
-                continue;
-
-            double alpha  = fmin(1.0, em);
-            double fulgor = fmin(1.0, em * (1.0 + em * 0.4));  /* superlinearis */
-
-            double var = fbm(dx * 5.0 + ox + 3.1, dy * 5.0 + oy + 7.9, 2, 0.5);
-
-            /* color: Planck + lineae emissionis additivae */
-            double r = base.r * fulgor;
-            double g = base.g * fulgor;
-            double b = base.b * fulgor;
-
-            r += ha * (0.90 + var * 0.10) * fulgor;
-            g += ha * 0.04 * fulgor;
-            b += ha * 0.01 * fulgor;
-
-            r += oiii * 0.02 * fulgor;
-            g += oiii * (0.75 + var * 0.08) * fulgor;
-            b += oiii * 0.95 * fulgor;
-
-            r = fmin(1.0, fmax(0.0, r));
-            g = fmin(1.0, fmax(0.0, g));
-            b = fmin(1.0, fmax(0.0, b));
-
-            int fi      = (py * FEN + px) * 4;
-            fen[fi + 0] = (unsigned char)(r * 255.0);
-            fen[fi + 1] = (unsigned char)(g * 255.0);
-            fen[fi + 2] = (unsigned char)(b * 255.0);
-            fen[fi + 3] = (unsigned char)(alpha * 255.0);
-        }
-    }
-}
+#include "planetae/saxosum.c"
+#include "planetae/gaseosum.c"
+#include "planetae/glaciale.c"
+#include "planetae/parvum.c"
+#include "planetae/sol.c"
+#include "planetae/nebula.c"
 
 /* ================================================================
  * dispatcher
@@ -1484,13 +518,13 @@ void planeta_reddere(
     const planeta_perceptus_t *perceptus
 ) {
     memset(fenestra, 0, FEN * FEN * 4);
-    switch (planeta->p.genus) {
-    case PLANETA_SAXOSUM:  reddere_saxosum(fenestra, &planeta->g.saxosum, perceptus);  break;
-    case PLANETA_GASEOSUM: reddere_gaseosum(fenestra, &planeta->g.gaseosum, perceptus); break;
-    case PLANETA_GLACIALE: reddere_glaciale(fenestra, &planeta->g.glaciale, perceptus); break;
-    case PLANETA_PARVUM:   reddere_parvum(fenestra, &planeta->g.parvum, perceptus);   break;
-    case PLANETA_SOL:      reddere_sol(fenestra, &planeta->g.sol);                     break;
-    case PLANETA_NEBULA:   reddere_nebula(fenestra, &planeta->g.nebula);               break;
+    switch (planeta->qui) {
+    case PLANETA_SAXOSUM:  reddere_saxosum(fenestra, &planeta->ubi.saxosum, perceptus);  break;
+    case PLANETA_GASEOSUM: reddere_gaseosum(fenestra, &planeta->ubi.gaseosum, perceptus); break;
+    case PLANETA_GLACIALE: reddere_glaciale(fenestra, &planeta->ubi.glaciale, perceptus); break;
+    case PLANETA_PARVUM:   reddere_parvum(fenestra, &planeta->ubi.parvum, perceptus);   break;
+    case PLANETA_SOL:      reddere_sol(fenestra, &planeta->ubi.sol);                     break;
+    case PLANETA_NEBULA:   reddere_nebula(fenestra, &planeta->ubi.nebula);               break;
     }
 }
 
@@ -1498,7 +532,7 @@ void planeta_reddere(
  * ISON parser
  * ================================================================ */
 
-static planeta_genus_t genus_ex_nomine(const char *s)
+static planetarius_t genus_ex_nomine(const char *s)
 {
     if (!s)
         return PLANETA_SAXOSUM;
@@ -1535,162 +569,167 @@ static double ison_f(const char *ison, const char *via, double praef)
 planeta_t *planeta_ex_ison(const char *ison)
 {
     char *genus_s = ison_da_chordam(ison, "genus");
-    planeta_genus_t g = genus_ex_nomine(genus_s);
+    planetarius_t g = genus_ex_nomine(genus_s);
     free(genus_s);
 
     /* macro: implet campos basis communes */
-#define BASIS(ptr) do { \
-    (ptr)->basis.genus      = g; \
-    (ptr)->basis.radius     = ison_f(ison, "radius", 0.9); \
-    (ptr)->basis.inclinatio = ison_f(ison, "inclinatio", 0.0); \
-    (ptr)->basis.rotatio    = ison_f(ison, "rotatio", 0.0); \
-    (ptr)->basis.semen      = (unsigned)ison_f(ison, "semen", 42); \
+#define BASIS(typ) do { \
+    v->ubi.typ.pro.radius     = ison_f(ison, "radius", 0.9); \
+    v->ubi.typ.pro.inclinatio = ison_f(ison, "inclinatio", 0.0); \
+    v->ubi.typ.pro.rotatio    = ison_f(ison, "rotatio", 0.0); \
+    v->ubi.typ.pro.semen      = (unsigned)ison_f(ison, "semen", 42); \
 } while (0)
 
     switch (g) {
     case PLANETA_SAXOSUM: {
-        planeta_saxosum_t *p = calloc(1, sizeof(*p));
-        BASIS(p);
-        p->silicata         = ison_f(ison, "silicata", 0.0);
-        p->ferrum           = ison_f(ison, "ferrum", 0.0);
-        p->sulphur          = ison_f(ison, "sulphur", 0.0);
-        p->carbo            = ison_f(ison, "carbo", 0.0);
-        p->glacies          = ison_f(ison, "glacies", 0.0);
-        p->glacies_co2      = ison_f(ison, "glacies_co2", 0.0);
-        p->malachita        = ison_f(ison, "malachita", 0.0);
-        p->aqua             = ison_f(ison, "aqua", 0.0);
-        p->aqua_profunditas = ison_f(ison, "aqua_profunditas", 0.5);
-        p->continentes      = (int)ison_f(ison, "continentes", 0);
-        p->scala            = ison_f(ison, "scala", 1.0);
-        p->tectonica        = ison_f(ison, "tectonica", 0.3);
-        p->craterae         = ison_f(ison, "craterae", 0.0);
-        p->maria            = ison_f(ison, "maria", 0.0);
-        p->vulcanismus      = ison_f(ison, "vulcanismus", 0.0);
-        p->pressio_kPa      = ison_f(ison, "pressio_kPa", 0.0);
-        p->n2               = ison_f(ison, "n2", 0.0);
-        p->o2               = ison_f(ison, "o2", 0.0);
-        p->co2              = ison_f(ison, "co2", 0.0);
-        p->ch4              = ison_f(ison, "ch4", 0.0);
-        p->h2               = ison_f(ison, "h2", 0.0);
-        p->he               = ison_f(ison, "he", 0.0);
-        p->nh3              = ison_f(ison, "nh3", 0.0);
-        p->pulvis           = ison_f(ison, "pulvis", 0.0);
-        p->nubes            = ison_f(ison, "nubes", 0.0);
-        p->polaris          = ison_f(ison, "polaris", 0.0);
-        return (planeta_t *)p;
+        planeta_t *v = calloc(1, sizeof(planeta_t));
+        v->qui = g;
+        BASIS(saxosum);
+        v->ubi.saxosum.res.silicata         = ison_f(ison, "silicata", 0.0);
+        v->ubi.saxosum.res.ferrum           = ison_f(ison, "ferrum", 0.0);
+        v->ubi.saxosum.res.sulphur          = ison_f(ison, "sulphur", 0.0);
+        v->ubi.saxosum.res.carbo            = ison_f(ison, "carbo", 0.0);
+        v->ubi.saxosum.res.glacies          = ison_f(ison, "glacies", 0.0);
+        v->ubi.saxosum.res.glacies_co2      = ison_f(ison, "glacies_co2", 0.0);
+        v->ubi.saxosum.res.malachita        = ison_f(ison, "malachita", 0.0);
+        v->ubi.saxosum.res.aqua             = ison_f(ison, "aqua", 0.0);
+        v->ubi.saxosum.res.aqua_profunditas = ison_f(ison, "aqua_profunditas", 0.5);
+        v->ubi.saxosum.res.continentes      = (int)ison_f(ison, "continentes", 0);
+        v->ubi.saxosum.res.scala            = ison_f(ison, "scala", 1.0);
+        v->ubi.saxosum.res.tectonica        = ison_f(ison, "tectonica", 0.3);
+        v->ubi.saxosum.res.craterae         = ison_f(ison, "craterae", 0.0);
+        v->ubi.saxosum.res.maria            = ison_f(ison, "maria", 0.0);
+        v->ubi.saxosum.res.vulcanismus      = ison_f(ison, "vulcanismus", 0.0);
+        v->ubi.saxosum.res.pressio_kPa      = ison_f(ison, "pressio_kPa", 0.0);
+        v->ubi.saxosum.res.n2               = ison_f(ison, "n2", 0.0);
+        v->ubi.saxosum.res.o2               = ison_f(ison, "o2", 0.0);
+        v->ubi.saxosum.res.co2              = ison_f(ison, "co2", 0.0);
+        v->ubi.saxosum.res.ch4              = ison_f(ison, "ch4", 0.0);
+        v->ubi.saxosum.res.h2               = ison_f(ison, "h2", 0.0);
+        v->ubi.saxosum.res.he               = ison_f(ison, "he", 0.0);
+        v->ubi.saxosum.res.nh3              = ison_f(ison, "nh3", 0.0);
+        v->ubi.saxosum.res.pulvis           = ison_f(ison, "pulvis", 0.0);
+        v->ubi.saxosum.res.nubes            = ison_f(ison, "nubes", 0.0);
+        v->ubi.saxosum.res.polaris          = ison_f(ison, "polaris", 0.0);
+        return v;
     }
     case PLANETA_GASEOSUM: {
-        planeta_gaseosum_t *p = calloc(1, sizeof(*p));
-        BASIS(p);
-        p->n2               = ison_f(ison, "n2", 0.0);
-        p->o2               = ison_f(ison, "o2", 0.0);
-        p->co2              = ison_f(ison, "co2", 0.0);
-        p->ch4              = ison_f(ison, "ch4", 0.0);
-        p->h2               = ison_f(ison, "h2", 0.0);
-        p->he               = ison_f(ison, "he", 0.0);
-        p->nh3              = ison_f(ison, "nh3", 0.0);
-        p->pulvis           = ison_f(ison, "pulvis", 0.0);
-        p->fasciae          = (int)ison_f(ison, "fasciae", 0);
-        p->fasciae_contrast = ison_f(ison, "fasciae_contrast", 0.5);
-        p->maculae          = (int)ison_f(ison, "maculae", 0);
-        p->macula_lat       = ison_f(ison, "macula_lat", 0.0);
-        p->macula_lon       = ison_f(ison, "macula_lon", 0.0);
-        p->macula_radius    = ison_f(ison, "macula_radius", 0.1);
-        p->macula_obscuritas = ison_f(ison, "macula_obscuritas", 0.5);
-        p->fusio            = ison_f(ison, "fusio", 0.0);
-        p->temperatura      = ison_f(ison, "temperatura", 0.0);
-        p->luminositas      = ison_f(ison, "luminositas", 1.0);
-        p->corona           = ison_f(ison, "corona", 0.0);
-        p->granulatio       = ison_f(ison, "granulatio", 0.0);
-        return (planeta_t *)p;
+        planeta_t *v = calloc(1, sizeof(planeta_t));
+        v->qui = g;
+        BASIS(gaseosum);
+        v->ubi.gaseosum.res.n2               = ison_f(ison, "n2", 0.0);
+        v->ubi.gaseosum.res.o2               = ison_f(ison, "o2", 0.0);
+        v->ubi.gaseosum.res.co2              = ison_f(ison, "co2", 0.0);
+        v->ubi.gaseosum.res.ch4              = ison_f(ison, "ch4", 0.0);
+        v->ubi.gaseosum.res.h2               = ison_f(ison, "h2", 0.0);
+        v->ubi.gaseosum.res.he               = ison_f(ison, "he", 0.0);
+        v->ubi.gaseosum.res.nh3              = ison_f(ison, "nh3", 0.0);
+        v->ubi.gaseosum.res.pulvis           = ison_f(ison, "pulvis", 0.0);
+        v->ubi.gaseosum.res.fasciae          = (int)ison_f(ison, "fasciae", 0);
+        v->ubi.gaseosum.res.fasciae_contrast = ison_f(ison, "fasciae_contrast", 0.5);
+        v->ubi.gaseosum.res.maculae          = (int)ison_f(ison, "maculae", 0);
+        v->ubi.gaseosum.res.macula_lat       = ison_f(ison, "macula_lat", 0.0);
+        v->ubi.gaseosum.res.macula_lon       = ison_f(ison, "macula_lon", 0.0);
+        v->ubi.gaseosum.res.macula_radius    = ison_f(ison, "macula_radius", 0.1);
+        v->ubi.gaseosum.res.macula_obscuritas = ison_f(ison, "macula_obscuritas", 0.5);
+        v->ubi.gaseosum.res.fusio            = ison_f(ison, "fusio", 0.0);
+        v->ubi.gaseosum.res.temperatura      = ison_f(ison, "temperatura", 0.0);
+        v->ubi.gaseosum.res.luminositas      = ison_f(ison, "luminositas", 1.0);
+        v->ubi.gaseosum.res.corona           = ison_f(ison, "corona", 0.0);
+        v->ubi.gaseosum.res.granulatio       = ison_f(ison, "granulatio", 0.0);
+        return v;
     }
     case PLANETA_GLACIALE: {
-        planeta_glaciale_t *p = calloc(1, sizeof(*p));
-        BASIS(p);
-        p->n2               = ison_f(ison, "n2", 0.0);
-        p->o2               = ison_f(ison, "o2", 0.0);
-        p->co2              = ison_f(ison, "co2", 0.0);
-        p->ch4              = ison_f(ison, "ch4", 0.0);
-        p->h2               = ison_f(ison, "h2", 0.0);
-        p->he               = ison_f(ison, "he", 0.0);
-        p->nh3              = ison_f(ison, "nh3", 0.0);
-        p->pulvis           = ison_f(ison, "pulvis", 0.0);
-        p->fasciae          = (int)ison_f(ison, "fasciae", 0);
-        p->fasciae_contrast = ison_f(ison, "fasciae_contrast", 0.5);
-        p->maculae          = (int)ison_f(ison, "maculae", 0);
-        p->macula_lat       = ison_f(ison, "macula_lat", 0.0);
-        p->macula_lon       = ison_f(ison, "macula_lon", 0.0);
-        p->macula_radius    = ison_f(ison, "macula_radius", 0.1);
-        return (planeta_t *)p;
+        planeta_t *v = calloc(1, sizeof(planeta_t));
+        v->qui = g;
+        BASIS(glaciale);
+        v->ubi.glaciale.res.n2               = ison_f(ison, "n2", 0.0);
+        v->ubi.glaciale.res.o2               = ison_f(ison, "o2", 0.0);
+        v->ubi.glaciale.res.co2              = ison_f(ison, "co2", 0.0);
+        v->ubi.glaciale.res.ch4              = ison_f(ison, "ch4", 0.0);
+        v->ubi.glaciale.res.h2               = ison_f(ison, "h2", 0.0);
+        v->ubi.glaciale.res.he               = ison_f(ison, "he", 0.0);
+        v->ubi.glaciale.res.nh3              = ison_f(ison, "nh3", 0.0);
+        v->ubi.glaciale.res.pulvis           = ison_f(ison, "pulvis", 0.0);
+        v->ubi.glaciale.res.fasciae          = (int)ison_f(ison, "fasciae", 0);
+        v->ubi.glaciale.res.fasciae_contrast = ison_f(ison, "fasciae_contrast", 0.5);
+        v->ubi.glaciale.res.maculae          = (int)ison_f(ison, "maculae", 0);
+        v->ubi.glaciale.res.macula_lat       = ison_f(ison, "macula_lat", 0.0);
+        v->ubi.glaciale.res.macula_lon       = ison_f(ison, "macula_lon", 0.0);
+        v->ubi.glaciale.res.macula_radius    = ison_f(ison, "macula_radius", 0.1);
+        return v;
     }
     case PLANETA_PARVUM: {
-        planeta_parvum_t *p = calloc(1, sizeof(*p));
-        BASIS(p);
-        p->silicata         = ison_f(ison, "silicata", 0.0);
-        p->ferrum           = ison_f(ison, "ferrum", 0.0);
-        p->sulphur          = ison_f(ison, "sulphur", 0.0);
-        p->carbo            = ison_f(ison, "carbo", 0.0);
-        p->glacies          = ison_f(ison, "glacies", 0.0);
-        p->glacies_co2      = ison_f(ison, "glacies_co2", 0.0);
-        p->malachita        = ison_f(ison, "malachita", 0.0);
-        p->aqua             = ison_f(ison, "aqua", 0.0);
-        p->aqua_profunditas = ison_f(ison, "aqua_profunditas", 0.5);
-        p->continentes      = (int)ison_f(ison, "continentes", 0);
-        p->scala            = ison_f(ison, "scala", 1.0);
-        p->tectonica        = ison_f(ison, "tectonica", 0.3);
-        p->craterae         = ison_f(ison, "craterae", 0.0);
-        p->maria            = ison_f(ison, "maria", 0.0);
-        p->vulcanismus      = ison_f(ison, "vulcanismus", 0.0);
-        p->pressio_kPa      = ison_f(ison, "pressio_kPa", 0.0);
-        p->n2               = ison_f(ison, "n2", 0.0);
-        p->o2               = ison_f(ison, "o2", 0.0);
-        p->co2              = ison_f(ison, "co2", 0.0);
-        p->ch4              = ison_f(ison, "ch4", 0.0);
-        p->h2               = ison_f(ison, "h2", 0.0);
-        p->he               = ison_f(ison, "he", 0.0);
-        p->nh3              = ison_f(ison, "nh3", 0.0);
-        p->pulvis           = ison_f(ison, "pulvis", 0.0);
-        p->nubes            = ison_f(ison, "nubes", 0.0);
-        p->polaris          = ison_f(ison, "polaris", 0.0);
-        return (planeta_t *)p;
+        planeta_t *v = calloc(1, sizeof(planeta_t));
+        v->qui = g;
+        BASIS(parvum);
+        v->ubi.parvum.res.silicata         = ison_f(ison, "silicata", 0.0);
+        v->ubi.parvum.res.ferrum           = ison_f(ison, "ferrum", 0.0);
+        v->ubi.parvum.res.sulphur          = ison_f(ison, "sulphur", 0.0);
+        v->ubi.parvum.res.carbo            = ison_f(ison, "carbo", 0.0);
+        v->ubi.parvum.res.glacies          = ison_f(ison, "glacies", 0.0);
+        v->ubi.parvum.res.glacies_co2      = ison_f(ison, "glacies_co2", 0.0);
+        v->ubi.parvum.res.malachita        = ison_f(ison, "malachita", 0.0);
+        v->ubi.parvum.res.aqua             = ison_f(ison, "aqua", 0.0);
+        v->ubi.parvum.res.aqua_profunditas = ison_f(ison, "aqua_profunditas", 0.5);
+        v->ubi.parvum.res.continentes      = (int)ison_f(ison, "continentes", 0);
+        v->ubi.parvum.res.scala            = ison_f(ison, "scala", 1.0);
+        v->ubi.parvum.res.tectonica        = ison_f(ison, "tectonica", 0.3);
+        v->ubi.parvum.res.craterae         = ison_f(ison, "craterae", 0.0);
+        v->ubi.parvum.res.maria            = ison_f(ison, "maria", 0.0);
+        v->ubi.parvum.res.vulcanismus      = ison_f(ison, "vulcanismus", 0.0);
+        v->ubi.parvum.res.pressio_kPa      = ison_f(ison, "pressio_kPa", 0.0);
+        v->ubi.parvum.res.n2               = ison_f(ison, "n2", 0.0);
+        v->ubi.parvum.res.o2               = ison_f(ison, "o2", 0.0);
+        v->ubi.parvum.res.co2              = ison_f(ison, "co2", 0.0);
+        v->ubi.parvum.res.ch4              = ison_f(ison, "ch4", 0.0);
+        v->ubi.parvum.res.h2               = ison_f(ison, "h2", 0.0);
+        v->ubi.parvum.res.he               = ison_f(ison, "he", 0.0);
+        v->ubi.parvum.res.nh3              = ison_f(ison, "nh3", 0.0);
+        v->ubi.parvum.res.pulvis           = ison_f(ison, "pulvis", 0.0);
+        v->ubi.parvum.res.nubes            = ison_f(ison, "nubes", 0.0);
+        v->ubi.parvum.res.polaris          = ison_f(ison, "polaris", 0.0);
+        return v;
     }
     case PLANETA_SOL: {
-        planeta_sol_t *p = calloc(1, sizeof(*p));
-        BASIS(p);
-        p->fusio            = ison_f(ison, "fusio", 1.0);
-        p->temperatura      = ison_f(ison, "temperatura", 0.0);
-        p->luminositas      = ison_f(ison, "luminositas", 1.0);
-        p->corona           = ison_f(ison, "corona", 0.0);
-        p->granulatio       = ison_f(ison, "granulatio", 0.0);
-        p->maculae          = (int)ison_f(ison, "maculae", 0);
-        p->macula_radius    = ison_f(ison, "macula_radius", 0.1);
-        p->macula_obscuritas = ison_f(ison, "macula_obscuritas", 0.5);
-        p->h2               = ison_f(ison, "h2", 0.0);
-        p->he               = ison_f(ison, "he", 0.0);
-        p->ch4              = ison_f(ison, "ch4", 0.0);
-        p->nh3              = ison_f(ison, "nh3", 0.0);
-        return (planeta_t *)p;
+        planeta_t *v = calloc(1, sizeof(planeta_t));
+        v->qui = g;
+        BASIS(sol);
+        v->ubi.sol.res.fusio            = ison_f(ison, "fusio", 1.0);
+        v->ubi.sol.res.temperatura      = ison_f(ison, "temperatura", 0.0);
+        v->ubi.sol.res.luminositas      = ison_f(ison, "luminositas", 1.0);
+        v->ubi.sol.res.corona           = ison_f(ison, "corona", 0.0);
+        v->ubi.sol.res.granulatio       = ison_f(ison, "granulatio", 0.0);
+        v->ubi.sol.res.maculae          = (int)ison_f(ison, "maculae", 0);
+        v->ubi.sol.res.macula_radius    = ison_f(ison, "macula_radius", 0.1);
+        v->ubi.sol.res.macula_obscuritas = ison_f(ison, "macula_obscuritas", 0.5);
+        v->ubi.sol.res.h2               = ison_f(ison, "h2", 0.0);
+        v->ubi.sol.res.he               = ison_f(ison, "he", 0.0);
+        v->ubi.sol.res.ch4              = ison_f(ison, "ch4", 0.0);
+        v->ubi.sol.res.nh3              = ison_f(ison, "nh3", 0.0);
+        return v;
     }
     case PLANETA_NEBULA: {
-        planeta_nebula_t *p = calloc(1, sizeof(*p));
-        BASIS(p);
-        p->temperatura      = ison_f(ison, "temperatura", 0.0);
-        p->luminositas      = ison_f(ison, "luminositas", 1.0);
-        p->h2               = ison_f(ison, "h2", 0.0);
-        p->o2               = ison_f(ison, "o2", 0.0);
-        p->carbo            = ison_f(ison, "carbo", 0.0);
-        p->tectonica        = ison_f(ison, "tectonica", 0.5);
-        p->nubes            = ison_f(ison, "nubes", 0.4);
-        return (planeta_t *)p;
+        planeta_t *v = calloc(1, sizeof(planeta_t));
+        v->qui = g;
+        BASIS(nebula);
+        v->ubi.nebula.res.temperatura      = ison_f(ison, "temperatura", 0.0);
+        v->ubi.nebula.res.luminositas      = ison_f(ison, "luminositas", 1.0);
+        v->ubi.nebula.res.h2               = ison_f(ison, "h2", 0.0);
+        v->ubi.nebula.res.o2               = ison_f(ison, "o2", 0.0);
+        v->ubi.nebula.res.carbo            = ison_f(ison, "carbo", 0.0);
+        v->ubi.nebula.res.tectonica        = ison_f(ison, "tectonica", 0.5);
+        v->ubi.nebula.res.nubes            = ison_f(ison, "nubes", 0.4);
+        return v;
     }
     default: {
-        planeta_saxosum_t *p = calloc(1, sizeof(*p));
-        p->basis.genus      = PLANETA_SAXOSUM;
-        p->basis.radius     = ison_f(ison, "radius", 0.9);
-        p->basis.inclinatio = ison_f(ison, "inclinatio", 0.0);
-        p->basis.rotatio    = ison_f(ison, "rotatio", 0.0);
-        p->basis.semen      = (unsigned)ison_f(ison, "semen", 42);
-        return (planeta_t *)p;
+        planeta_t *v = calloc(1, sizeof(planeta_t));
+        v->qui = PLANETA_SAXOSUM;
+        v->ubi.saxosum.pro.radius     = ison_f(ison, "radius", 0.9);
+        v->ubi.saxosum.pro.inclinatio = ison_f(ison, "inclinatio", 0.0);
+        v->ubi.saxosum.pro.rotatio    = ison_f(ison, "rotatio", 0.0);
+        v->ubi.saxosum.pro.semen      = (unsigned)ison_f(ison, "semen", 42);
+        return v;
     }
     }
 

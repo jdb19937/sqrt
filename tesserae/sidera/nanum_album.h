@@ -8,7 +8,13 @@
 #include "../sidus.h"
 
 typedef struct {
-    sidulum_t basis;
-} sidus_nanum_album_t;
+    int res;
+} nanulum_album_t;
+
+typedef struct {
+    tessella_t      avi;
+    sidulum_t       pro;
+    nanulum_album_t res;
+} nanum_album_t;
 
 #endif /* SIDUS_NANUM_ALBUM_H */
