@@ -4,14 +4,11 @@ torus_specta
 proba_astra
 proba_planeta
 proba_caelae
-astra_proba
-planeta_proba
-caelae_proba
+proba_visio
+proba_prima
 astra_animare
 caele
 redde
-proba
-proba_visio
 *.isonl
 *.o
 *.ppm

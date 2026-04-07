@@ -72,8 +72,15 @@ torus_animare: torus_animare.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
 torus_specta: torus_specta.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ torus_specta.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
-proba: proba.c $(CAPITA)
-	$(CC) $(CFLAGS) -o $@ proba.c -lm
+proba: proba_prima proba_astra proba_planeta proba_caelae proba_visio
+	./proba_prima
+	./proba_caelae
+	./proba_astra
+	./proba_planeta
+	./proba_visio
+
+proba_prima: proba_prima.c $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ proba_prima.c -lm
 
 proba_astra: proba_astra.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ proba_astra.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
@@ -107,11 +114,11 @@ colloca: omnia
 	install -m 644 tesserae/sidus.h tesserae/planeta.h tesserae/visio.h $(PREFIX)/include/sqrt/tesserae/
 
 purga:
-	rm -f torus_planus torus_animare torus_specta proba_astra proba_planeta proba_caelae proba_visio caele genera redde astra_animare proba
+	rm -f torus_planus torus_animare torus_specta proba_astra proba_planeta proba_caelae proba_visio caele genera redde astra_animare proba_prima
 	rm -f $(OBJECTA) $(BIBLIOTHECA)
 	rm -f caelae/*.ppm caelae/*.isonl
 
 linte:
 	insinulint -c *.c *.h
 
-.PHONY: omnia colloca purga caelae lude linte
+.PHONY: omnia colloca purga proba caelae lude linte
