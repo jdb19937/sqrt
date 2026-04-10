@@ -1,0 +1,89 @@
+{
+  "latitudo": 1024,
+  "altitudo": 1024,
+  "numerus_stellarum": 10000,
+  "semen": 99,
+
+  "planetae": [
+    {
+      "x": 500.0,
+      "y": 300.0,
+      "scala": 0.5,
+      "nomen": "Terra",
+      "genus": "saxosum",
+      "planeta": {
+        "planetella": {
+          "radius": 0.9,
+          "inclinatio": 0.41,
+          "rotatio": 4.0,
+          "semen": 30137
+        },
+        "saxosculum": {
+          "silicata": 0.35,
+          "ferrum": 0.10,
+          "aqua": 0.71,
+          "continentes": 6,
+          "tectonica": 0.7,
+          "pressio_kPa": 101.0,
+          "n2": 0.78,
+          "o2": 0.21,
+          "nubes": 0.30
+        }
+      }
+    },
+    {
+      "x": 100.0,
+      "y": 800.0,
+      "scala": 0.45,
+      "nomen": "Jupiter",
+      "genus": "gaseosum",
+      "perceptus": {
+        "aspectus": {"situs": 0.35, "angulus": 4.10, "lumen": 0.8},
+        "acuitas": 0.6
+      },
+      "planeta": {
+        "planetella": {
+          "radius": 0.9,
+          "inclinatio": 0.055,
+          "rotatio": 0.0,
+          "semen": 5971
+        },
+        "gaseosculum": {
+          "h2": 0.90,
+          "he": 0.10,
+          "fasciae": 12,
+          "fasciae_contrast": 0.75,
+          "maculae": 1,
+          "macula_lat": -0.38,
+          "macula_lon": 0.3,
+          "macula_radius": 0.15,
+          "macula_obscuritas": 0.8
+        }
+      }
+    },
+    {
+      "x": 700.0,
+      "y": 560.0,
+      "scala": 1.0,
+      "nomen": "Sol",
+      "genus": "sol",
+      "planeta": {
+        "planetella": {
+          "radius": 0.88,
+          "semen": 77777
+        },
+        "soliculum": {
+          "fusio": 1.0,
+          "temperatura": 5778,
+          "corona": 0.65,
+          "granulatio": 0.50,
+          "h2": 0.735,
+          "he": 0.248,
+          "maculae": 4,
+          "macula_radius": 0.8,
+          "macula_obscuritas": 0.55
+        }
+      }
+    }
+  ]
+}
