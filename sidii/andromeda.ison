@@ -1,14 +1,10 @@
 {
-  "nomen": "Andromeda",
-  "qui": "galaxia",
-  "ubi": {
-    "pro": {
-      "magnitudo": 3.44,
-      "temperatura": 6500
-    },
-    "res": {
-      "morphologia": 1,
-      "angulus": 0.6
-    }
+  "sidulum": {
+    "magnitudo": 3.44,
+    "temperatura": 6500
+  },
+  "galaxiola": {
+    "morphologia": 1,
+    "angulus": 0.6
   }
 }

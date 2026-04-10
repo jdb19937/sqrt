@@ -1,21 +1,17 @@
 {
-  "nomen": "Torus Borrelli",
-  "qui": "torus",
-  "ubi": {
-    "pro": {
-      "semen": 42
-    },
-    "res": {
-      "methodus": "borrelli",
-      "thema": 0,
-      "strata": 0,
-      "radius_maior": 1.0,
-      "radius_minor": 0.42,
-      "gradus_u": 800,
-      "gradus_v": 400,
-      "distantia": 3.5,
-      "elevatio": 0.55,
-      "azimuthus": -0.65
-    }
+  "visiuncula": {
+    "semen": 42
+  },
+  "toriculus": {
+    "methodus": "borrelli",
+    "thema": 0,
+    "strata": 0,
+    "radius_maior": 1.0,
+    "radius_minor": 0.42,
+    "gradus_u": 800,
+    "gradus_v": 400,
+    "distantia": 3.5,
+    "elevatio": 0.55,
+    "azimuthus": -0.65
   }
 }

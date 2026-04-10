@@ -1,21 +1,17 @@
 {
-  "nomen": "Enceladus",
-  "qui": "parvum",
-  "ubi": {
-    "pro": {
-      "radius": 0.9,
-      "inclinatio": 0.03,
-      "rotatio": 1.6,
-      "semen": 60251
-    },
-    "res": {
-      "glacies": 0.95,
-      "silicata": 0.05,
+  "planetella": {
+    "radius": 0.9,
+    "inclinatio": 0.03,
+    "rotatio": 1.6,
+    "semen": 60251
+  },
+  "parvulum": {
+    "glacies": 0.95,
+    "silicata": 0.05,
 
-      "scala": 1.0,
-      "craterae": 0.15,
+    "scala": 1.0,
+    "craterae": 0.15,
 
-      "pressio_kPa": 0.0
-    }
+    "pressio_kPa": 0.0
   }
 }

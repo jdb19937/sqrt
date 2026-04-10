@@ -1,26 +1,22 @@
 {
-  "nomen": "Jupiter",
-  "qui": "gaseosum",
-  "ubi": {
-    "pro": {
-      "radius": 0.9,
-      "inclinatio": 0.0547,
-      "rotatio": 0.0,
-      "semen": 5971
-    },
-    "res": {
-      "h2": 0.90,
-      "he": 0.10,
-      "nh3": 0.003,
+  "planetella": {
+    "radius": 0.9,
+    "inclinatio": 0.0547,
+    "rotatio": 0.0,
+    "semen": 5971
+  },
+  "gaseosculum": {
+    "h2": 0.90,
+    "he": 0.10,
+    "nh3": 0.003,
 
-      "fasciae": 12,
-      "fasciae_contrast": 0.75,
+    "fasciae": 12,
+    "fasciae_contrast": 0.75,
 
-      "maculae": 1,
-      "macula_lat": -0.38,
-      "macula_lon": 0.3,
-      "macula_radius": 0.15,
-      "macula_obscuritas": 0.8
-    }
+    "maculae": 1,
+    "macula_lat": -0.38,
+    "macula_lon": 0.3,
+    "macula_radius": 0.15,
+    "macula_obscuritas": 0.8
   }
 }

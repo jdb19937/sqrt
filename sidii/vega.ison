@@ -1,10 +1,6 @@
 {
-  "nomen": "Vega",
-  "qui": "sequentia",
-  "ubi": {
-    "pro": {
-      "magnitudo": 0.03,
-      "temperatura": 9600
-    }
+  "sidulum": {
+    "magnitudo": 0.03,
+    "temperatura": 9600
   }
 }

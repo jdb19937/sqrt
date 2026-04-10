@@ -1,10 +1,6 @@
 {
-  "nomen": "Betelgeuse",
-  "qui": "supergigas",
-  "ubi": {
-    "pro": {
-      "magnitudo": 0.42,
-      "temperatura": 3500
-    }
+  "sidulum": {
+    "magnitudo": 0.42,
+    "temperatura": 3500
   }
 }

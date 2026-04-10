@@ -1,25 +1,21 @@
 {
-  "nomen": "Ganymede",
-  "qui": "saxosum",
-  "ubi": {
-    "pro": {
-      "radius": 0.9,
-      "inclinatio": 0.03,
-      "rotatio": 2.5,
-      "semen": 50359
-    },
-    "res": {
-      "silicata": 0.45,
-      "glacies": 0.35,
-      "ferrum": 0.10,
-      "carbo": 0.10,
+  "planetella": {
+    "radius": 0.9,
+    "inclinatio": 0.03,
+    "rotatio": 2.5,
+    "semen": 50359
+  },
+  "saxosculum": {
+    "silicata": 0.45,
+    "glacies": 0.35,
+    "ferrum": 0.10,
+    "carbo": 0.10,
 
-      "scala": 1.0,
-      "craterae": 0.45,
-      "maria": 0.35,
+    "scala": 1.0,
+    "craterae": 0.45,
+    "maria": 0.35,
 
-      "pressio_kPa": 0.0001,
-      "o2": 1.0
-    }
+    "pressio_kPa": 0.0001,
+    "o2": 1.0
   }
 }

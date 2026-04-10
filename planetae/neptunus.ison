@@ -1,25 +1,21 @@
 {
-  "nomen": "Neptunus",
-  "qui": "glaciale",
-  "ubi": {
-    "pro": {
-      "radius": 0.9,
-      "inclinatio": 0.4943,
-      "rotatio": 0.0,
-      "semen": 8241
-    },
-    "res": {
-      "h2": 0.80,
-      "he": 0.19,
-      "ch4": 0.015,
+  "planetella": {
+    "radius": 0.9,
+    "inclinatio": 0.4943,
+    "rotatio": 0.0,
+    "semen": 8241
+  },
+  "glaciellum": {
+    "h2": 0.80,
+    "he": 0.19,
+    "ch4": 0.015,
 
-      "fasciae": 6,
-      "fasciae_contrast": 0.20,
+    "fasciae": 6,
+    "fasciae_contrast": 0.20,
 
-      "maculae": 1,
-      "macula_lat": -0.34,
-      "macula_lon": 4.20,
-      "macula_radius": 0.10
-    }
+    "maculae": 1,
+    "macula_lat": -0.34,
+    "macula_lon": 4.20,
+    "macula_radius": 0.10
   }
 }

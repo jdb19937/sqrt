@@ -1,10 +1,6 @@
 {
-  "nomen": "Sirius",
-  "qui": "sequentia",
-  "ubi": {
-    "pro": {
-      "magnitudo": -1.46,
-      "temperatura": 9940
-    }
+  "sidulum": {
+    "magnitudo": -1.46,
+    "temperatura": 9940
   }
 }

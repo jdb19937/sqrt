@@ -1,21 +1,17 @@
 {
-  "nomen": "Nebula Tenebra",
-  "qui": "nebula",
-  "ubi": {
-    "pro": {
-      "radius": 0.85,
-      "semen": 83521
-    },
-    "res": {
-      "temperatura": 3200,
-      "luminositas": 0.45,
+  "planetella": {
+    "radius": 0.85,
+    "semen": 83521
+  },
+  "nebulula": {
+    "temperatura": 3200,
+    "luminositas": 0.45,
 
-      "h2": 0.50,
-      "o2": 0.05,
+    "h2": 0.50,
+    "o2": 0.05,
 
-      "carbo": 0.78,
-      "tectonica": 0.55,
-      "nubes": 0.35
-    }
+    "carbo": 0.78,
+    "tectonica": 0.55,
+    "nubes": 0.35
   }
 }

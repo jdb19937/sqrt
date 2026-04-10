@@ -1,18 +1,14 @@
 {
-  "nomen": "Navis Prima",
-  "qui": "navis",
-  "ubi": {
-    "pro": {
-      "semen": 42
-    },
-    "res": {
-      "centrum_re": -1.7557,
-      "centrum_im": -0.0175,
-      "amplitudo": 0.08,
-      "iterationes": 512,
-      "color_cyclus": 8.0,
-      "color_phase": 0.0,
-      "saturatio": 1.2
-    }
+  "visiuncula": {
+    "semen": 42
+  },
+  "naviculus": {
+    "centrum_re": -1.7557,
+    "centrum_im": -0.0175,
+    "amplitudo": 0.08,
+    "iterationes": 512,
+    "color_cyclus": 8.0,
+    "color_phase": 0.0,
+    "saturatio": 1.2
   }
 }

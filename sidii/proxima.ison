@@ -1,10 +1,6 @@
 {
-  "nomen": "Proxima Centauri",
-  "qui": "sequentia",
-  "ubi": {
-    "pro": {
-      "magnitudo": 11.13,
-      "temperatura": 3042
-    }
+  "sidulum": {
+    "magnitudo": 11.13,
+    "temperatura": 3042
   }
 }

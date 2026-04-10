@@ -1,29 +1,25 @@
 {
-  "nomen": "Oceanus Profundus",
-  "qui": "saxosum",
-  "ubi": {
-    "pro": {
-      "radius": 0.9,
-      "inclinatio": 0.3,
-      "rotatio": 4.8,
-      "semen": 70421
-    },
-    "res": {
-      "malachita": 0.40,
-      "silicata": 0.30,
+  "planetella": {
+    "radius": 0.9,
+    "inclinatio": 0.3,
+    "rotatio": 4.8,
+    "semen": 70421
+  },
+  "saxosculum": {
+    "malachita": 0.40,
+    "silicata": 0.30,
 
-      "aqua": 0.95,
-      "aqua_profunditas": 0.7,
+    "aqua": 0.95,
+    "aqua_profunditas": 0.7,
 
-      "continentes": 3,
-      "scala": 1.0,
-      "tectonica": 0.5,
+    "continentes": 3,
+    "scala": 1.0,
+    "tectonica": 0.5,
 
-      "pressio_kPa": 120.0,
-      "n2": 0.75,
-      "o2": 0.20,
-      "co2": 0.05,
-      "nubes": 0.65
-    }
+    "pressio_kPa": 120.0,
+    "n2": 0.75,
+    "o2": 0.20,
+    "co2": 0.05,
+    "nubes": 0.65
   }
 }

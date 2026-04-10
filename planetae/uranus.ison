@@ -1,20 +1,16 @@
 {
-  "nomen": "Uranus",
-  "qui": "glaciale",
-  "ubi": {
-    "pro": {
-      "radius": 0.9,
-      "inclinatio": 1.7064,
-      "rotatio": 0.0,
-      "semen": 7508
-    },
-    "res": {
-      "h2": 0.83,
-      "he": 0.15,
-      "ch4": 0.02,
+  "planetella": {
+    "radius": 0.9,
+    "inclinatio": 1.7064,
+    "rotatio": 0.0,
+    "semen": 7508
+  },
+  "glaciellum": {
+    "h2": 0.83,
+    "he": 0.15,
+    "ch4": 0.02,
 
-      "fasciae": 4,
-      "fasciae_contrast": 0.10
-    }
+    "fasciae": 4,
+    "fasciae_contrast": 0.10
   }
 }

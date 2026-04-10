@@ -1,10 +1,6 @@
 {
-  "nomen": "Sirius B",
-  "qui": "nanum_album",
-  "ubi": {
-    "pro": {
-      "magnitudo": 8.44,
-      "temperatura": 25200
-    }
+  "sidulum": {
+    "magnitudo": 8.44,
+    "temperatura": 25200
   }
 }

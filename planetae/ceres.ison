@@ -1,24 +1,20 @@
 {
-  "nomen": "Ceres",
-  "qui": "parvum",
-  "ubi": {
-    "pro": {
-      "radius": 0.9,
-      "inclinatio": 0.07,
-      "rotatio": 4.5,
-      "semen": 80311
-    },
-    "res": {
-      "silicata": 0.50,
-      "carbo": 0.30,
-      "glacies": 0.15,
-      "ferrum": 0.05,
+  "planetella": {
+    "radius": 0.9,
+    "inclinatio": 0.07,
+    "rotatio": 4.5,
+    "semen": 80311
+  },
+  "parvulum": {
+    "silicata": 0.50,
+    "carbo": 0.30,
+    "glacies": 0.15,
+    "ferrum": 0.05,
 
-      "scala": 1.0,
-      "craterae": 0.60,
-      "maria": 0.08,
+    "scala": 1.0,
+    "craterae": 0.60,
+    "maria": 0.08,
 
-      "pressio_kPa": 0.0
-    }
+    "pressio_kPa": 0.0
   }
 }
