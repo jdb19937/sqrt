@@ -1,3 +1,12 @@
+static void galaxia_ex_ison(sidus_t *s, const char *ison)
+{
+    s->qui = SIDUS_GALAXIA;
+    s->ubi.galaxia.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->ubi.galaxia.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 5000);
+    s->ubi.galaxia.res.morphologia = (galaxia_morphologia_t)(int)ison_da_f(ison, "galaxiola.morphologia", 0);
+    s->ubi.galaxia.res.angulus     = ison_da_f(ison, "galaxiola.angulus", 0.0);
+}
+
 /*
  * reddere_galaxia — galaxia distans in fenestra 64×64.
  *

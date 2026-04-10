@@ -6,6 +6,7 @@
 
 #include "sidus.h"
 #include "../instrumentum.h"
+#include "ison.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -212,6 +213,34 @@ static void fen_spicula(
 #include "sidera/magnetar.c"
 #include "sidera/galaxia.c"
 #include "sidera/vagans.c"
+
+/* ================================================================
+ * ISON parser
+ * ================================================================ */
+
+void sidus_ex_ison(sidus_t *s, const char *ison)
+{
+    memset(s, 0, sizeof(*s));
+    char *tmp;
+    if ((tmp = ison_da_crudum(ison, "vaganulus")))
+        { free(tmp); vagans_ex_ison(s, ison); return; }
+    if ((tmp = ison_da_crudum(ison, "galaxiola")))
+        { free(tmp); galaxia_ex_ison(s, ison); return; }
+    if ((tmp = ison_da_crudum(ison, "magnetarulum")))
+        { free(tmp); magnetar_ex_ison(s, ison); return; }
+    if ((tmp = ison_da_crudum(ison, "nanulum_album")))
+        { free(tmp); nanum_album_ex_ison(s, ison); return; }
+    if ((tmp = ison_da_crudum(ison, "gigulum_rubrum")))
+        { free(tmp); gigas_rubrum_ex_ison(s, ison); return; }
+    if ((tmp = ison_da_crudum(ison, "supergigulum")))
+        { free(tmp); supergigas_ex_ison(s, ison); return; }
+    if ((tmp = ison_da_crudum(ison, "neutroniulum")))
+        { free(tmp); neutronium_ex_ison(s, ison); return; }
+    if ((tmp = ison_da_crudum(ison, "crystallulum")))
+        { free(tmp); crystallinum_ex_ison(s, ison); return; }
+    /* praefinitum: sequentia (solum sidulum) */
+    sequentia_ex_ison(s, ison);
+}
 
 /* ================================================================
  * dispatcher

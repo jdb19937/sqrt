@@ -57,3 +57,10 @@ static void reddere_neutronium(
         jet_col, luciditas * 0.3
     );
 }
+
+static void neutronium_ex_ison(sidus_t *s, const char *ison)
+{
+    s->qui = SIDUS_NEUTRONIUM;
+    s->ubi.neutronium.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->ubi.neutronium.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 20000);
+}

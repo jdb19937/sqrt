@@ -255,6 +255,9 @@ void sidus_reddere(
     const instrumentum_t *instrumentum
 );
 
+/* sidus ex ISON legere — implet sidus_t ex chorda ISON */
+void sidus_ex_ison(sidus_t *sidus, const char *ison);
+
 /* colorem ex temperatura (Kelvin) per Planck approximare */
 color_t sidus_temperatura_ad_colorem(double kelvin);
 

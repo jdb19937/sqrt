@@ -683,12 +683,12 @@ static void emitte_planetam(
     int habet_cosidus, int est_ultima
 ) {
     printf("    {\n");
-    printf("      \"nomen\": \"%s\",\n", p->nomen);
-    printf("      \"genus\": \"%s\",\n", p->genus);
     printf(
         "      \"x\": %d, \"y\": %d, \"scala\": %.2f,\n",
         p->x, p->y, p->scala
     );
+    printf("      \"nomen\": \"%s\",\n", p->nomen);
+    printf("      \"genus\": \"%s\",\n", p->genus);
 
     /* perceptus — non pro sole */
     if (!p->est_sol) {
@@ -718,107 +718,123 @@ static void emitte_planetam(
         printf("      },\n");
     }
 
-    printf("      \"radius\": %.2f,\n", p->radius);
+    /* planeta sub-objectum */
+    printf("      \"planeta\": {\n");
 
+    /* planetella */
+    printf("        \"planetella\": {\n");
+    printf("          \"radius\": %.2f,\n", p->radius);
     if (!p->est_sol) {
-        printf("      \"inclinatio\": %.4f,\n", p->inclinatio);
-        printf("      \"rotatio\": %.1f,\n", p->rotatio);
+        printf("          \"inclinatio\": %.4f,\n", p->inclinatio);
+        printf("          \"rotatio\": %.1f,\n", p->rotatio);
     }
+    printf("          \"semen\": %u\n", p->semen_p);
+    printf("        },\n");
 
-    /* --- sol --- */
+    /* sub-objectum specificum generis */
     if (p->est_sol) {
-        printf("      \"fusio\": 1.0,\n");
-        printf("      \"temperatura\": %.0f,\n", p->temperatura);
-        printf("      \"corona\": %.2f,\n", p->corona);
-        printf("      \"granulatio\": %.2f,\n", p->granulatio);
-        printf("      \"h2\": %.3f,\n", p->h2);
-        printf("      \"he\": %.3f,\n", p->he);
+        printf("        \"soliculum\": {\n");
+        printf("          \"fusio\": 1.0,\n");
+        printf("          \"temperatura\": %.0f,\n", p->temperatura);
+        printf("          \"corona\": %.2f,\n", p->corona);
+        printf("          \"granulatio\": %.2f,\n", p->granulatio);
+        printf("          \"h2\": %.3f,\n", p->h2);
+        printf("          \"he\": %.3f,\n", p->he);
         if (p->maculae > 0) {
-            printf("      \"maculae\": %d,\n", p->maculae);
-            printf("      \"macula_radius\": %.1f,\n", p->macula_radius);
-            printf("      \"macula_obscuritas\": %.2f,\n", p->macula_obscuritas);
+            printf("          \"maculae\": %d,\n", p->maculae);
+            printf("          \"macula_radius\": %.1f,\n", p->macula_radius);
+            printf("          \"macula_obscuritas\": %.2f\n", p->macula_obscuritas);
+        } else {
+            /* remove trailing comma from he */
         }
+        printf("        }\n");
 
-    /* --- saxosum / parvum --- */
     } else if (
         strcmp(p->genus, "saxosum") == 0
         || strcmp(p->genus, "parvum") == 0
     ) {
+        printf(
+            "        \"%s\": {\n",
+            strcmp(p->genus, "parvum") == 0 ? "parvulum" : "saxosculum"
+        );
         if (p->silicata > 0.005)
-            printf("      \"silicata\": %.2f,\n", p->silicata);
+            printf("          \"silicata\": %.2f,\n", p->silicata);
         if (p->ferrum > 0.005)
-            printf("      \"ferrum\": %.2f,\n", p->ferrum);
+            printf("          \"ferrum\": %.2f,\n", p->ferrum);
         if (p->sulphur > 0.005)
-            printf("      \"sulphur\": %.2f,\n", p->sulphur);
+            printf("          \"sulphur\": %.2f,\n", p->sulphur);
         if (p->carbo > 0.005)
-            printf("      \"carbo\": %.2f,\n", p->carbo);
+            printf("          \"carbo\": %.2f,\n", p->carbo);
         if (p->glacies > 0.005)
-            printf("      \"glacies\": %.2f,\n", p->glacies);
+            printf("          \"glacies\": %.2f,\n", p->glacies);
         if (p->malachita > 0.005)
-            printf("      \"malachita\": %.2f,\n", p->malachita);
+            printf("          \"malachita\": %.2f,\n", p->malachita);
 
         if (p->aqua > 0.005) {
-            printf("      \"aqua\": %.2f,\n", p->aqua);
-            printf("      \"aqua_profunditas\": %.1f,\n", p->aqua_profunditas);
+            printf("          \"aqua\": %.2f,\n", p->aqua);
+            printf("          \"aqua_profunditas\": %.1f,\n", p->aqua_profunditas);
         }
 
         if (p->continentes > 0)
-            printf("      \"continentes\": %d,\n", p->continentes);
+            printf("          \"continentes\": %d,\n", p->continentes);
         if (p->tectonica > 0.005)
-            printf("      \"tectonica\": %.1f,\n", p->tectonica);
+            printf("          \"tectonica\": %.1f,\n", p->tectonica);
         if (p->craterae > 0.005)
-            printf("      \"craterae\": %.2f,\n", p->craterae);
+            printf("          \"craterae\": %.2f,\n", p->craterae);
         if (p->maria > 0.005)
-            printf("      \"maria\": %.2f,\n", p->maria);
+            printf("          \"maria\": %.2f,\n", p->maria);
         if (p->vulcanismus > 0.005)
-            printf("      \"vulcanismus\": %.1f,\n", p->vulcanismus);
+            printf("          \"vulcanismus\": %.1f,\n", p->vulcanismus);
 
         if (p->pressio_kPa >= 0.1)
-            printf("      \"pressio_kPa\": %.1f,\n", p->pressio_kPa);
+            printf("          \"pressio_kPa\": %.1f,\n", p->pressio_kPa);
         else if (p->pressio_kPa > 0.00005)
-            printf("      \"pressio_kPa\": %.3f,\n", p->pressio_kPa);
+            printf("          \"pressio_kPa\": %.3f,\n", p->pressio_kPa);
         else
-            printf("      \"pressio_kPa\": 0.0,\n");
+            printf("          \"pressio_kPa\": 0.0,\n");
 
         if (p->n2 > 0.005)
-            printf("      \"n2\": %.2f,\n", p->n2);
+            printf("          \"n2\": %.2f,\n", p->n2);
         if (p->o2 > 0.005)
-            printf("      \"o2\": %.2f,\n", p->o2);
+            printf("          \"o2\": %.2f,\n", p->o2);
         if (p->co2 > 0.005)
-            printf("      \"co2\": %.3f,\n", p->co2);
+            printf("          \"co2\": %.3f,\n", p->co2);
         if (p->ch4 > 0.005)
-            printf("      \"ch4\": %.2f,\n", p->ch4);
+            printf("          \"ch4\": %.2f,\n", p->ch4);
         if (p->pulvis > 0.005)
-            printf("      \"pulvis\": %.1f,\n", p->pulvis);
+            printf("          \"pulvis\": %.1f,\n", p->pulvis);
         if (p->nubes > 0.005)
-            printf("      \"nubes\": %.2f,\n", p->nubes);
+            printf("          \"nubes\": %.2f,\n", p->nubes);
         if (p->polaris > 0.005)
-            printf("      \"polaris\": %.2f,\n", p->polaris);
+            printf("          \"polaris\": %.2f\n", p->polaris);
+        printf("        }\n");
 
-    /* --- gaseosum / glaciale --- */
     } else {
-        printf("      \"pressio_kPa\": 0,\n");
-        printf("      \"h2\": %.2f,\n", p->h2);
-        printf("      \"he\": %.2f,\n", p->he);
+        printf(
+            "        \"%s\": {\n",
+            strcmp(p->genus, "glaciale") == 0 ? "glaciellum" : "gaseosculum"
+        );
+        printf("          \"h2\": %.2f,\n", p->h2);
+        printf("          \"he\": %.2f,\n", p->he);
         if (p->ch4 > 0.005)
-            printf("      \"ch4\": %.3f,\n", p->ch4);
+            printf("          \"ch4\": %.3f,\n", p->ch4);
         if (p->nh3 > 0.005)
-            printf("      \"nh3\": %.3f,\n", p->nh3);
+            printf("          \"nh3\": %.3f,\n", p->nh3);
         if (p->fasciae > 0) {
-            printf("      \"fasciae\": %d,\n", p->fasciae);
-            printf("      \"fasciae_contrast\": %.2f,\n", p->fasciae_contrast);
+            printf("          \"fasciae\": %d,\n", p->fasciae);
+            printf("          \"fasciae_contrast\": %.2f,\n", p->fasciae_contrast);
         }
         if (p->maculae > 0) {
-            printf("      \"maculae\": %d,\n", p->maculae);
-            printf("      \"macula_lat\": %.2f,\n", p->macula_lat);
-            printf("      \"macula_lon\": %.1f,\n", p->macula_lon);
-            printf("      \"macula_radius\": %.2f,\n", p->macula_radius);
-            printf("      \"macula_obscuritas\": %.1f,\n", p->macula_obscuritas);
+            printf("          \"maculae\": %d,\n", p->maculae);
+            printf("          \"macula_lat\": %.2f,\n", p->macula_lat);
+            printf("          \"macula_lon\": %.1f,\n", p->macula_lon);
+            printf("          \"macula_radius\": %.2f,\n", p->macula_radius);
+            printf("          \"macula_obscuritas\": %.1f\n", p->macula_obscuritas);
         }
+        printf("        }\n");
     }
 
-    /* semen — semper ultimum, sine virgula */
-    printf("      \"semen\": %u\n", p->semen_p);
+    printf("      }\n"); /* finis planeta */
 
     if (est_ultima)
         printf("    }\n");

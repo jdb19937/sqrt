@@ -1,3 +1,12 @@
+static void vagans_ex_ison(sidus_t *s, const char *ison)
+{
+    s->qui = SIDUS_VAGANS;
+    s->ubi.vagans.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->ubi.vagans.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 5000);
+    s->ubi.vagans.res.phase       = ison_da_f(ison, "vaganulus.phase", 0.0);
+    s->ubi.vagans.res.angulus     = ison_da_f(ison, "vaganulus.angulus", 0.0);
+}
+
 static void reddere_vagans(
     unsigned char *fen,
     const vagans_t *s,

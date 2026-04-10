@@ -397,3 +397,40 @@ static void reddere_saxosum(
         }
     }
 }
+
+static planeta_t *saxosum_ex_ison(const char *ison)
+{
+    planeta_t *v = calloc(1, sizeof(planeta_t));
+    v->qui = PLANETA_SAXOSUM;
+    v->ubi.saxosum.pro.radius     = ison_f(ison, "planetella.radius", 0.9);
+    v->ubi.saxosum.pro.inclinatio = ison_f(ison, "planetella.inclinatio", 0.0);
+    v->ubi.saxosum.pro.rotatio    = ison_f(ison, "planetella.rotatio", 0.0);
+    v->ubi.saxosum.pro.semen      = (unsigned)ison_f(ison, "planetella.semen", 42);
+    v->ubi.saxosum.res.silicata         = ison_f(ison, "saxosculum.silicata", 0.0);
+    v->ubi.saxosum.res.ferrum           = ison_f(ison, "saxosculum.ferrum", 0.0);
+    v->ubi.saxosum.res.sulphur          = ison_f(ison, "saxosculum.sulphur", 0.0);
+    v->ubi.saxosum.res.carbo            = ison_f(ison, "saxosculum.carbo", 0.0);
+    v->ubi.saxosum.res.glacies          = ison_f(ison, "saxosculum.glacies", 0.0);
+    v->ubi.saxosum.res.glacies_co2      = ison_f(ison, "saxosculum.glacies_co2", 0.0);
+    v->ubi.saxosum.res.malachita        = ison_f(ison, "saxosculum.malachita", 0.0);
+    v->ubi.saxosum.res.aqua             = ison_f(ison, "saxosculum.aqua", 0.0);
+    v->ubi.saxosum.res.aqua_profunditas = ison_f(ison, "saxosculum.aqua_profunditas", 0.5);
+    v->ubi.saxosum.res.continentes      = (int)ison_f(ison, "saxosculum.continentes", 0);
+    v->ubi.saxosum.res.scala            = ison_f(ison, "saxosculum.scala", 1.0);
+    v->ubi.saxosum.res.tectonica        = ison_f(ison, "saxosculum.tectonica", 0.3);
+    v->ubi.saxosum.res.craterae         = ison_f(ison, "saxosculum.craterae", 0.0);
+    v->ubi.saxosum.res.maria            = ison_f(ison, "saxosculum.maria", 0.0);
+    v->ubi.saxosum.res.vulcanismus      = ison_f(ison, "saxosculum.vulcanismus", 0.0);
+    v->ubi.saxosum.res.pressio_kPa      = ison_f(ison, "saxosculum.pressio_kPa", 0.0);
+    v->ubi.saxosum.res.n2               = ison_f(ison, "saxosculum.n2", 0.0);
+    v->ubi.saxosum.res.o2               = ison_f(ison, "saxosculum.o2", 0.0);
+    v->ubi.saxosum.res.co2              = ison_f(ison, "saxosculum.co2", 0.0);
+    v->ubi.saxosum.res.ch4              = ison_f(ison, "saxosculum.ch4", 0.0);
+    v->ubi.saxosum.res.h2               = ison_f(ison, "saxosculum.h2", 0.0);
+    v->ubi.saxosum.res.he               = ison_f(ison, "saxosculum.he", 0.0);
+    v->ubi.saxosum.res.nh3              = ison_f(ison, "saxosculum.nh3", 0.0);
+    v->ubi.saxosum.res.pulvis           = ison_f(ison, "saxosculum.pulvis", 0.0);
+    v->ubi.saxosum.res.nubes            = ison_f(ison, "saxosculum.nubes", 0.0);
+    v->ubi.saxosum.res.polaris          = ison_f(ison, "saxosculum.polaris", 0.0);
+    return v;
+}

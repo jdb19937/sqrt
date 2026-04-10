@@ -289,3 +289,32 @@ static void zeppelinus_reddere(unsigned char *fenestra, const zeppelinus_t *z)
         }
     }
 }
+
+static visio_t *zeppelinus_ex_ison(const char *ison)
+{
+    visio_t *v = (visio_t *)calloc(1, sizeof(visio_t));
+    if (!v) return NULL;
+    v->qui = VISIO_ZEPPELINUS;
+    v->ubi.zeppelinus.pro.semen = (unsigned)ison_da_n(ison, "visiuncula.semen", 42);
+    v->ubi.zeppelinus.res.ratio        = ison_da_f(ison, "zeppelinulus.ratio", 4.0);
+    v->ubi.zeppelinus.res.inclinatio   = ison_da_f(ison, "zeppelinulus.inclinatio", 0.0);
+    v->ubi.zeppelinus.res.azimuthus    = ison_da_f(ison, "zeppelinulus.azimuthus", 0.0);
+    v->ubi.zeppelinus.res.lux_angulus  = ison_da_f(ison, "zeppelinulus.lux_angulus", 0.8);
+    v->ubi.zeppelinus.res.lux_elevatio = ison_da_f(ison, "zeppelinulus.lux_elevatio", 0.6);
+    v->ubi.zeppelinus.res.involucrum   = (color_t){
+        ison_da_f(ison, "zeppelinulus.involucrum.r", 0.60),
+        ison_da_f(ison, "zeppelinulus.involucrum.g", 0.62),
+        ison_da_f(ison, "zeppelinulus.involucrum.b", 0.65),
+        1.0
+    };
+    v->ubi.zeppelinus.res.gondola = (color_t){
+        ison_da_f(ison, "zeppelinulus.gondola.r", 0.25),
+        ison_da_f(ison, "zeppelinulus.gondola.g", 0.18),
+        ison_da_f(ison, "zeppelinulus.gondola.b", 0.12),
+        1.0
+    };
+    v->ubi.zeppelinus.res.elevatio  = ison_da_f(ison, "zeppelinulus.elevatio", 0.15);
+    v->ubi.zeppelinus.res.fenestrae = ison_da_f(ison, "zeppelinulus.fenestrae", 6.0);
+    v->ubi.zeppelinus.res.pinnae    = ison_da_f(ison, "zeppelinulus.pinnae", 0.4);
+    return v;
+}

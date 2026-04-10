@@ -47,3 +47,10 @@ static void reddere_supergigas(
             col, instr->halo_vis * luciditas * 0.5
         );
 }
+
+static void supergigas_ex_ison(sidus_t *s, const char *ison)
+{
+    s->qui = SIDUS_SUPERGIGAS;
+    s->ubi.supergigas.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->ubi.supergigas.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 4000);
+}

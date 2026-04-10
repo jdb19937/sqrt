@@ -226,3 +226,34 @@ static void reddere_gaseosum(
 
     aplicare_fusionem(fen, p);
 }
+
+static planeta_t *gaseosum_ex_ison(const char *ison)
+{
+    planeta_t *v = calloc(1, sizeof(planeta_t));
+    v->qui = PLANETA_GASEOSUM;
+    v->ubi.gaseosum.pro.radius     = ison_f(ison, "planetella.radius", 0.9);
+    v->ubi.gaseosum.pro.inclinatio = ison_f(ison, "planetella.inclinatio", 0.0);
+    v->ubi.gaseosum.pro.rotatio    = ison_f(ison, "planetella.rotatio", 0.0);
+    v->ubi.gaseosum.pro.semen      = (unsigned)ison_f(ison, "planetella.semen", 42);
+    v->ubi.gaseosum.res.n2               = ison_f(ison, "gaseosculum.n2", 0.0);
+    v->ubi.gaseosum.res.o2               = ison_f(ison, "gaseosculum.o2", 0.0);
+    v->ubi.gaseosum.res.co2              = ison_f(ison, "gaseosculum.co2", 0.0);
+    v->ubi.gaseosum.res.ch4              = ison_f(ison, "gaseosculum.ch4", 0.0);
+    v->ubi.gaseosum.res.h2               = ison_f(ison, "gaseosculum.h2", 0.0);
+    v->ubi.gaseosum.res.he               = ison_f(ison, "gaseosculum.he", 0.0);
+    v->ubi.gaseosum.res.nh3              = ison_f(ison, "gaseosculum.nh3", 0.0);
+    v->ubi.gaseosum.res.pulvis           = ison_f(ison, "gaseosculum.pulvis", 0.0);
+    v->ubi.gaseosum.res.fasciae          = (int)ison_f(ison, "gaseosculum.fasciae", 0);
+    v->ubi.gaseosum.res.fasciae_contrast = ison_f(ison, "gaseosculum.fasciae_contrast", 0.5);
+    v->ubi.gaseosum.res.maculae          = (int)ison_f(ison, "gaseosculum.maculae", 0);
+    v->ubi.gaseosum.res.macula_lat       = ison_f(ison, "gaseosculum.macula_lat", 0.0);
+    v->ubi.gaseosum.res.macula_lon       = ison_f(ison, "gaseosculum.macula_lon", 0.0);
+    v->ubi.gaseosum.res.macula_radius    = ison_f(ison, "gaseosculum.macula_radius", 0.1);
+    v->ubi.gaseosum.res.macula_obscuritas = ison_f(ison, "gaseosculum.macula_obscuritas", 0.5);
+    v->ubi.gaseosum.res.fusio            = ison_f(ison, "gaseosculum.fusio", 0.0);
+    v->ubi.gaseosum.res.temperatura      = ison_f(ison, "gaseosculum.temperatura", 0.0);
+    v->ubi.gaseosum.res.luminositas      = ison_f(ison, "gaseosculum.luminositas", 1.0);
+    v->ubi.gaseosum.res.corona           = ison_f(ison, "gaseosculum.corona", 0.0);
+    v->ubi.gaseosum.res.granulatio       = ison_f(ison, "gaseosculum.granulatio", 0.0);
+    return v;
+}

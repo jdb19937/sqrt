@@ -33,3 +33,10 @@ static void reddere_gigas_rubrum(
         }
     }
 }
+
+static void gigas_rubrum_ex_ison(sidus_t *s, const char *ison)
+{
+    s->qui = SIDUS_GIGAS_RUBRUM;
+    s->ubi.gigas_rubrum.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->ubi.gigas_rubrum.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 3500);
+}

@@ -106,4 +106,18 @@ static void navis_reddere(unsigned char *fenestra, const navis_t *n)
     }
 }
 
-
+static visio_t *navis_ex_ison(const char *ison)
+{
+    visio_t *v = (visio_t *)calloc(1, sizeof(visio_t));
+    if (!v) return NULL;
+    v->qui = VISIO_NAVIS;
+    v->ubi.navis.pro.semen = (unsigned)ison_da_n(ison, "visiuncula.semen", 42);
+    v->ubi.navis.res.centrum_re   = ison_da_f(ison, "naviculus.centrum_re", -1.7557);
+    v->ubi.navis.res.centrum_im   = ison_da_f(ison, "naviculus.centrum_im", -0.0175);
+    v->ubi.navis.res.amplitudo    = ison_da_f(ison, "naviculus.amplitudo", 0.08);
+    v->ubi.navis.res.iterationes  = (int)ison_da_n(ison, "naviculus.iterationes", 1000);
+    v->ubi.navis.res.color_cyclus = ison_da_f(ison, "naviculus.color_cyclus", 8.0);
+    v->ubi.navis.res.color_phase  = ison_da_f(ison, "naviculus.color_phase", 0.0);
+    v->ubi.navis.res.saturatio    = ison_da_f(ison, "naviculus.saturatio", 1.0);
+    return v;
+}

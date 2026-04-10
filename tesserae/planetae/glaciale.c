@@ -96,3 +96,28 @@ static void reddere_glaciale(
         }
     }
 }
+
+static planeta_t *glaciale_ex_ison(const char *ison)
+{
+    planeta_t *v = calloc(1, sizeof(planeta_t));
+    v->qui = PLANETA_GLACIALE;
+    v->ubi.glaciale.pro.radius     = ison_f(ison, "planetella.radius", 0.9);
+    v->ubi.glaciale.pro.inclinatio = ison_f(ison, "planetella.inclinatio", 0.0);
+    v->ubi.glaciale.pro.rotatio    = ison_f(ison, "planetella.rotatio", 0.0);
+    v->ubi.glaciale.pro.semen      = (unsigned)ison_f(ison, "planetella.semen", 42);
+    v->ubi.glaciale.res.n2               = ison_f(ison, "glaciellum.n2", 0.0);
+    v->ubi.glaciale.res.o2               = ison_f(ison, "glaciellum.o2", 0.0);
+    v->ubi.glaciale.res.co2              = ison_f(ison, "glaciellum.co2", 0.0);
+    v->ubi.glaciale.res.ch4              = ison_f(ison, "glaciellum.ch4", 0.0);
+    v->ubi.glaciale.res.h2               = ison_f(ison, "glaciellum.h2", 0.0);
+    v->ubi.glaciale.res.he               = ison_f(ison, "glaciellum.he", 0.0);
+    v->ubi.glaciale.res.nh3              = ison_f(ison, "glaciellum.nh3", 0.0);
+    v->ubi.glaciale.res.pulvis           = ison_f(ison, "glaciellum.pulvis", 0.0);
+    v->ubi.glaciale.res.fasciae          = (int)ison_f(ison, "glaciellum.fasciae", 0);
+    v->ubi.glaciale.res.fasciae_contrast = ison_f(ison, "glaciellum.fasciae_contrast", 0.5);
+    v->ubi.glaciale.res.maculae          = (int)ison_f(ison, "glaciellum.maculae", 0);
+    v->ubi.glaciale.res.macula_lat       = ison_f(ison, "glaciellum.macula_lat", 0.0);
+    v->ubi.glaciale.res.macula_lon       = ison_f(ison, "glaciellum.macula_lon", 0.0);
+    v->ubi.glaciale.res.macula_radius    = ison_f(ison, "glaciellum.macula_radius", 0.1);
+    return v;
+}

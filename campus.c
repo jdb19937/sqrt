@@ -544,29 +544,6 @@ void campus_generare(
  * ================================================================ */
 
 
-static sidereus_t genus_ex_nomine(const char *nomen)
-{
-    if (strcmp(nomen, "nanum_album") == 0)
-        return SIDUS_NANUM_ALBUM;
-    if (strcmp(nomen, "sequentia") == 0)
-        return SIDUS_SEQUENTIA;
-    if (strcmp(nomen, "gigas_rubrum") == 0)
-        return SIDUS_GIGAS_RUBRUM;
-    if (strcmp(nomen, "supergigas") == 0)
-        return SIDUS_SUPERGIGAS;
-    if (strcmp(nomen, "neutronium") == 0)
-        return SIDUS_NEUTRONIUM;
-    if (strcmp(nomen, "crystallinum") == 0)
-        return SIDUS_CRYSTALLINUM;
-    if (strcmp(nomen, "magnetar") == 0)
-        return SIDUS_MAGNETAR;
-    if (strcmp(nomen, "galaxia") == 0)
-        return SIDUS_GALAXIA;
-    if (strcmp(nomen, "vagans") == 0)
-        return SIDUS_VAGANS;
-    return SIDUS_SEQUENTIA;
-}
-
 typedef struct {
     campus_t *campus;
     double galaxia_glow, galaxia_rift, inclinatio;
@@ -613,7 +590,9 @@ static void isonl_linea_reddere(const char *linea, void *ctx_v)
         int x         = (int)ison_da_n(internum, "x", 0);
         int y         = (int)ison_da_n(internum, "y", 0);
         double sc     = ison_da_f(internum, "scala", 1.0);
-        planeta_t *pl = planeta_ex_ison(internum);
+        char *pl_ison = ison_da_crudum(internum, "planeta");
+        planeta_t *pl = pl_ison ? planeta_ex_ison(pl_ison) : NULL;
+        free(pl_ison);
         free(internum);
         if (pl) {
             planeta_perceptus_t perc = planeta_perceptus_ex_ison(per_s);
@@ -642,29 +621,9 @@ static void isonl_linea_reddere(const char *linea, void *ctx_v)
     int x = (int)ison_da_n(internum, "x", 0);
     int y = (int)ison_da_n(internum, "y", 0);
 
-    char *genus_s    = ison_da_chordam(internum, "qui");
-    sidereus_t genus = genus_ex_nomine(genus_s ? genus_s : "sequentia");
-    free(genus_s);
-    double mag  = ison_da_f(internum, "ubi.pro.magnitudo", 5.0);
-    double temp = ison_da_f(internum, "ubi.pro.temperatura", 5000);
-
     sidus_t sidus;
-    memset(&sidus, 0, sizeof(sidus));
-    sidus.qui = genus;
-    if (genus == SIDUS_VAGANS) {
-        sidus.ubi.vagans.pro = (sidulum_t){mag, temp};
-        sidus.ubi.vagans.res.phase   = ison_da_f(internum, "ubi.res.phase", 0);
-        sidus.ubi.vagans.res.angulus = ison_da_f(internum, "ubi.res.angulus", 0);
-    } else if (genus == SIDUS_GALAXIA) {
-        sidus.ubi.galaxia.pro = (sidulum_t){mag, temp};
-        sidus.ubi.galaxia.res.morphologia = (galaxia_morphologia_t)(int)ison_da_f(internum, "ubi.res.morphologia", 0);
-        sidus.ubi.galaxia.res.angulus     = ison_da_f(internum, "ubi.res.angulus", 0);
-    } else if (genus == SIDUS_MAGNETAR) {
-        sidus.ubi.magnetar.pro = (sidulum_t){mag, temp};
-        sidus.ubi.magnetar.res.phase = ison_da_f(internum, "ubi.res.phase", 0);
-    } else {
-        sidus.ubi.sequentia.pro = (sidulum_t){mag, temp};
-    }
+    sidus_ex_ison(&sidus, internum);
+    double mag = sidus.ubi.sequentia.pro.magnitudo;
     free(internum);
 
     instrumentum_t instr = {.saturatio = 1.0};

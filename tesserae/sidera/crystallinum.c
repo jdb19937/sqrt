@@ -64,3 +64,10 @@ static void reddere_crystallinum(
     /* halo tenuis multicolor circa centrum */
     fen_punctum(fen, SEMI, SEMI, 4.0, col, luciditas * 0.06);
 }
+
+static void crystallinum_ex_ison(sidus_t *s, const char *ison)
+{
+    s->qui = SIDUS_CRYSTALLINUM;
+    s->ubi.crystallinum.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->ubi.crystallinum.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 15000);
+}

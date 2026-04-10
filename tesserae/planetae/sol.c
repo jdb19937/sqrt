@@ -78,3 +78,26 @@ static void reddere_sol(unsigned char *fen, const sol_t *p)
         }
     }
 }
+
+static planeta_t *sol_ex_ison(const char *ison)
+{
+    planeta_t *v = calloc(1, sizeof(planeta_t));
+    v->qui = PLANETA_SOL;
+    v->ubi.sol.pro.radius     = ison_f(ison, "planetella.radius", 0.9);
+    v->ubi.sol.pro.inclinatio = ison_f(ison, "planetella.inclinatio", 0.0);
+    v->ubi.sol.pro.rotatio    = ison_f(ison, "planetella.rotatio", 0.0);
+    v->ubi.sol.pro.semen      = (unsigned)ison_f(ison, "planetella.semen", 42);
+    v->ubi.sol.res.fusio            = ison_f(ison, "soliculum.fusio", 1.0);
+    v->ubi.sol.res.temperatura      = ison_f(ison, "soliculum.temperatura", 0.0);
+    v->ubi.sol.res.luminositas      = ison_f(ison, "soliculum.luminositas", 1.0);
+    v->ubi.sol.res.corona           = ison_f(ison, "soliculum.corona", 0.0);
+    v->ubi.sol.res.granulatio       = ison_f(ison, "soliculum.granulatio", 0.0);
+    v->ubi.sol.res.maculae          = (int)ison_f(ison, "soliculum.maculae", 0);
+    v->ubi.sol.res.macula_radius    = ison_f(ison, "soliculum.macula_radius", 0.1);
+    v->ubi.sol.res.macula_obscuritas = ison_f(ison, "soliculum.macula_obscuritas", 0.5);
+    v->ubi.sol.res.h2               = ison_f(ison, "soliculum.h2", 0.0);
+    v->ubi.sol.res.he               = ison_f(ison, "soliculum.he", 0.0);
+    v->ubi.sol.res.ch4              = ison_f(ison, "soliculum.ch4", 0.0);
+    v->ubi.sol.res.nh3              = ison_f(ison, "soliculum.nh3", 0.0);
+    return v;
+}

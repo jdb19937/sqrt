@@ -1,3 +1,11 @@
+static void magnetar_ex_ison(sidus_t *s, const char *ison)
+{
+    s->qui = SIDUS_MAGNETAR;
+    s->ubi.magnetar.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->ubi.magnetar.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 20000);
+    s->ubi.magnetar.res.phase       = ison_da_f(ison, "magnetarulum.phase", 0.0);
+}
+
 /* Magnetar: stella neutronium cum B ~10^9-10^11 T.
  * Jets relativistici bipolares spirant circa lineas campi magnetici.
  * Materia in jet accelerata ad ~0.3c per processum Blandford-Znajek.
