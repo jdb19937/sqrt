@@ -1,20 +1,24 @@
 {
   "nomen": "Caeruleus",
-  "genus": "sol",
+  "qui": "sol",
+  "ubi": {
+    "pro": {
+      "radius": 0.88,
+      "semen": 55555
+    },
+    "res": {
+      "fusio": 1.0,
+      "temperatura": 18000,
+      "luminositas": 1.0,
+      "corona": 0.70,
+      "granulatio": 0.12,
 
-  "radius": 0.88,
-  "semen": 55555,
+      "h2": 0.735,
+      "he": 0.248,
 
-  "fusio": 1.0,
-  "temperatura": 18000,
-  "luminositas": 1.0,
-  "corona": 0.70,
-  "granulatio": 0.12,
-
-  "h2": 0.735,
-  "he": 0.248,
-
-  "maculae": 0,
-  "macula_radius": 0.0,
-  "macula_obscuritas": 0.0
+      "maculae": 0,
+      "macula_radius": 0.0,
+      "macula_obscuritas": 0.0
+    }
+  }
 }

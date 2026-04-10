@@ -1,0 +1,9 @@
+{
+  "titulus": "neutroniulum",
+  "properties": {
+    "res": {
+      "type": "integer"
+    }
+  },
+  "required": []
+}

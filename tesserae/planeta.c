@@ -568,16 +568,16 @@ static double ison_f(const char *ison, const char *via, double praef)
 
 planeta_t *planeta_ex_ison(const char *ison)
 {
-    char *genus_s = ison_da_chordam(ison, "genus");
+    char *genus_s = ison_da_chordam(ison, "qui");
     planetarius_t g = genus_ex_nomine(genus_s);
     free(genus_s);
 
     /* macro: implet campos basis communes */
 #define BASIS(typ) do { \
-    v->ubi.typ.pro.radius     = ison_f(ison, "radius", 0.9); \
-    v->ubi.typ.pro.inclinatio = ison_f(ison, "inclinatio", 0.0); \
-    v->ubi.typ.pro.rotatio    = ison_f(ison, "rotatio", 0.0); \
-    v->ubi.typ.pro.semen      = (unsigned)ison_f(ison, "semen", 42); \
+    v->ubi.typ.pro.radius     = ison_f(ison, "ubi.pro.radius", 0.9); \
+    v->ubi.typ.pro.inclinatio = ison_f(ison, "ubi.pro.inclinatio", 0.0); \
+    v->ubi.typ.pro.rotatio    = ison_f(ison, "ubi.pro.rotatio", 0.0); \
+    v->ubi.typ.pro.semen      = (unsigned)ison_f(ison, "ubi.pro.semen", 42); \
 } while (0)
 
     switch (g) {
@@ -585,150 +585,150 @@ planeta_t *planeta_ex_ison(const char *ison)
         planeta_t *v = calloc(1, sizeof(planeta_t));
         v->qui = g;
         BASIS(saxosum);
-        v->ubi.saxosum.res.silicata         = ison_f(ison, "silicata", 0.0);
-        v->ubi.saxosum.res.ferrum           = ison_f(ison, "ferrum", 0.0);
-        v->ubi.saxosum.res.sulphur          = ison_f(ison, "sulphur", 0.0);
-        v->ubi.saxosum.res.carbo            = ison_f(ison, "carbo", 0.0);
-        v->ubi.saxosum.res.glacies          = ison_f(ison, "glacies", 0.0);
-        v->ubi.saxosum.res.glacies_co2      = ison_f(ison, "glacies_co2", 0.0);
-        v->ubi.saxosum.res.malachita        = ison_f(ison, "malachita", 0.0);
-        v->ubi.saxosum.res.aqua             = ison_f(ison, "aqua", 0.0);
-        v->ubi.saxosum.res.aqua_profunditas = ison_f(ison, "aqua_profunditas", 0.5);
-        v->ubi.saxosum.res.continentes      = (int)ison_f(ison, "continentes", 0);
-        v->ubi.saxosum.res.scala            = ison_f(ison, "scala", 1.0);
-        v->ubi.saxosum.res.tectonica        = ison_f(ison, "tectonica", 0.3);
-        v->ubi.saxosum.res.craterae         = ison_f(ison, "craterae", 0.0);
-        v->ubi.saxosum.res.maria            = ison_f(ison, "maria", 0.0);
-        v->ubi.saxosum.res.vulcanismus      = ison_f(ison, "vulcanismus", 0.0);
-        v->ubi.saxosum.res.pressio_kPa      = ison_f(ison, "pressio_kPa", 0.0);
-        v->ubi.saxosum.res.n2               = ison_f(ison, "n2", 0.0);
-        v->ubi.saxosum.res.o2               = ison_f(ison, "o2", 0.0);
-        v->ubi.saxosum.res.co2              = ison_f(ison, "co2", 0.0);
-        v->ubi.saxosum.res.ch4              = ison_f(ison, "ch4", 0.0);
-        v->ubi.saxosum.res.h2               = ison_f(ison, "h2", 0.0);
-        v->ubi.saxosum.res.he               = ison_f(ison, "he", 0.0);
-        v->ubi.saxosum.res.nh3              = ison_f(ison, "nh3", 0.0);
-        v->ubi.saxosum.res.pulvis           = ison_f(ison, "pulvis", 0.0);
-        v->ubi.saxosum.res.nubes            = ison_f(ison, "nubes", 0.0);
-        v->ubi.saxosum.res.polaris          = ison_f(ison, "polaris", 0.0);
+        v->ubi.saxosum.res.silicata         = ison_f(ison, "ubi.res.silicata", 0.0);
+        v->ubi.saxosum.res.ferrum           = ison_f(ison, "ubi.res.ferrum", 0.0);
+        v->ubi.saxosum.res.sulphur          = ison_f(ison, "ubi.res.sulphur", 0.0);
+        v->ubi.saxosum.res.carbo            = ison_f(ison, "ubi.res.carbo", 0.0);
+        v->ubi.saxosum.res.glacies          = ison_f(ison, "ubi.res.glacies", 0.0);
+        v->ubi.saxosum.res.glacies_co2      = ison_f(ison, "ubi.res.glacies_co2", 0.0);
+        v->ubi.saxosum.res.malachita        = ison_f(ison, "ubi.res.malachita", 0.0);
+        v->ubi.saxosum.res.aqua             = ison_f(ison, "ubi.res.aqua", 0.0);
+        v->ubi.saxosum.res.aqua_profunditas = ison_f(ison, "ubi.res.aqua_profunditas", 0.5);
+        v->ubi.saxosum.res.continentes      = (int)ison_f(ison, "ubi.res.continentes", 0);
+        v->ubi.saxosum.res.scala            = ison_f(ison, "ubi.res.scala", 1.0);
+        v->ubi.saxosum.res.tectonica        = ison_f(ison, "ubi.res.tectonica", 0.3);
+        v->ubi.saxosum.res.craterae         = ison_f(ison, "ubi.res.craterae", 0.0);
+        v->ubi.saxosum.res.maria            = ison_f(ison, "ubi.res.maria", 0.0);
+        v->ubi.saxosum.res.vulcanismus      = ison_f(ison, "ubi.res.vulcanismus", 0.0);
+        v->ubi.saxosum.res.pressio_kPa      = ison_f(ison, "ubi.res.pressio_kPa", 0.0);
+        v->ubi.saxosum.res.n2               = ison_f(ison, "ubi.res.n2", 0.0);
+        v->ubi.saxosum.res.o2               = ison_f(ison, "ubi.res.o2", 0.0);
+        v->ubi.saxosum.res.co2              = ison_f(ison, "ubi.res.co2", 0.0);
+        v->ubi.saxosum.res.ch4              = ison_f(ison, "ubi.res.ch4", 0.0);
+        v->ubi.saxosum.res.h2               = ison_f(ison, "ubi.res.h2", 0.0);
+        v->ubi.saxosum.res.he               = ison_f(ison, "ubi.res.he", 0.0);
+        v->ubi.saxosum.res.nh3              = ison_f(ison, "ubi.res.nh3", 0.0);
+        v->ubi.saxosum.res.pulvis           = ison_f(ison, "ubi.res.pulvis", 0.0);
+        v->ubi.saxosum.res.nubes            = ison_f(ison, "ubi.res.nubes", 0.0);
+        v->ubi.saxosum.res.polaris          = ison_f(ison, "ubi.res.polaris", 0.0);
         return v;
     }
     case PLANETA_GASEOSUM: {
         planeta_t *v = calloc(1, sizeof(planeta_t));
         v->qui = g;
         BASIS(gaseosum);
-        v->ubi.gaseosum.res.n2               = ison_f(ison, "n2", 0.0);
-        v->ubi.gaseosum.res.o2               = ison_f(ison, "o2", 0.0);
-        v->ubi.gaseosum.res.co2              = ison_f(ison, "co2", 0.0);
-        v->ubi.gaseosum.res.ch4              = ison_f(ison, "ch4", 0.0);
-        v->ubi.gaseosum.res.h2               = ison_f(ison, "h2", 0.0);
-        v->ubi.gaseosum.res.he               = ison_f(ison, "he", 0.0);
-        v->ubi.gaseosum.res.nh3              = ison_f(ison, "nh3", 0.0);
-        v->ubi.gaseosum.res.pulvis           = ison_f(ison, "pulvis", 0.0);
-        v->ubi.gaseosum.res.fasciae          = (int)ison_f(ison, "fasciae", 0);
-        v->ubi.gaseosum.res.fasciae_contrast = ison_f(ison, "fasciae_contrast", 0.5);
-        v->ubi.gaseosum.res.maculae          = (int)ison_f(ison, "maculae", 0);
-        v->ubi.gaseosum.res.macula_lat       = ison_f(ison, "macula_lat", 0.0);
-        v->ubi.gaseosum.res.macula_lon       = ison_f(ison, "macula_lon", 0.0);
-        v->ubi.gaseosum.res.macula_radius    = ison_f(ison, "macula_radius", 0.1);
-        v->ubi.gaseosum.res.macula_obscuritas = ison_f(ison, "macula_obscuritas", 0.5);
-        v->ubi.gaseosum.res.fusio            = ison_f(ison, "fusio", 0.0);
-        v->ubi.gaseosum.res.temperatura      = ison_f(ison, "temperatura", 0.0);
-        v->ubi.gaseosum.res.luminositas      = ison_f(ison, "luminositas", 1.0);
-        v->ubi.gaseosum.res.corona           = ison_f(ison, "corona", 0.0);
-        v->ubi.gaseosum.res.granulatio       = ison_f(ison, "granulatio", 0.0);
+        v->ubi.gaseosum.res.n2               = ison_f(ison, "ubi.res.n2", 0.0);
+        v->ubi.gaseosum.res.o2               = ison_f(ison, "ubi.res.o2", 0.0);
+        v->ubi.gaseosum.res.co2              = ison_f(ison, "ubi.res.co2", 0.0);
+        v->ubi.gaseosum.res.ch4              = ison_f(ison, "ubi.res.ch4", 0.0);
+        v->ubi.gaseosum.res.h2               = ison_f(ison, "ubi.res.h2", 0.0);
+        v->ubi.gaseosum.res.he               = ison_f(ison, "ubi.res.he", 0.0);
+        v->ubi.gaseosum.res.nh3              = ison_f(ison, "ubi.res.nh3", 0.0);
+        v->ubi.gaseosum.res.pulvis           = ison_f(ison, "ubi.res.pulvis", 0.0);
+        v->ubi.gaseosum.res.fasciae          = (int)ison_f(ison, "ubi.res.fasciae", 0);
+        v->ubi.gaseosum.res.fasciae_contrast = ison_f(ison, "ubi.res.fasciae_contrast", 0.5);
+        v->ubi.gaseosum.res.maculae          = (int)ison_f(ison, "ubi.res.maculae", 0);
+        v->ubi.gaseosum.res.macula_lat       = ison_f(ison, "ubi.res.macula_lat", 0.0);
+        v->ubi.gaseosum.res.macula_lon       = ison_f(ison, "ubi.res.macula_lon", 0.0);
+        v->ubi.gaseosum.res.macula_radius    = ison_f(ison, "ubi.res.macula_radius", 0.1);
+        v->ubi.gaseosum.res.macula_obscuritas = ison_f(ison, "ubi.res.macula_obscuritas", 0.5);
+        v->ubi.gaseosum.res.fusio            = ison_f(ison, "ubi.res.fusio", 0.0);
+        v->ubi.gaseosum.res.temperatura      = ison_f(ison, "ubi.res.temperatura", 0.0);
+        v->ubi.gaseosum.res.luminositas      = ison_f(ison, "ubi.res.luminositas", 1.0);
+        v->ubi.gaseosum.res.corona           = ison_f(ison, "ubi.res.corona", 0.0);
+        v->ubi.gaseosum.res.granulatio       = ison_f(ison, "ubi.res.granulatio", 0.0);
         return v;
     }
     case PLANETA_GLACIALE: {
         planeta_t *v = calloc(1, sizeof(planeta_t));
         v->qui = g;
         BASIS(glaciale);
-        v->ubi.glaciale.res.n2               = ison_f(ison, "n2", 0.0);
-        v->ubi.glaciale.res.o2               = ison_f(ison, "o2", 0.0);
-        v->ubi.glaciale.res.co2              = ison_f(ison, "co2", 0.0);
-        v->ubi.glaciale.res.ch4              = ison_f(ison, "ch4", 0.0);
-        v->ubi.glaciale.res.h2               = ison_f(ison, "h2", 0.0);
-        v->ubi.glaciale.res.he               = ison_f(ison, "he", 0.0);
-        v->ubi.glaciale.res.nh3              = ison_f(ison, "nh3", 0.0);
-        v->ubi.glaciale.res.pulvis           = ison_f(ison, "pulvis", 0.0);
-        v->ubi.glaciale.res.fasciae          = (int)ison_f(ison, "fasciae", 0);
-        v->ubi.glaciale.res.fasciae_contrast = ison_f(ison, "fasciae_contrast", 0.5);
-        v->ubi.glaciale.res.maculae          = (int)ison_f(ison, "maculae", 0);
-        v->ubi.glaciale.res.macula_lat       = ison_f(ison, "macula_lat", 0.0);
-        v->ubi.glaciale.res.macula_lon       = ison_f(ison, "macula_lon", 0.0);
-        v->ubi.glaciale.res.macula_radius    = ison_f(ison, "macula_radius", 0.1);
+        v->ubi.glaciale.res.n2               = ison_f(ison, "ubi.res.n2", 0.0);
+        v->ubi.glaciale.res.o2               = ison_f(ison, "ubi.res.o2", 0.0);
+        v->ubi.glaciale.res.co2              = ison_f(ison, "ubi.res.co2", 0.0);
+        v->ubi.glaciale.res.ch4              = ison_f(ison, "ubi.res.ch4", 0.0);
+        v->ubi.glaciale.res.h2               = ison_f(ison, "ubi.res.h2", 0.0);
+        v->ubi.glaciale.res.he               = ison_f(ison, "ubi.res.he", 0.0);
+        v->ubi.glaciale.res.nh3              = ison_f(ison, "ubi.res.nh3", 0.0);
+        v->ubi.glaciale.res.pulvis           = ison_f(ison, "ubi.res.pulvis", 0.0);
+        v->ubi.glaciale.res.fasciae          = (int)ison_f(ison, "ubi.res.fasciae", 0);
+        v->ubi.glaciale.res.fasciae_contrast = ison_f(ison, "ubi.res.fasciae_contrast", 0.5);
+        v->ubi.glaciale.res.maculae          = (int)ison_f(ison, "ubi.res.maculae", 0);
+        v->ubi.glaciale.res.macula_lat       = ison_f(ison, "ubi.res.macula_lat", 0.0);
+        v->ubi.glaciale.res.macula_lon       = ison_f(ison, "ubi.res.macula_lon", 0.0);
+        v->ubi.glaciale.res.macula_radius    = ison_f(ison, "ubi.res.macula_radius", 0.1);
         return v;
     }
     case PLANETA_PARVUM: {
         planeta_t *v = calloc(1, sizeof(planeta_t));
         v->qui = g;
         BASIS(parvum);
-        v->ubi.parvum.res.silicata         = ison_f(ison, "silicata", 0.0);
-        v->ubi.parvum.res.ferrum           = ison_f(ison, "ferrum", 0.0);
-        v->ubi.parvum.res.sulphur          = ison_f(ison, "sulphur", 0.0);
-        v->ubi.parvum.res.carbo            = ison_f(ison, "carbo", 0.0);
-        v->ubi.parvum.res.glacies          = ison_f(ison, "glacies", 0.0);
-        v->ubi.parvum.res.glacies_co2      = ison_f(ison, "glacies_co2", 0.0);
-        v->ubi.parvum.res.malachita        = ison_f(ison, "malachita", 0.0);
-        v->ubi.parvum.res.aqua             = ison_f(ison, "aqua", 0.0);
-        v->ubi.parvum.res.aqua_profunditas = ison_f(ison, "aqua_profunditas", 0.5);
-        v->ubi.parvum.res.continentes      = (int)ison_f(ison, "continentes", 0);
-        v->ubi.parvum.res.scala            = ison_f(ison, "scala", 1.0);
-        v->ubi.parvum.res.tectonica        = ison_f(ison, "tectonica", 0.3);
-        v->ubi.parvum.res.craterae         = ison_f(ison, "craterae", 0.0);
-        v->ubi.parvum.res.maria            = ison_f(ison, "maria", 0.0);
-        v->ubi.parvum.res.vulcanismus      = ison_f(ison, "vulcanismus", 0.0);
-        v->ubi.parvum.res.pressio_kPa      = ison_f(ison, "pressio_kPa", 0.0);
-        v->ubi.parvum.res.n2               = ison_f(ison, "n2", 0.0);
-        v->ubi.parvum.res.o2               = ison_f(ison, "o2", 0.0);
-        v->ubi.parvum.res.co2              = ison_f(ison, "co2", 0.0);
-        v->ubi.parvum.res.ch4              = ison_f(ison, "ch4", 0.0);
-        v->ubi.parvum.res.h2               = ison_f(ison, "h2", 0.0);
-        v->ubi.parvum.res.he               = ison_f(ison, "he", 0.0);
-        v->ubi.parvum.res.nh3              = ison_f(ison, "nh3", 0.0);
-        v->ubi.parvum.res.pulvis           = ison_f(ison, "pulvis", 0.0);
-        v->ubi.parvum.res.nubes            = ison_f(ison, "nubes", 0.0);
-        v->ubi.parvum.res.polaris          = ison_f(ison, "polaris", 0.0);
+        v->ubi.parvum.res.silicata         = ison_f(ison, "ubi.res.silicata", 0.0);
+        v->ubi.parvum.res.ferrum           = ison_f(ison, "ubi.res.ferrum", 0.0);
+        v->ubi.parvum.res.sulphur          = ison_f(ison, "ubi.res.sulphur", 0.0);
+        v->ubi.parvum.res.carbo            = ison_f(ison, "ubi.res.carbo", 0.0);
+        v->ubi.parvum.res.glacies          = ison_f(ison, "ubi.res.glacies", 0.0);
+        v->ubi.parvum.res.glacies_co2      = ison_f(ison, "ubi.res.glacies_co2", 0.0);
+        v->ubi.parvum.res.malachita        = ison_f(ison, "ubi.res.malachita", 0.0);
+        v->ubi.parvum.res.aqua             = ison_f(ison, "ubi.res.aqua", 0.0);
+        v->ubi.parvum.res.aqua_profunditas = ison_f(ison, "ubi.res.aqua_profunditas", 0.5);
+        v->ubi.parvum.res.continentes      = (int)ison_f(ison, "ubi.res.continentes", 0);
+        v->ubi.parvum.res.scala            = ison_f(ison, "ubi.res.scala", 1.0);
+        v->ubi.parvum.res.tectonica        = ison_f(ison, "ubi.res.tectonica", 0.3);
+        v->ubi.parvum.res.craterae         = ison_f(ison, "ubi.res.craterae", 0.0);
+        v->ubi.parvum.res.maria            = ison_f(ison, "ubi.res.maria", 0.0);
+        v->ubi.parvum.res.vulcanismus      = ison_f(ison, "ubi.res.vulcanismus", 0.0);
+        v->ubi.parvum.res.pressio_kPa      = ison_f(ison, "ubi.res.pressio_kPa", 0.0);
+        v->ubi.parvum.res.n2               = ison_f(ison, "ubi.res.n2", 0.0);
+        v->ubi.parvum.res.o2               = ison_f(ison, "ubi.res.o2", 0.0);
+        v->ubi.parvum.res.co2              = ison_f(ison, "ubi.res.co2", 0.0);
+        v->ubi.parvum.res.ch4              = ison_f(ison, "ubi.res.ch4", 0.0);
+        v->ubi.parvum.res.h2               = ison_f(ison, "ubi.res.h2", 0.0);
+        v->ubi.parvum.res.he               = ison_f(ison, "ubi.res.he", 0.0);
+        v->ubi.parvum.res.nh3              = ison_f(ison, "ubi.res.nh3", 0.0);
+        v->ubi.parvum.res.pulvis           = ison_f(ison, "ubi.res.pulvis", 0.0);
+        v->ubi.parvum.res.nubes            = ison_f(ison, "ubi.res.nubes", 0.0);
+        v->ubi.parvum.res.polaris          = ison_f(ison, "ubi.res.polaris", 0.0);
         return v;
     }
     case PLANETA_SOL: {
         planeta_t *v = calloc(1, sizeof(planeta_t));
         v->qui = g;
         BASIS(sol);
-        v->ubi.sol.res.fusio            = ison_f(ison, "fusio", 1.0);
-        v->ubi.sol.res.temperatura      = ison_f(ison, "temperatura", 0.0);
-        v->ubi.sol.res.luminositas      = ison_f(ison, "luminositas", 1.0);
-        v->ubi.sol.res.corona           = ison_f(ison, "corona", 0.0);
-        v->ubi.sol.res.granulatio       = ison_f(ison, "granulatio", 0.0);
-        v->ubi.sol.res.maculae          = (int)ison_f(ison, "maculae", 0);
-        v->ubi.sol.res.macula_radius    = ison_f(ison, "macula_radius", 0.1);
-        v->ubi.sol.res.macula_obscuritas = ison_f(ison, "macula_obscuritas", 0.5);
-        v->ubi.sol.res.h2               = ison_f(ison, "h2", 0.0);
-        v->ubi.sol.res.he               = ison_f(ison, "he", 0.0);
-        v->ubi.sol.res.ch4              = ison_f(ison, "ch4", 0.0);
-        v->ubi.sol.res.nh3              = ison_f(ison, "nh3", 0.0);
+        v->ubi.sol.res.fusio            = ison_f(ison, "ubi.res.fusio", 1.0);
+        v->ubi.sol.res.temperatura      = ison_f(ison, "ubi.res.temperatura", 0.0);
+        v->ubi.sol.res.luminositas      = ison_f(ison, "ubi.res.luminositas", 1.0);
+        v->ubi.sol.res.corona           = ison_f(ison, "ubi.res.corona", 0.0);
+        v->ubi.sol.res.granulatio       = ison_f(ison, "ubi.res.granulatio", 0.0);
+        v->ubi.sol.res.maculae          = (int)ison_f(ison, "ubi.res.maculae", 0);
+        v->ubi.sol.res.macula_radius    = ison_f(ison, "ubi.res.macula_radius", 0.1);
+        v->ubi.sol.res.macula_obscuritas = ison_f(ison, "ubi.res.macula_obscuritas", 0.5);
+        v->ubi.sol.res.h2               = ison_f(ison, "ubi.res.h2", 0.0);
+        v->ubi.sol.res.he               = ison_f(ison, "ubi.res.he", 0.0);
+        v->ubi.sol.res.ch4              = ison_f(ison, "ubi.res.ch4", 0.0);
+        v->ubi.sol.res.nh3              = ison_f(ison, "ubi.res.nh3", 0.0);
         return v;
     }
     case PLANETA_NEBULA: {
         planeta_t *v = calloc(1, sizeof(planeta_t));
         v->qui = g;
         BASIS(nebula);
-        v->ubi.nebula.res.temperatura      = ison_f(ison, "temperatura", 0.0);
-        v->ubi.nebula.res.luminositas      = ison_f(ison, "luminositas", 1.0);
-        v->ubi.nebula.res.h2               = ison_f(ison, "h2", 0.0);
-        v->ubi.nebula.res.o2               = ison_f(ison, "o2", 0.0);
-        v->ubi.nebula.res.carbo            = ison_f(ison, "carbo", 0.0);
-        v->ubi.nebula.res.tectonica        = ison_f(ison, "tectonica", 0.5);
-        v->ubi.nebula.res.nubes            = ison_f(ison, "nubes", 0.4);
+        v->ubi.nebula.res.temperatura      = ison_f(ison, "ubi.res.temperatura", 0.0);
+        v->ubi.nebula.res.luminositas      = ison_f(ison, "ubi.res.luminositas", 1.0);
+        v->ubi.nebula.res.h2               = ison_f(ison, "ubi.res.h2", 0.0);
+        v->ubi.nebula.res.o2               = ison_f(ison, "ubi.res.o2", 0.0);
+        v->ubi.nebula.res.carbo            = ison_f(ison, "ubi.res.carbo", 0.0);
+        v->ubi.nebula.res.tectonica        = ison_f(ison, "ubi.res.tectonica", 0.5);
+        v->ubi.nebula.res.nubes            = ison_f(ison, "ubi.res.nubes", 0.4);
         return v;
     }
     default: {
         planeta_t *v = calloc(1, sizeof(planeta_t));
         v->qui = PLANETA_SAXOSUM;
-        v->ubi.saxosum.pro.radius     = ison_f(ison, "radius", 0.9);
-        v->ubi.saxosum.pro.inclinatio = ison_f(ison, "inclinatio", 0.0);
-        v->ubi.saxosum.pro.rotatio    = ison_f(ison, "rotatio", 0.0);
-        v->ubi.saxosum.pro.semen      = (unsigned)ison_f(ison, "semen", 42);
+        v->ubi.saxosum.pro.radius     = ison_f(ison, "ubi.res.radius", 0.9);
+        v->ubi.saxosum.pro.inclinatio = ison_f(ison, "ubi.res.inclinatio", 0.0);
+        v->ubi.saxosum.pro.rotatio    = ison_f(ison, "ubi.res.rotatio", 0.0);
+        v->ubi.saxosum.pro.semen      = (unsigned)ison_f(ison, "ubi.res.semen", 42);
         return v;
     }
     }

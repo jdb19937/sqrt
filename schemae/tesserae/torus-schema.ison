@@ -1,0 +1,15 @@
+{
+  "titulus": "torus",
+  "properties": {
+    "tessella": {
+      "$ref": "tessella-schema.ison"
+    },
+    "visiuncula": {
+      "$ref": "visiuncula-schema.ison"
+    },
+    "toriculus": {
+      "$ref": "toriculus-schema.ison"
+    }
+  },
+  "required": []
+}

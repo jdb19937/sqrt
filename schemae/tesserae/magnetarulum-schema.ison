@@ -1,0 +1,9 @@
+{
+  "titulus": "magnetarulum",
+  "properties": {
+    "phase": {
+      "type": "number"
+    }
+  },
+  "required": []
+}

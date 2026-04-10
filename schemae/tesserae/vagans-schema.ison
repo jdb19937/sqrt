@@ -1,0 +1,15 @@
+{
+  "titulus": "vagans",
+  "properties": {
+    "tessella": {
+      "$ref": "tessella-schema.ison"
+    },
+    "sidulum": {
+      "$ref": "sidulum-schema.ison"
+    },
+    "vaganulus": {
+      "$ref": "vaganulus-schema.ison"
+    }
+  },
+  "required": []
+}

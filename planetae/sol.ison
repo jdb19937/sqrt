@@ -1,21 +1,25 @@
 {
   "nomen": "Sol",
-  "genus": "sol",
+  "qui": "sol",
+  "ubi": {
+    "pro": {
+      "radius": 0.88,
+      "semen": 77777
+    },
+    "res": {
+      "fusio": 1.0,
+      "temperatura": 5778,
+      "corona": 0.65,
+      "granulatio": 0.50,
 
-  "radius": 0.88,
-  "semen": 77777,
+      "h2": 0.735,
+      "he": 0.248,
+      "ch4": 0.0,
+      "nh3": 0.0,
 
-  "fusio": 1.0,
-  "temperatura": 5778,
-  "corona": 0.65,
-  "granulatio": 0.50,
-
-  "h2": 0.735,
-  "he": 0.248,
-  "ch4": 0.0,
-  "nh3": 0.0,
-
-  "maculae": 4,
-  "macula_radius": 0.8,
-  "macula_obscuritas": 0.55
+      "maculae": 4,
+      "macula_radius": 0.8,
+      "macula_obscuritas": 0.55
+    }
+  }
 }

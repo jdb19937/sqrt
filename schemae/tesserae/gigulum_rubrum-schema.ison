@@ -1,0 +1,9 @@
+{
+  "titulus": "gigulum_rubrum",
+  "properties": {
+    "res": {
+      "type": "integer"
+    }
+  },
+  "required": []
+}

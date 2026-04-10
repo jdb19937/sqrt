@@ -1,0 +1,48 @@
+{
+  "titulus": "glaciellum",
+  "properties": {
+    "n2": {
+      "type": "number"
+    },
+    "o2": {
+      "type": "number"
+    },
+    "co2": {
+      "type": "number"
+    },
+    "ch4": {
+      "type": "number"
+    },
+    "h2": {
+      "type": "number"
+    },
+    "he": {
+      "type": "number"
+    },
+    "nh3": {
+      "type": "number"
+    },
+    "pulvis": {
+      "type": "number"
+    },
+    "fasciae": {
+      "type": "integer"
+    },
+    "fasciae_contrast": {
+      "type": "number"
+    },
+    "maculae": {
+      "type": "integer"
+    },
+    "macula_lat": {
+      "type": "number"
+    },
+    "macula_lon": {
+      "type": "number"
+    },
+    "macula_radius": {
+      "type": "number"
+    }
+  },
+  "required": []
+}

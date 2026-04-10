@@ -1,0 +1,15 @@
+{
+  "titulus": "parvum",
+  "properties": {
+    "tessella": {
+      "$ref": "tessella-schema.ison"
+    },
+    "planetella": {
+      "$ref": "planetella-schema.ison"
+    },
+    "parvulum": {
+      "$ref": "parvulum-schema.ison"
+    }
+  },
+  "required": []
+}

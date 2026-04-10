@@ -40,25 +40,50 @@ static void sidus_emittere(
     const char *genus, double mag, double temp,
     int x, int y, double phase, double ang_phase
 ) {
-    ison_scriptor_t *internum = ison_scriptor_crea();
-    ison_scriptor_adde(internum, "genus", genus);
-
     char buf[64];
+
+    /* ubi.pro */
+    ison_scriptor_t *pro = ison_scriptor_crea();
     snprintf(buf, sizeof(buf), "%.3f", mag);
-    ison_scriptor_adde_crudum(internum, "magnitudo", buf);
+    ison_scriptor_adde_crudum(pro, "magnitudo", buf);
     snprintf(buf, sizeof(buf), "%.1f", temp);
-    ison_scriptor_adde_crudum(internum, "temperatura", buf);
+    ison_scriptor_adde_crudum(pro, "temperatura", buf);
+    char *pro_s = ison_scriptor_fini(pro);
+
+    /* ubi.res (si opus est) */
+    char *res_s = NULL;
+    if (phase > 0.001) {
+        ison_scriptor_t *res = ison_scriptor_crea();
+        if (strcmp(genus, "galaxia") == 0) {
+            snprintf(buf, sizeof(buf), "%d", (int)phase);
+            ison_scriptor_adde_crudum(res, "morphologia", buf);
+        } else {
+            snprintf(buf, sizeof(buf), "%.3f", phase);
+            ison_scriptor_adde_crudum(res, "phase", buf);
+        }
+        snprintf(buf, sizeof(buf), "%.3f", ang_phase);
+        ison_scriptor_adde_crudum(res, "angulus", buf);
+        res_s = ison_scriptor_fini(res);
+    }
+
+    /* ubi */
+    ison_scriptor_t *ubi = ison_scriptor_crea();
+    ison_scriptor_adde_crudum(ubi, "pro", pro_s);
+    if (res_s)
+        ison_scriptor_adde_crudum(ubi, "res", res_s);
+    char *ubi_s = ison_scriptor_fini(ubi);
+    free(pro_s);
+    free(res_s);
+
+    /* internum */
+    ison_scriptor_t *internum = ison_scriptor_crea();
+    ison_scriptor_adde(internum, "qui", genus);
     snprintf(buf, sizeof(buf), "%d", x);
     ison_scriptor_adde_crudum(internum, "x", buf);
     snprintf(buf, sizeof(buf), "%d", y);
     ison_scriptor_adde_crudum(internum, "y", buf);
-
-    if (phase > 0.001) {
-        snprintf(buf, sizeof(buf), "%.3f", phase);
-        ison_scriptor_adde_crudum(internum, "phase", buf);
-        snprintf(buf, sizeof(buf), "%.3f", ang_phase);
-        ison_scriptor_adde_crudum(internum, "angulus_phase", buf);
-    }
+    ison_scriptor_adde_crudum(internum, "ubi", ubi_s);
+    free(ubi_s);
 
     char *internum_s       = ison_scriptor_fini(internum);
     ison_scriptor_t *outer = ison_scriptor_crea();
@@ -257,25 +282,18 @@ int main(int argc, char **argv)
             double r_mag = alea_f();
             double mag   = 3.0 + 3.0 * (1.0 - pow(r_mag, 0.4));
 
-            const char *morph_s;
             int morph_id;
             double mr = alea_f();
-            if (mr < 0.15)       {
-                morph_s  = "elliptica";
+            if (mr < 0.15)
                 morph_id = 0;
-            }else if (mr < 0.50)  {
-                morph_s  = "spiralis";
+            else if (mr < 0.50)
                 morph_id = 1;
-            }else if (mr < 0.75)  {
-                morph_s  = "barrata";
+            else if (mr < 0.75)
                 morph_id = 2;
-            }else if (mr < 0.90)  {
-                morph_s  = "lenticularis";
+            else if (mr < 0.90)
                 morph_id = 3;
-            }else                 {
-                morph_s  = "irregularis";
+            else
                 morph_id = 4;
-            }
 
             double cos_incl = alea_f();
             double temp_code = cos_incl * 10000.0;
@@ -284,31 +302,7 @@ int main(int argc, char **argv)
             int py = (int)(alea_f() * altitudo);
 
             /* emittere galaxiam cum proprietatibus additis */
-            {
-                ison_scriptor_t *internum = ison_scriptor_crea();
-                char buf[64];
-                ison_scriptor_adde(internum, "genus", "galaxia");
-                snprintf(buf, sizeof(buf), "%.3f", mag);
-                ison_scriptor_adde_crudum(internum, "magnitudo", buf);
-                snprintf(buf, sizeof(buf), "%.1f", temp_code);
-                ison_scriptor_adde_crudum(internum, "temperatura", buf);
-                snprintf(buf, sizeof(buf), "%d", px);
-                ison_scriptor_adde_crudum(internum, "x", buf);
-                snprintf(buf, sizeof(buf), "%d", py);
-                ison_scriptor_adde_crudum(internum, "y", buf);
-                snprintf(buf, sizeof(buf), "%d", morph_id);
-                ison_scriptor_adde_crudum(internum, "phase", buf);
-                snprintf(buf, sizeof(buf), "%.3f", ang);
-                ison_scriptor_adde_crudum(internum, "angulus_phase", buf);
-                ison_scriptor_adde(internum, "morphologia", morph_s);
-                char *internum_s       = ison_scriptor_fini(internum);
-                ison_scriptor_t *outer = ison_scriptor_crea();
-                ison_scriptor_adde_crudum(outer, "sidus", internum_s);
-                char *linea = ison_scriptor_fini(outer);
-                puts(linea);
-                free(linea);
-                free(internum_s);
-            }
+            sidus_emittere("galaxia", mag, temp_code, px, py, morph_id, ang);
             n_gal++;
         }
     }

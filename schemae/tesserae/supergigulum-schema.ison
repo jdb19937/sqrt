@@ -1,0 +1,9 @@
+{
+  "titulus": "supergigulum",
+  "properties": {
+    "res": {
+      "type": "integer"
+    }
+  },
+  "required": []
+}

@@ -1,0 +1,31 @@
+{
+  "titulus": "planeta",
+  "genera": [
+    "saxosum",
+    "gaseosum",
+    "glaciale",
+    "parvum",
+    "sol",
+    "nebula"
+  ],
+  "oneOf": [
+    {
+      "$ref": "saxosum-schema.ison"
+    },
+    {
+      "$ref": "gaseosum-schema.ison"
+    },
+    {
+      "$ref": "glaciale-schema.ison"
+    },
+    {
+      "$ref": "parvum-schema.ison"
+    },
+    {
+      "$ref": "sol-schema.ison"
+    },
+    {
+      "$ref": "nebula-schema.ison"
+    }
+  ]
+}

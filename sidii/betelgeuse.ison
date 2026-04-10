@@ -1,7 +1,10 @@
 {
   "nomen": "Betelgeuse",
-  "phylum": "sidus",
-  "genus": "supergigas",
-  "magnitudo": 0.42,
-  "temperatura": 3500
+  "qui": "supergigas",
+  "ubi": {
+    "pro": {
+      "magnitudo": 0.42,
+      "temperatura": 3500
+    }
+  }
 }

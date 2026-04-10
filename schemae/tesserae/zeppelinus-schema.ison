@@ -1,0 +1,15 @@
+{
+  "titulus": "zeppelinus",
+  "properties": {
+    "tessella": {
+      "$ref": "tessella-schema.ison"
+    },
+    "visiuncula": {
+      "$ref": "visiuncula-schema.ison"
+    },
+    "zeppelinulus": {
+      "$ref": "zeppelinulus-schema.ison"
+    }
+  },
+  "required": []
+}

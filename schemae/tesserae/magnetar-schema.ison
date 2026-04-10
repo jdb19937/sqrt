@@ -1,0 +1,15 @@
+{
+  "titulus": "magnetar",
+  "properties": {
+    "tessella": {
+      "$ref": "tessella-schema.ison"
+    },
+    "sidulum": {
+      "$ref": "sidulum-schema.ison"
+    },
+    "magnetarulum": {
+      "$ref": "magnetarulum-schema.ison"
+    }
+  },
+  "required": []
+}

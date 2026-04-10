@@ -1,16 +1,20 @@
 {
   "nomen": "Saturnus",
-  "genus": "gaseosum",
-  "radius": 0.9,
-  "inclinatio": 0.4667,
-  "rotatio": 0.0,
-  "semen": 6833,
+  "qui": "gaseosum",
+  "ubi": {
+    "pro": {
+      "radius": 0.9,
+      "inclinatio": 0.4667,
+      "rotatio": 0.0,
+      "semen": 6833
+    },
+    "res": {
+      "h2": 0.96,
+      "he": 0.03,
+      "nh3": 0.01,
 
-  "pressio_kPa": 0,
-  "h2": 0.96,
-  "he": 0.03,
-  "nh3": 0.01,
-
-  "fasciae": 10,
-  "fasciae_contrast": 0.35
+      "fasciae": 10,
+      "fasciae_contrast": 0.35
+    }
+  }
 }

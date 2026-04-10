@@ -1,0 +1,12 @@
+{
+  "titulus": "sidulum",
+  "properties": {
+    "magnitudo": {
+      "type": "number"
+    },
+    "temperatura": {
+      "type": "number"
+    }
+  },
+  "required": []
+}

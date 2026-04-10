@@ -1,0 +1,9 @@
+{
+  "titulus": "crystallulum",
+  "properties": {
+    "res": {
+      "type": "integer"
+    }
+  },
+  "required": []
+}

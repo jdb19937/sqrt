@@ -1,0 +1,15 @@
+{
+  "titulus": "nanum_album",
+  "properties": {
+    "tessella": {
+      "$ref": "tessella-schema.ison"
+    },
+    "sidulum": {
+      "$ref": "sidulum-schema.ison"
+    },
+    "nanulum_album": {
+      "$ref": "nanulum_album-schema.ison"
+    }
+  },
+  "required": []
+}

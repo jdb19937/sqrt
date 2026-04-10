@@ -1,0 +1,15 @@
+{
+  "titulus": "saxosum",
+  "properties": {
+    "tessella": {
+      "$ref": "tessella-schema.ison"
+    },
+    "planetella": {
+      "$ref": "planetella-schema.ison"
+    },
+    "saxosculum": {
+      "$ref": "saxosculum-schema.ison"
+    }
+  },
+  "required": []
+}

@@ -871,8 +871,8 @@ int main(int argc, char **argv)
     char nomen_stellae[64];
 
     if (sidus_ison) {
-        char *genus = ison_da_chordam(sidus_ison, "genus");
-        double temp = ison_da_f(sidus_ison, "temperatura", 0);
+        char *genus = ison_da_chordam(sidus_ison, "qui");
+        double temp = ison_da_f(sidus_ison, "ubi.pro.temperatura", 0);
         if (temp < 100)
             temp = genera_temperaturam();
 
@@ -927,8 +927,8 @@ int main(int argc, char **argv)
     if (cosidus_ison) {
         habet_cosidus = 1;
 
-        char *genus = ison_da_chordam(cosidus_ison, "genus");
-        double temp = ison_da_f(cosidus_ison, "temperatura", 0);
+        char *genus = ison_da_chordam(cosidus_ison, "qui");
+        double temp = ison_da_f(cosidus_ison, "ubi.pro.temperatura", 0);
         if (temp < 100)
             temp = genera_temperaturam();
 

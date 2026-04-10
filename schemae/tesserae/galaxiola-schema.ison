@@ -1,0 +1,12 @@
+{
+  "titulus": "galaxiola",
+  "properties": {
+    "morphologia": {
+      "$ref": "galaxia_morphologia-schema.ison"
+    },
+    "angulus": {
+      "type": "number"
+    }
+  },
+  "required": []
+}

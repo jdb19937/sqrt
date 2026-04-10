@@ -70,10 +70,10 @@ static void catalogum_linea(const char *linea, void *ctx)
     sidus_registrum_t *s = &sidera[numerus_siderum];
     s->x           = (int)ison_da_n(sidus_raw, "x", 0);
     s->y           = (int)ison_da_n(sidus_raw, "y", 0);
-    s->temperatura = ison_da_f(sidus_raw, "temperatura", 5000);
-    s->magnitudo   = ison_da_f(sidus_raw, "magnitudo", 6.0);
+    s->temperatura = ison_da_f(sidus_raw, "ubi.pro.temperatura", 5000);
+    s->magnitudo   = ison_da_f(sidus_raw, "ubi.pro.magnitudo", 6.0);
 
-    char *g = ison_da_chordam(sidus_raw, "genus");
+    char *g = ison_da_chordam(sidus_raw, "qui");
     if (g) {
         strncpy(s->genus, g, 23);
         s->genus[23] = '\0';

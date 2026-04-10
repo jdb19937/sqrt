@@ -1,23 +1,28 @@
 {
   "nomen": "Titan",
-  "genus": "saxosum",
-  "radius": 0.9,
-  "inclinatio": 0.046,
-  "rotatio": 1.5,
-  "semen": 60137,
+  "qui": "saxosum",
+  "ubi": {
+    "pro": {
+      "radius": 0.9,
+      "inclinatio": 0.046,
+      "rotatio": 1.5,
+      "semen": 60137
+    },
+    "res": {
+      "silicata": 0.30,
+      "carbo": 0.40,
+      "glacies": 0.20,
 
-  "silicata": 0.30,
-  "carbo": 0.40,
-  "glacies": 0.20,
+      "aqua": 0.05,
+      "aqua_profunditas": 0.3,
 
-  "aqua": 0.05,
-  "aqua_profunditas": 0.3,
+      "scala": 1.0,
 
-  "scala": 1.0,
-
-  "pressio_kPa": 147.0,
-  "n2": 0.95,
-  "ch4": 0.05,
-  "nubes": 0.90,
-  "pulvis": 0.7
+      "pressio_kPa": 147.0,
+      "n2": 0.95,
+      "ch4": 0.05,
+      "nubes": 0.90,
+      "pulvis": 0.7
+    }
+  }
 }

@@ -1,0 +1,36 @@
+{
+  "titulus": "zeppelinulus",
+  "properties": {
+    "ratio": {
+      "type": "number"
+    },
+    "inclinatio": {
+      "type": "number"
+    },
+    "azimuthus": {
+      "type": "number"
+    },
+    "lux_angulus": {
+      "type": "number"
+    },
+    "lux_elevatio": {
+      "type": "number"
+    },
+    "involucrum": {
+      "$ref": "color-schema.ison"
+    },
+    "gondola": {
+      "$ref": "color-schema.ison"
+    },
+    "elevatio": {
+      "type": "number"
+    },
+    "fenestrae": {
+      "type": "number"
+    },
+    "pinnae": {
+      "type": "number"
+    }
+  },
+  "required": []
+}

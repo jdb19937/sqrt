@@ -1,0 +1,9 @@
+{
+  "titulus": "sequentiola",
+  "properties": {
+    "res": {
+      "type": "integer"
+    }
+  },
+  "required": []
+}

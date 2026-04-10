@@ -1,0 +1,15 @@
+{
+  "titulus": "galaxia",
+  "properties": {
+    "tessella": {
+      "$ref": "tessella-schema.ison"
+    },
+    "sidulum": {
+      "$ref": "sidulum-schema.ison"
+    },
+    "galaxiola": {
+      "$ref": "galaxiola-schema.ison"
+    }
+  },
+  "required": []
+}

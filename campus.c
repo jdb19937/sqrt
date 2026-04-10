@@ -544,153 +544,6 @@ void campus_generare(
  * ================================================================ */
 
 
-static planeta_t *planeta_ex_pares_c(const ison_par_t *pp, int n)
-{
-    const char *g = ison_pares_s(pp, n, "genus");
-    planetarius_t genus;
-    if (strcmp(g, "gaseosum") == 0)
-        genus = PLANETA_GASEOSUM;
-    else if (strcmp(g, "glaciale") == 0)
-        genus = PLANETA_GLACIALE;
-    else if (strcmp(g, "parvum") == 0)
-        genus = PLANETA_PARVUM;
-    else if (strcmp(g, "sol") == 0)
-        genus = PLANETA_SOL;
-    else if (strcmp(g, "nebula") == 0)
-        genus = PLANETA_NEBULA;
-    else
-        genus = PLANETA_SAXOSUM;
-
-    planeta_t *v = calloc(1, sizeof(planeta_t));
-    v->qui = genus;
-    v->ubi.saxosum.pro.radius     = ison_pares_f(pp, n, "radius", 0.9);
-    v->ubi.saxosum.pro.inclinatio = ison_pares_f(pp, n, "inclinatio", 0.0);
-    v->ubi.saxosum.pro.rotatio    = ison_pares_f(pp, n, "rotatio", 0.0);
-    v->ubi.saxosum.pro.semen      = (unsigned)ison_pares_n(pp, n, "semen", 42);
-
-    switch (genus) {
-    case PLANETA_SAXOSUM:
-        v->ubi.saxosum.res.silicata         = ison_pares_f(pp, n, "silicata", 0.0);
-        v->ubi.saxosum.res.ferrum           = ison_pares_f(pp, n, "ferrum", 0.0);
-        v->ubi.saxosum.res.sulphur          = ison_pares_f(pp, n, "sulphur", 0.0);
-        v->ubi.saxosum.res.carbo            = ison_pares_f(pp, n, "carbo", 0.0);
-        v->ubi.saxosum.res.glacies          = ison_pares_f(pp, n, "glacies", 0.0);
-        v->ubi.saxosum.res.glacies_co2      = ison_pares_f(pp, n, "glacies_co2", 0.0);
-        v->ubi.saxosum.res.malachita        = ison_pares_f(pp, n, "malachita", 0.0);
-        v->ubi.saxosum.res.aqua             = ison_pares_f(pp, n, "aqua", 0.0);
-        v->ubi.saxosum.res.aqua_profunditas = ison_pares_f(pp, n, "aqua_profunditas", 0.5);
-        v->ubi.saxosum.res.continentes      = (int)ison_pares_n(pp, n, "continentes", 0);
-        v->ubi.saxosum.res.scala            = ison_pares_f(pp, n, "scala_featurae", 1.0);
-        v->ubi.saxosum.res.tectonica        = ison_pares_f(pp, n, "tectonica", 0.3);
-        v->ubi.saxosum.res.craterae         = ison_pares_f(pp, n, "craterae", 0.0);
-        v->ubi.saxosum.res.maria            = ison_pares_f(pp, n, "maria", 0.0);
-        v->ubi.saxosum.res.vulcanismus      = ison_pares_f(pp, n, "vulcanismus", 0.0);
-        v->ubi.saxosum.res.pressio_kPa      = ison_pares_f(pp, n, "pressio_kPa", 0.0);
-        v->ubi.saxosum.res.n2               = ison_pares_f(pp, n, "n2", 0.0);
-        v->ubi.saxosum.res.o2               = ison_pares_f(pp, n, "o2", 0.0);
-        v->ubi.saxosum.res.co2              = ison_pares_f(pp, n, "co2", 0.0);
-        v->ubi.saxosum.res.ch4              = ison_pares_f(pp, n, "ch4", 0.0);
-        v->ubi.saxosum.res.h2               = ison_pares_f(pp, n, "h2", 0.0);
-        v->ubi.saxosum.res.he               = ison_pares_f(pp, n, "he", 0.0);
-        v->ubi.saxosum.res.nh3              = ison_pares_f(pp, n, "nh3", 0.0);
-        v->ubi.saxosum.res.pulvis           = ison_pares_f(pp, n, "pulvis", 0.0);
-        v->ubi.saxosum.res.nubes            = ison_pares_f(pp, n, "nubes", 0.0);
-        v->ubi.saxosum.res.polaris          = ison_pares_f(pp, n, "polaris", 0.0);
-        break;
-    case PLANETA_GASEOSUM:
-        v->ubi.gaseosum.res.n2               = ison_pares_f(pp, n, "n2", 0.0);
-        v->ubi.gaseosum.res.o2               = ison_pares_f(pp, n, "o2", 0.0);
-        v->ubi.gaseosum.res.co2              = ison_pares_f(pp, n, "co2", 0.0);
-        v->ubi.gaseosum.res.ch4              = ison_pares_f(pp, n, "ch4", 0.0);
-        v->ubi.gaseosum.res.h2               = ison_pares_f(pp, n, "h2", 0.0);
-        v->ubi.gaseosum.res.he               = ison_pares_f(pp, n, "he", 0.0);
-        v->ubi.gaseosum.res.nh3              = ison_pares_f(pp, n, "nh3", 0.0);
-        v->ubi.gaseosum.res.pulvis           = ison_pares_f(pp, n, "pulvis", 0.0);
-        v->ubi.gaseosum.res.fasciae          = (int)ison_pares_n(pp, n, "fasciae", 0);
-        v->ubi.gaseosum.res.fasciae_contrast = ison_pares_f(pp, n, "fasciae_contrast", 0.5);
-        v->ubi.gaseosum.res.maculae          = (int)ison_pares_n(pp, n, "maculae", 0);
-        v->ubi.gaseosum.res.macula_lat       = ison_pares_f(pp, n, "macula_lat", 0.0);
-        v->ubi.gaseosum.res.macula_lon       = ison_pares_f(pp, n, "macula_lon", 0.0);
-        v->ubi.gaseosum.res.macula_radius    = ison_pares_f(pp, n, "macula_radius", 0.1);
-        v->ubi.gaseosum.res.macula_obscuritas = ison_pares_f(pp, n, "macula_obscuritas", 0.5);
-        v->ubi.gaseosum.res.fusio            = ison_pares_f(pp, n, "fusio", 0.0);
-        v->ubi.gaseosum.res.temperatura      = ison_pares_f(pp, n, "temperatura", 0.0);
-        v->ubi.gaseosum.res.luminositas      = ison_pares_f(pp, n, "luminositas", 1.0);
-        v->ubi.gaseosum.res.corona           = ison_pares_f(pp, n, "corona", 0.0);
-        v->ubi.gaseosum.res.granulatio       = ison_pares_f(pp, n, "granulatio", 0.0);
-        break;
-    case PLANETA_GLACIALE:
-        v->ubi.glaciale.res.n2               = ison_pares_f(pp, n, "n2", 0.0);
-        v->ubi.glaciale.res.o2               = ison_pares_f(pp, n, "o2", 0.0);
-        v->ubi.glaciale.res.co2              = ison_pares_f(pp, n, "co2", 0.0);
-        v->ubi.glaciale.res.ch4              = ison_pares_f(pp, n, "ch4", 0.0);
-        v->ubi.glaciale.res.h2               = ison_pares_f(pp, n, "h2", 0.0);
-        v->ubi.glaciale.res.he               = ison_pares_f(pp, n, "he", 0.0);
-        v->ubi.glaciale.res.nh3              = ison_pares_f(pp, n, "nh3", 0.0);
-        v->ubi.glaciale.res.pulvis           = ison_pares_f(pp, n, "pulvis", 0.0);
-        v->ubi.glaciale.res.fasciae          = (int)ison_pares_n(pp, n, "fasciae", 0);
-        v->ubi.glaciale.res.fasciae_contrast = ison_pares_f(pp, n, "fasciae_contrast", 0.5);
-        v->ubi.glaciale.res.maculae          = (int)ison_pares_n(pp, n, "maculae", 0);
-        v->ubi.glaciale.res.macula_lat       = ison_pares_f(pp, n, "macula_lat", 0.0);
-        v->ubi.glaciale.res.macula_lon       = ison_pares_f(pp, n, "macula_lon", 0.0);
-        v->ubi.glaciale.res.macula_radius    = ison_pares_f(pp, n, "macula_radius", 0.1);
-        break;
-    case PLANETA_PARVUM:
-        v->ubi.parvum.res.silicata         = ison_pares_f(pp, n, "silicata", 0.0);
-        v->ubi.parvum.res.ferrum           = ison_pares_f(pp, n, "ferrum", 0.0);
-        v->ubi.parvum.res.sulphur          = ison_pares_f(pp, n, "sulphur", 0.0);
-        v->ubi.parvum.res.carbo            = ison_pares_f(pp, n, "carbo", 0.0);
-        v->ubi.parvum.res.glacies          = ison_pares_f(pp, n, "glacies", 0.0);
-        v->ubi.parvum.res.glacies_co2      = ison_pares_f(pp, n, "glacies_co2", 0.0);
-        v->ubi.parvum.res.malachita        = ison_pares_f(pp, n, "malachita", 0.0);
-        v->ubi.parvum.res.aqua             = ison_pares_f(pp, n, "aqua", 0.0);
-        v->ubi.parvum.res.aqua_profunditas = ison_pares_f(pp, n, "aqua_profunditas", 0.5);
-        v->ubi.parvum.res.continentes      = (int)ison_pares_n(pp, n, "continentes", 0);
-        v->ubi.parvum.res.scala            = ison_pares_f(pp, n, "scala_featurae", 1.0);
-        v->ubi.parvum.res.tectonica        = ison_pares_f(pp, n, "tectonica", 0.3);
-        v->ubi.parvum.res.craterae         = ison_pares_f(pp, n, "craterae", 0.0);
-        v->ubi.parvum.res.maria            = ison_pares_f(pp, n, "maria", 0.0);
-        v->ubi.parvum.res.vulcanismus      = ison_pares_f(pp, n, "vulcanismus", 0.0);
-        v->ubi.parvum.res.pressio_kPa      = ison_pares_f(pp, n, "pressio_kPa", 0.0);
-        v->ubi.parvum.res.n2               = ison_pares_f(pp, n, "n2", 0.0);
-        v->ubi.parvum.res.o2               = ison_pares_f(pp, n, "o2", 0.0);
-        v->ubi.parvum.res.co2              = ison_pares_f(pp, n, "co2", 0.0);
-        v->ubi.parvum.res.ch4              = ison_pares_f(pp, n, "ch4", 0.0);
-        v->ubi.parvum.res.h2               = ison_pares_f(pp, n, "h2", 0.0);
-        v->ubi.parvum.res.he               = ison_pares_f(pp, n, "he", 0.0);
-        v->ubi.parvum.res.nh3              = ison_pares_f(pp, n, "nh3", 0.0);
-        v->ubi.parvum.res.pulvis           = ison_pares_f(pp, n, "pulvis", 0.0);
-        v->ubi.parvum.res.nubes            = ison_pares_f(pp, n, "nubes", 0.0);
-        v->ubi.parvum.res.polaris          = ison_pares_f(pp, n, "polaris", 0.0);
-        break;
-    case PLANETA_SOL:
-        v->ubi.sol.res.fusio            = ison_pares_f(pp, n, "fusio", 1.0);
-        v->ubi.sol.res.temperatura      = ison_pares_f(pp, n, "temperatura", 0.0);
-        v->ubi.sol.res.luminositas      = ison_pares_f(pp, n, "luminositas", 1.0);
-        v->ubi.sol.res.corona           = ison_pares_f(pp, n, "corona", 0.0);
-        v->ubi.sol.res.granulatio       = ison_pares_f(pp, n, "granulatio", 0.0);
-        v->ubi.sol.res.maculae          = (int)ison_pares_n(pp, n, "maculae", 0);
-        v->ubi.sol.res.macula_radius    = ison_pares_f(pp, n, "macula_radius", 0.1);
-        v->ubi.sol.res.macula_obscuritas = ison_pares_f(pp, n, "macula_obscuritas", 0.5);
-        v->ubi.sol.res.h2               = ison_pares_f(pp, n, "h2", 0.0);
-        v->ubi.sol.res.he               = ison_pares_f(pp, n, "he", 0.0);
-        v->ubi.sol.res.ch4              = ison_pares_f(pp, n, "ch4", 0.0);
-        v->ubi.sol.res.nh3              = ison_pares_f(pp, n, "nh3", 0.0);
-        break;
-    case PLANETA_NEBULA:
-        v->ubi.nebula.res.temperatura      = ison_pares_f(pp, n, "temperatura", 0.0);
-        v->ubi.nebula.res.luminositas      = ison_pares_f(pp, n, "luminositas", 1.0);
-        v->ubi.nebula.res.h2               = ison_pares_f(pp, n, "h2", 0.0);
-        v->ubi.nebula.res.o2               = ison_pares_f(pp, n, "o2", 0.0);
-        v->ubi.nebula.res.carbo            = ison_pares_f(pp, n, "carbo", 0.0);
-        v->ubi.nebula.res.tectonica        = ison_pares_f(pp, n, "tectonica", 0.5);
-        v->ubi.nebula.res.nubes            = ison_pares_f(pp, n, "nubes", 0.4);
-        break;
-    default:
-        break;
-    }
-    return v;
-}
 
 static sidereus_t genus_ex_nomine(const char *nomen)
 {
@@ -758,13 +611,12 @@ static void isonl_linea_reddere(const char *linea, void *ctx_v)
     internum = ison_da_crudum(linea, "planeta");
     if (internum) {
         char *per_s = ison_da_crudum(internum, "perceptus");
-        n = ison_lege(internum, pp, 64);
+        int x     = (int)ison_da_n(internum, "x", 0);
+        int y     = (int)ison_da_n(internum, "y", 0);
+        double sc = ison_da_f(internum, "scala", 1.0);
+        planeta_t *pl = planeta_ex_ison(internum);
         free(internum);
-        if (n > 0) {
-            int x     = (int)ison_pares_n(pp, n, "x", 0);
-            int y     = (int)ison_pares_n(pp, n, "y", 0);
-            double sc = ison_pares_f(pp, n, "scala", 1.0);
-            planeta_t *pl = planeta_ex_pares_c(pp, n);
+        if (pl) {
             planeta_perceptus_t perc = planeta_perceptus_ex_ison(per_s);
             free(per_s);
             unsigned char *fen = (unsigned char *)calloc(
@@ -787,35 +639,34 @@ static void isonl_linea_reddere(const char *linea, void *ctx_v)
     internum = ison_da_crudum(linea, "sidus");
     if (!internum)
         return;
-    n = ison_lege(internum, pp, 64);
-    free(internum);
-    if (n <= 0)
-        return;
 
-    int x = (int)ison_pares_n(pp, n, "x", 0);
-    int y = (int)ison_pares_n(pp, n, "y", 0);
+    int x = (int)ison_da_n(internum, "x", 0);
+    int y = (int)ison_da_n(internum, "y", 0);
 
-    sidereus_t genus = genus_ex_nomine(ison_pares_s(pp, n, "genus"));
-    double mag       = ison_pares_f(pp, n, "magnitudo", 5.0);
-    double temp      = ison_pares_f(pp, n, "temperatura", 5000);
+    char *genus_s = ison_da_chordam(internum, "qui");
+    sidereus_t genus = genus_ex_nomine(genus_s ? genus_s : "sequentia");
+    free(genus_s);
+    double mag  = ison_da_f(internum, "ubi.pro.magnitudo", 5.0);
+    double temp = ison_da_f(internum, "ubi.pro.temperatura", 5000);
 
     sidus_t sidus;
     memset(&sidus, 0, sizeof(sidus));
     sidus.qui = genus;
     if (genus == SIDUS_VAGANS) {
         sidus.ubi.vagans.pro = (sidulum_t){mag, temp};
-        sidus.ubi.vagans.res.phase   = ison_pares_f(pp, n, "phase", 0);
-        sidus.ubi.vagans.res.angulus = ison_pares_f(pp, n, "angulus_phase", 0);
+        sidus.ubi.vagans.res.phase   = ison_da_f(internum, "ubi.res.phase", 0);
+        sidus.ubi.vagans.res.angulus = ison_da_f(internum, "ubi.res.angulus", 0);
     } else if (genus == SIDUS_GALAXIA) {
         sidus.ubi.galaxia.pro = (sidulum_t){mag, temp};
-        sidus.ubi.galaxia.res.morphologia = (galaxia_morphologia_t)(int)ison_pares_f(pp, n, "morphologia", 0);
-        sidus.ubi.galaxia.res.angulus     = ison_pares_f(pp, n, "angulus_phase", 0);
+        sidus.ubi.galaxia.res.morphologia = (galaxia_morphologia_t)(int)ison_da_f(internum, "ubi.res.morphologia", 0);
+        sidus.ubi.galaxia.res.angulus     = ison_da_f(internum, "ubi.res.angulus", 0);
     } else if (genus == SIDUS_MAGNETAR) {
         sidus.ubi.magnetar.pro = (sidulum_t){mag, temp};
-        sidus.ubi.magnetar.res.phase = ison_pares_f(pp, n, "phase", 0);
+        sidus.ubi.magnetar.res.phase = ison_da_f(internum, "ubi.res.phase", 0);
     } else {
         sidus.ubi.sequentia.pro = (sidulum_t){mag, temp};
     }
+    free(internum);
 
     instrumentum_t instr = {.saturatio = 1.0};
     if (mag < 1.5 && ctx->i_spic > 0) {

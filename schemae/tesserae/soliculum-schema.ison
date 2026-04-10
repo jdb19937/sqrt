@@ -1,0 +1,42 @@
+{
+  "titulus": "soliculum",
+  "properties": {
+    "fusio": {
+      "type": "number"
+    },
+    "temperatura": {
+      "type": "number"
+    },
+    "luminositas": {
+      "type": "number"
+    },
+    "corona": {
+      "type": "number"
+    },
+    "granulatio": {
+      "type": "number"
+    },
+    "maculae": {
+      "type": "integer"
+    },
+    "macula_radius": {
+      "type": "number"
+    },
+    "macula_obscuritas": {
+      "type": "number"
+    },
+    "h2": {
+      "type": "number"
+    },
+    "he": {
+      "type": "number"
+    },
+    "ch4": {
+      "type": "number"
+    },
+    "nh3": {
+      "type": "number"
+    }
+  },
+  "required": []
+}

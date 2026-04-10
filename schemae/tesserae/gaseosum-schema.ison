@@ -1,0 +1,15 @@
+{
+  "titulus": "gaseosum",
+  "properties": {
+    "tessella": {
+      "$ref": "tessella-schema.ison"
+    },
+    "planetella": {
+      "$ref": "planetella-schema.ison"
+    },
+    "gaseosculum": {
+      "$ref": "gaseosculum-schema.ison"
+    }
+  },
+  "required": []
+}

@@ -1,0 +1,15 @@
+{
+  "titulus": "sequentia",
+  "properties": {
+    "tessella": {
+      "$ref": "tessella-schema.ison"
+    },
+    "sidulum": {
+      "$ref": "sidulum-schema.ison"
+    },
+    "sequentiola": {
+      "$ref": "sequentiola-schema.ison"
+    }
+  },
+  "required": []
+}

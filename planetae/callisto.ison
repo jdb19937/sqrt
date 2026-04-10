@@ -1,18 +1,23 @@
 {
   "nomen": "Callisto",
-  "genus": "saxosum",
-  "radius": 0.9,
-  "inclinatio": 0.03,
-  "rotatio": 2.2,
-  "semen": 50461,
+  "qui": "saxosum",
+  "ubi": {
+    "pro": {
+      "radius": 0.9,
+      "inclinatio": 0.03,
+      "rotatio": 2.2,
+      "semen": 50461
+    },
+    "res": {
+      "silicata": 0.40,
+      "carbo": 0.30,
+      "ferrum": 0.15,
+      "glacies": 0.15,
 
-  "silicata": 0.40,
-  "carbo": 0.30,
-  "ferrum": 0.15,
-  "glacies": 0.15,
+      "scala": 1.0,
+      "craterae": 0.95,
 
-  "scala": 1.0,
-  "craterae": 0.95,
-
-  "pressio_kPa": 0.0
+      "pressio_kPa": 0.0
+    }
+  }
 }

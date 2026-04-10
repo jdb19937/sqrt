@@ -1,18 +1,24 @@
 {
   "nomen": "Zeppelinus",
-  "genus": "zeppelinus",
-  "semen": 42,
-  "ratio": 4.5,
-  "inclinatio": 0.05,
-  "azimuthus": 0.2,
-  "lux_angulus": 0.8,
-  "lux_elevatio": 0.6,
-  "involucrum_r": 0.60,
-  "involucrum_g": 0.62,
-  "involucrum_b": 0.65,
-  "gondola_r": 0.25,
-  "gondola_g": 0.18,
-  "gondola_b": 0.12,
-  "fenestrae": 6,
-  "pinnae": 0.4
+  "qui": "zeppelinus",
+  "ubi": {
+    "pro": {
+      "semen": 42
+    },
+    "res": {
+      "ratio": 4.5,
+      "inclinatio": 0.05,
+      "azimuthus": 0.2,
+      "lux_angulus": 0.8,
+      "lux_elevatio": 0.6,
+      "involucrum_r": 0.60,
+      "involucrum_g": 0.62,
+      "involucrum_b": 0.65,
+      "gondola_r": 0.25,
+      "gondola_g": 0.18,
+      "gondola_b": 0.12,
+      "fenestrae": 6,
+      "pinnae": 0.4
+    }
+  }
 }

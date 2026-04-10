@@ -1,0 +1,9 @@
+{
+  "titulus": "nanulum_album",
+  "properties": {
+    "res": {
+      "type": "integer"
+    }
+  },
+  "required": []
+}
