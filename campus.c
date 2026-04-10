@@ -544,7 +544,6 @@ void campus_generare(
  * ================================================================ */
 
 
-
 static sidereus_t genus_ex_nomine(const char *nomen)
 {
     if (strcmp(nomen, "nanum_album") == 0)
@@ -610,10 +609,10 @@ static void isonl_linea_reddere(const char *linea, void *ctx_v)
     /* {"planeta": {...}} */
     internum = ison_da_crudum(linea, "planeta");
     if (internum) {
-        char *per_s = ison_da_crudum(internum, "perceptus");
-        int x     = (int)ison_da_n(internum, "x", 0);
-        int y     = (int)ison_da_n(internum, "y", 0);
-        double sc = ison_da_f(internum, "scala", 1.0);
+        char *per_s   = ison_da_crudum(internum, "perceptus");
+        int x         = (int)ison_da_n(internum, "x", 0);
+        int y         = (int)ison_da_n(internum, "y", 0);
+        double sc     = ison_da_f(internum, "scala", 1.0);
         planeta_t *pl = planeta_ex_ison(internum);
         free(internum);
         if (pl) {
@@ -643,7 +642,7 @@ static void isonl_linea_reddere(const char *linea, void *ctx_v)
     int x = (int)ison_da_n(internum, "x", 0);
     int y = (int)ison_da_n(internum, "y", 0);
 
-    char *genus_s = ison_da_chordam(internum, "qui");
+    char *genus_s    = ison_da_chordam(internum, "qui");
     sidereus_t genus = genus_ex_nomine(genus_s ? genus_s : "sequentia");
     free(genus_s);
     double mag  = ison_da_f(internum, "ubi.pro.magnitudo", 5.0);
