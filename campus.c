@@ -850,3 +850,137 @@ campus_t *campus_ex_isonl_reddere(
 
     return ctx.campus;
 }
+
+/* ================================================================
+ * campus_ex_ison_reddere — legit caela .ison (non ISONL)
+ * ================================================================ */
+
+static void ison_sidus_reddere(const char *raw, void *ctx_v)
+{
+    isonl_ctx_t *ctx = (isonl_ctx_t *)ctx_v;
+    int x = (int)ison_da_n(raw, "x", 0);
+    int y = (int)ison_da_n(raw, "y", 0);
+
+    char *sidus_raw = ison_da_crudum(raw, "sidus");
+    sidus_t sidus;
+    if (sidus_raw) {
+        sidus_ex_ison(&sidus, sidus_raw);
+        free(sidus_raw);
+    } else {
+        memset(&sidus, 0, sizeof(sidus));
+        sidus.ubi.sequentia.pro.magnitudo   = 6.0;
+        sidus.ubi.sequentia.pro.temperatura = 5000;
+    }
+    double mag = sidus.ubi.sequentia.pro.magnitudo;
+
+    instrumentum_t si = {.saturatio = 1.0};
+    if (mag < 1.5 && ctx->i_spic > 0) {
+        double bright    = 1.5 - mag;
+        si.spiculae      = ctx->i_spic;
+        si.spiculae_long = ctx->i_spic_long * bright + 2.0;
+        si.spiculae_ang  = ctx->i_spic_ang;
+        si.halo_radius   = ctx->i_halo_r * bright + 1.0;
+        si.halo_vis      = ctx->i_halo_v * bright;
+    } else if (mag < 2.5 && ctx->i_halo_r > 0.01) {
+        si.halo_radius = ctx->i_halo_r * (2.5 - mag) * 0.5;
+        si.halo_vis    = ctx->i_halo_v * (2.5 - mag) * 0.5;
+    }
+
+    unsigned char fen[FEN * FEN * 4];
+    sidus_reddere(fen, &sidus, &si);
+    sidus_in_campum(ctx->campus, x, y, fen);
+}
+
+static void ison_planeta_reddere(const char *raw, void *ctx_v)
+{
+    isonl_ctx_t *ctx = (isonl_ctx_t *)ctx_v;
+    char *per_s   = ison_da_crudum(raw, "perceptus");
+    int x         = (int)ison_da_n(raw, "x", 0);
+    int y         = (int)ison_da_n(raw, "y", 0);
+    double sc     = ison_da_f(raw, "scala", 1.0);
+    char *pl_ison = ison_da_crudum(raw, "planeta");
+    planeta_t *pl = pl_ison ? planeta_ex_ison(pl_ison) : NULL;
+    free(pl_ison);
+    if (pl) {
+        planeta_perceptus_t perc = planeta_perceptus_ex_ison(per_s);
+        free(per_s);
+        unsigned char *pfen = (unsigned char *)calloc(
+            (size_t)PLANETA_FENESTRA * PLANETA_FENESTRA * 4, 1
+        );
+        if (pfen) {
+            planeta_reddere(pfen, pl, &perc);
+            planeta_perceptum_applicare(pfen, &perc);
+            planeta_in_campum(ctx->campus, x, y, pfen, sc);
+            free(pfen);
+        }
+        free(pl);
+    } else {
+        free(per_s);
+    }
+}
+
+campus_t *campus_ex_ison_reddere(
+    const char *via_ison,
+    const char *via_instrumentum
+) {
+    char *ison = ison_lege_plicam(via_ison);
+    if (!ison) {
+        fprintf(stderr, "astra: %s legere non possum\n", via_ison);
+        return NULL;
+    }
+
+    char *instr_ison = ison_lege_plicam(via_instrumentum);
+    if (!instr_ison) {
+        fprintf(stderr, "astra: %s legere non possum\n", via_instrumentum);
+        free(ison);
+        return NULL;
+    }
+
+    /* instrumentum */
+    isonl_ctx_t ctx;
+    memset(&ctx, 0, sizeof(ctx));
+    ctx.i_spic      = (int)ison_da_f(instr_ison, "spiculae", 0);
+    ctx.i_spic_long = ison_da_f(instr_ison, "spiculae_long", 0);
+    ctx.i_spic_ang  = ison_da_f(instr_ison, "spiculae_ang", 0);
+    ctx.i_halo_r    = ison_da_f(instr_ison, "halo_radius", 0);
+    ctx.i_halo_v    = ison_da_f(instr_ison, "halo_vis", 0);
+
+    instrumentum_t inst;
+    memset(&inst, 0, sizeof(inst));
+    inst.saturatio    = ison_da_f(instr_ison, "saturatio", 1.0);
+    inst.aberratio    = ison_da_f(instr_ison, "aberratio", 0.0);
+    inst.visio        = ison_da_f(instr_ison, "visio", 0.0);
+    inst.scintillatio = ison_da_f(instr_ison, "scintillatio", 0.0);
+    inst.caeli_lumen  = ison_da_f(instr_ison, "caeli_lumen", 0.0);
+    inst.florescentia = ison_da_f(instr_ison, "florescentia", 0.0);
+    inst.acuitas      = ison_da_f(instr_ison, "acuitas", 0.0);
+    inst.refractio    = ison_da_f(instr_ison, "refractio", 0.0);
+    inst.vignetta     = ison_da_f(instr_ison, "vignetta", 0.0);
+    inst.distorsio    = ison_da_f(instr_ison, "distorsio", 0.0);
+    inst.fenestra     = ison_da_f(instr_ison, "fenestra", 0.0);
+    free(instr_ison);
+
+    /* meta */
+    int lat = (int)ison_da_n(ison, "latitudo", 1024);
+    int alt = (int)ison_da_n(ison, "altitudo", 512);
+    ctx.galaxia_glow    = ison_da_f(ison, "galaxia_glow", 0);
+    ctx.galaxia_rift    = ison_da_f(ison, "galaxia_rift", 0);
+    ctx.galaxia_nebulae = (int)ison_da_n(ison, "galaxia_nebulae", 0);
+    ctx.inclinatio      = ison_da_f(ison, "inclinatio_galaxiae", 0);
+    ctx.campus = campus_creare(lat, alt);
+    if (!ctx.campus) {
+        free(ison);
+        return NULL;
+    }
+
+    /* sidera */
+    ison_pro_quoque_elemento(ison, "sidera", ison_sidus_reddere, &ctx);
+
+    /* planetae */
+    ison_pro_quoque_elemento(ison, "planetae", ison_planeta_reddere, &ctx);
+
+    free(ison);
+    isonl_galaxiam_reddere(ctx.campus, &ctx);
+    isonl_post_processare(ctx.campus, &inst);
+    return ctx.campus;
+}

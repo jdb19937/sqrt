@@ -1,0 +1,20 @@
+{
+  "titulus": "caela",
+  "properties": {
+    "latitudo":             {"type": "integer"},
+    "altitudo":             {"type": "integer"},
+    "galaxia_glow":         {"type": "number"},
+    "galaxia_rift":         {"type": "number"},
+    "galaxia_nebulae":      {"type": "integer"},
+    "inclinatio_galaxiae":  {"type": "number"},
+    "sidera": {
+      "type": "array",
+      "items": {"$ref": "sidus_caeli-schema.ison"}
+    },
+    "planetae": {
+      "type": "array",
+      "items": {"$ref": "planeta_caeli-schema.ison"}
+    }
+  },
+  "required": ["latitudo", "altitudo"]
+}

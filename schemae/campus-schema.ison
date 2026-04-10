@@ -21,7 +21,7 @@
     "max_galaxiae":         {"type": "integer"},
     "planetae": {
       "type": "array",
-      "items": {"$ref": "planeta_campi-schema.ison"}
+      "items": {"$ref": "planeta_caeli-schema.ison"}
     }
   },
   "required": ["latitudo", "altitudo", "numerus_stellarum", "semen"]

@@ -140,6 +140,11 @@ campus_t *campus_ex_isonl_reddere(
     const char *via_instrumentum
 );
 
+campus_t *campus_ex_ison_reddere(
+    const char *via_ison,
+    const char *via_instrumentum
+);
+
 /* post-processare: effectus instrumenti applicare ad campum */
 void isonl_post_processare(
     campus_t *c,

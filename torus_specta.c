@@ -56,32 +56,42 @@ typedef struct {
 static sidus_registrum_t sidera[SIDERA_MAX];
 static int numerus_siderum = 0;
 
-static void catalogum_linea(const char *linea, void *ctx)
+static void catalogum_sidus_legere(const char *entry)
 {
-    (void)ctx;
-    char *sidus_raw = ison_da_crudum(linea, "sidus");
-    if (!sidus_raw)
+    if (numerus_siderum >= SIDERA_MAX)
         return;
-    if (numerus_siderum >= SIDERA_MAX) {
-        free(sidus_raw);
-        return;
-    }
 
     sidus_registrum_t *s = &sidera[numerus_siderum];
-    s->x           = (int)ison_da_n(sidus_raw, "x", 0);
-    s->y           = (int)ison_da_n(sidus_raw, "y", 0);
-    s->temperatura = ison_da_f(sidus_raw, "ubi.pro.temperatura", 5000);
-    s->magnitudo   = ison_da_f(sidus_raw, "ubi.pro.magnitudo", 6.0);
+    s->x = (int)ison_da_n(entry, "x", 0);
+    s->y = (int)ison_da_n(entry, "y", 0);
+    s->temperatura = ison_da_f(entry, "sidus.sidulum.temperatura", 5000);
+    s->magnitudo   = ison_da_f(entry, "sidus.sidulum.magnitudo", 6.0);
 
-    char *g = ison_da_chordam(sidus_raw, "qui");
-    if (g) {
-        strncpy(s->genus, g, 23);
-        s->genus[23] = '\0';
-        free(g);
-    } else
-        strcpy(s->genus, "sequentia");
+    /* detege genus ex clavibus praesentibus in sidus */
+    static const struct {
+        const char *clavis;
+        const char *nomen;
+    }genera[] = {
+        {"sidus.vaganulus",      "vagans"},
+        {"sidus.galaxiola",      "galaxia"},
+        {"sidus.magnetarulum",   "magnetar"},
+        {"sidus.nanulum_album",  "nanum_album"},
+        {"sidus.gigulum_rubrum", "gigas_rubrum"},
+        {"sidus.supergigulum",   "supergigas"},
+        {"sidus.neutroniulum",   "neutronium"},
+        {"sidus.crystallulum",   "crystallinum"},
+    };
+    strcpy(s->genus, "sequentia");
+    for (int i = 0; i < 8; i++) {
+        char *tmp = ison_da_crudum(entry, genera[i].clavis);
+        if (tmp) {
+            free(tmp);
+            strncpy(s->genus, genera[i].nomen, 23);
+            s->genus[23] = '\0';
+            break;
+        }
+    }
 
-    free(sidus_raw);
     numerus_siderum++;
 }
 
@@ -112,14 +122,20 @@ static void sidera_lucida_computare(void)
     free(indices);
 }
 
-static void catalogum_legere(const char *via_isonl)
+static void catalogum_elementum(const char *elem, void *ctx)
+{
+    (void)ctx;
+    catalogum_sidus_legere(elem);
+}
+
+static void catalogum_legere(const char *via_ison)
 {
     numerus_siderum = 0;
-    char *isonl     = ison_lege_plicam(via_isonl);
-    if (!isonl)
+    char *ison      = ison_lege_plicam(via_ison);
+    if (!ison)
         return;
-    ison_pro_quaque_linea_s(isonl, catalogum_linea, NULL);
-    free(isonl);
+    ison_pro_quoque_elemento(ison, "sidera", catalogum_elementum, NULL);
+    free(ison);
     sidera_lucida_computare();
     fprintf(
         stderr, "Catalogum: %d sidera, %d lucida.\n",
@@ -601,11 +617,11 @@ int main(int argc, char **argv)
     int superficies_obsoleta = 0;
     fprintf(stderr, "Superficies parata: %zu vertices.\n", n_vert);
 
-    /* campum stellarum ex ISONL reddere */
-    const char *via_isonl = "caelae/terra.isonl";
+    /* campum stellarum ex ISON reddere */
+    const char *via_caela = "caelae/terra.ison";
     const char *via_instr = "instrumenta/oculus.ison";
-    fprintf(stderr, "Campum stellarum reddens: %s + %s\n", via_isonl, via_instr);
-    campus_t *campus = campus_ex_isonl_reddere(via_isonl, via_instr);
+    fprintf(stderr, "Campum stellarum reddens: %s + %s\n", via_caela, via_instr);
+    campus_t *campus = campus_ex_ison_reddere(via_caela, via_instr);
     if (!campus) {
         fprintf(stderr, "ERROR: campus stellarum reddere non possum!\n");
         return 1;
@@ -699,7 +715,7 @@ int main(int argc, char **argv)
     char orbita_nomen[256] = {0};
 
     /* catalogum siderum legere */
-    catalogum_legere(via_isonl);
+    catalogum_legere(via_caela);
 
     /* curvatura (warp) status */
     int    curvatura_activa = 0;
@@ -828,7 +844,7 @@ int main(int argc, char **argv)
                                     " /tmp/sqrt_cosidus.ison %u"
                                     " > /tmp/sqrt_campus.ison"
                                     " && ./caele /tmp/sqrt_campus.ison"
-                                    " > /tmp/sqrt_caelae.isonl",
+                                    " > /tmp/sqrt_caelae.ison",
                                     semen_novum
                                 );
                             else
@@ -837,7 +853,7 @@ int main(int argc, char **argv)
                                     "./genera /tmp/sqrt_sidus.ison %u"
                                     " > /tmp/sqrt_campus.ison"
                                     " && ./caele /tmp/sqrt_campus.ison"
-                                    " > /tmp/sqrt_caelae.isonl",
+                                    " > /tmp/sqrt_caelae.ison",
                                     semen_novum
                                 );
                             _exit(system(mandatum));
@@ -1264,18 +1280,18 @@ int main(int argc, char **argv)
             /* fini curvatura cum animatio et generatio ambae perfectae */
             if (curv_tabula >= CURV_TABULAE && curv_generatum) {
                 campus_destruere(campus);
-                campus = campus_ex_isonl_reddere(
-                    "/tmp/sqrt_caelae.isonl", via_instr
+                campus = campus_ex_ison_reddere(
+                    "/tmp/sqrt_caelae.ison", via_instr
                 );
                 if (campus) {
-                    catalogum_legere("/tmp/sqrt_caelae.isonl");
+                    catalogum_legere("/tmp/sqrt_caelae.ison");
                     snprintf(
                         status_nuntius, sizeof(status_nuntius),
                         "Systema novum: %d sidera", numerus_siderum
                     );
                 } else {
                     /* fallback: restitue campus originale */
-                    campus = campus_ex_isonl_reddere(via_isonl, via_instr);
+                    campus = campus_ex_ison_reddere(via_caela, via_instr);
                     snprintf(
                         status_nuntius, sizeof(status_nuntius),
                         "ERRATUM: campus reddere non possum"

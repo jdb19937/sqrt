@@ -17,9 +17,9 @@ CAPITA = campus.h instrumentum.h aspectus.h \
          tesserae/sidus.h tesserae/planeta.h tesserae/visio.h \
          tessera.h tessella.h
 
-CAELAE = caelae/terra.isonl caelae/hubble.isonl caelae/jwst.isonl \
-         caelae/nuclei.isonl caelae/vacuum.isonl caelae/mortis.isonl \
-         caelae/binarium.isonl
+CAELAE = caelae/terra.ison caelae/hubble.ison caelae/jwst.ison \
+         caelae/nuclei.ison caelae/vacuum.ison caelae/mortis.ison \
+         caelae/binarium.ison
 
 omnia: torus_planus torus_animare torus_specta proba_astra caele genera redde astra_animare proba_planeta proba_caelae proba_visio
 
@@ -27,28 +27,28 @@ omnia: $(NOMEN)
 
 caelae: $(CAELAE)
 
-caelae/terra.isonl: campi/terra.ison caele
-	./caele campi/terra.ison > caelae/terra.isonl
+caelae/terra.ison: campi/terra.ison caele
+	./caele campi/terra.ison > caelae/terra.ison
 
-caelae/hubble.isonl: campi/hubble.ison caele
-	./caele campi/hubble.ison > caelae/hubble.isonl
+caelae/hubble.ison: campi/hubble.ison caele
+	./caele campi/hubble.ison > caelae/hubble.ison
 
-caelae/jwst.isonl: campi/jwst.ison caele
-	./caele campi/jwst.ison > caelae/jwst.isonl
+caelae/jwst.ison: campi/jwst.ison caele
+	./caele campi/jwst.ison > caelae/jwst.ison
 
-caelae/nuclei.isonl: campi/nuclei.ison caele
-	./caele campi/nuclei.ison > caelae/nuclei.isonl
+caelae/nuclei.ison: campi/nuclei.ison caele
+	./caele campi/nuclei.ison > caelae/nuclei.ison
 
-caelae/vacuum.isonl: campi/vacuum.ison caele
-	./caele campi/vacuum.ison > caelae/vacuum.isonl
+caelae/vacuum.ison: campi/vacuum.ison caele
+	./caele campi/vacuum.ison > caelae/vacuum.ison
 
-caelae/mortis.isonl: campi/mortis.ison caele
-	./caele campi/mortis.ison > caelae/mortis.isonl
+caelae/mortis.ison: campi/mortis.ison caele
+	./caele campi/mortis.ison > caelae/mortis.ison
 
-caelae/binarium.isonl: campi/binarium.ison caele
-	./caele campi/binarium.ison > caelae/binarium.isonl
+caelae/binarium.ison: campi/binarium.ison caele
+	./caele campi/binarium.ison > caelae/binarium.ison
 
-lude: torus_specta caelae/terra.isonl
+lude: torus_specta caelae/terra.ison
 	./torus_specta
 
 # objecta
@@ -78,6 +78,7 @@ proba: proba_prima proba_astra proba_planeta proba_caelae proba_visio
 	./proba_astra
 	./proba_planeta
 	./proba_visio
+	./proba_schemata.sh
 
 proba_prima: proba_prima.c $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ proba_prima.c -lm
@@ -116,7 +117,7 @@ colloca: omnia
 purga:
 	rm -f torus_planus torus_animare torus_specta proba_astra proba_planeta proba_caelae proba_visio caele genera redde astra_animare proba_prima
 	rm -f $(OBJECTA) $(BIBLIOTHECA)
-	rm -f caelae/*.ppm caelae/*.isonl
+	rm -f caelae/*.ppm caelae/*.ison
 
 linte:
 	insinulint -c *.c *.h
