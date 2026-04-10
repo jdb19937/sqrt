@@ -71,7 +71,7 @@ static void catalogum_sidus_legere(const char *entry)
     static const struct {
         const char *clavis;
         const char *nomen;
-    }genera[] = {
+    } genera[] = {
         {"sidus.vaganulus",      "vagans"},
         {"sidus.galaxiola",      "galaxia"},
         {"sidus.magnetarulum",   "magnetar"},
@@ -309,7 +309,7 @@ static void curvatura_lineas_generare(int lat_img, int alt_img)
             hsv_ad_rgb(
                 0.55 + curv_alea_f() * 0.25,
                 0.25 + curv_alea_f() * 0.5,
-                0.7 + curv_alea_f() * 0.3, &cr, &cg, &cb
+                0.7  + curv_alea_f() * 0.3, &cr, &cg, &cb
             );
         else if (h < 0.7)
             hsv_ad_rgb(
@@ -321,7 +321,7 @@ static void curvatura_lineas_generare(int lat_img, int alt_img)
             hsv_ad_rgb(
                 0.72 + curv_alea_f() * 0.15,
                 0.35 + curv_alea_f() * 0.45,
-                0.6 + curv_alea_f() * 0.4, &cr, &cg, &cb
+                0.6  + curv_alea_f() * 0.4, &cr, &cg, &cb
             );
         else
             hsv_ad_rgb(
