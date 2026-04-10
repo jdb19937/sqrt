@@ -1,10 +1,5 @@
 {
   "titulus": "visio",
-  "genera": [
-    "torus",
-    "navis",
-    "zeppelinus"
-  ],
   "oneOf": [
     {
       "$ref": "torus-schema.ison"

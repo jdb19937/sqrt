@@ -1,16 +1,5 @@
 {
   "titulus": "sidus",
-  "genera": [
-    "nanum_album",
-    "sequentia",
-    "gigas_rubrum",
-    "supergigas",
-    "neutronium",
-    "crystallinum",
-    "magnetar",
-    "galaxia",
-    "vagans"
-  ],
   "oneOf": [
     {
       "$ref": "nanum_album-schema.ison"
