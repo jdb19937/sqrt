@@ -18,6 +18,9 @@
         },
         {
             "$ref": "nebula-schema.ison"
+        },
+        {
+            "$ref": "simulacrum-schema.ison"
         }
     ]
 }

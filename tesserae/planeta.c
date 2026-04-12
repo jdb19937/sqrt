@@ -39,7 +39,8 @@ void planeta_reddere(
     case PLANETA_GLACIALE: reddere_glaciale(fenestra, &planeta->ubi.glaciale); break;
     case PLANETA_PARVUM:   reddere_parvum(fenestra, &planeta->ubi.parvum);     break;
     case PLANETA_SOL:      reddere_sol(fenestra, &planeta->ubi.sol);           break;
-    case PLANETA_NEBULA:   reddere_nebula(fenestra, &planeta->ubi.nebula);     break;
+    case PLANETA_NEBULA:      reddere_nebula(fenestra, &planeta->ubi.nebula);           break;
+    case PLANETA_SIMULACRUM:  reddere_simulacrum(fenestra, &planeta->ubi.simulacrum);  break;
     }
 }
 
@@ -89,9 +90,10 @@ planeta_t *planeta_ex_ison(const char *ison)
         {"nebulula",    PLANETA_NEBULA},
         {"gaseosculum", PLANETA_GASEOSUM},
         {"glaciellum",  PLANETA_GLACIALE},
-        {"parvulum",    PLANETA_PARVUM},
+        {"parvulum",      PLANETA_PARVUM},
+        {"simulacrulum",  PLANETA_SIMULACRUM},
     };
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
         char *tmp = ison_da_crudum(ison, detectio[i].clavis);
         if (tmp) { free(tmp); g = detectio[i].genus; break; }
     }
@@ -106,7 +108,8 @@ planeta_t *planeta_ex_ison(const char *ison)
     case PLANETA_GLACIALE: glaciale_ex_ison(&p->ubi.glaciale, ison); break;
     case PLANETA_PARVUM:   parvum_ex_ison(&p->ubi.parvum, ison);    break;
     case PLANETA_SOL:      sol_ex_ison(&p->ubi.sol, ison);          break;
-    case PLANETA_NEBULA:   nebula_ex_ison(&p->ubi.nebula, ison);    break;
+    case PLANETA_NEBULA:      nebula_ex_ison(&p->ubi.nebula, ison);           break;
+    case PLANETA_SIMULACRUM:  simulacrum_ex_ison(&p->ubi.simulacrum, ison);  break;
     }
     return p;
 }
@@ -123,7 +126,8 @@ void planeta_in_ison(FILE *f, const planeta_t *p)
     case PLANETA_GLACIALE: glaciale_in_ison(f, &p->ubi.glaciale); break;
     case PLANETA_PARVUM:   parvum_in_ison(f, &p->ubi.parvum);    break;
     case PLANETA_SOL:      sol_in_ison(f, &p->ubi.sol);          break;
-    case PLANETA_NEBULA:   nebula_in_ison(f, &p->ubi.nebula);    break;
+    case PLANETA_NEBULA:      nebula_in_ison(f, &p->ubi.nebula);           break;
+    case PLANETA_SIMULACRUM:  simulacrum_in_ison(f, &p->ubi.simulacrum);  break;
     }
 }
 

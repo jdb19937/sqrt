@@ -19,6 +19,7 @@ OBJECTA = pictura.o helvea.o campus.o instrumentum.o caela.o formula.o orbita.o 
           tesserae/planetae/saxosum.o tesserae/planetae/gaseosum.o \
           tesserae/planetae/glaciale.o tesserae/planetae/parvum.o \
           tesserae/planetae/sol.o tesserae/planetae/nebula.o \
+          tesserae/planetae/simulacrum.o \
           tesserae/visiones/torus.o tesserae/visiones/navis.o \
           tesserae/visiones/zeppelinus.o
 BIBLIOTHECA = libsqrt.a
@@ -76,10 +77,10 @@ libsqrt.a: $(OBJECTA)
 # programmata
 
 torus_planus: torus_planus.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
-	$(CC) $(CFLAGS) -o $@ torus_planus.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ torus_planus.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
-torus_animare: torus_animare.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
-	$(CC) $(CFLAGS) -o $@ torus_animare.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
+torus_animare: torus_animare.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ torus_animare.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
 torus_specta: torus_specta.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ torus_specta.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
@@ -95,26 +96,26 @@ proba: proba_prima proba_astra proba_planeta proba_caelae proba_visio
 proba_prima: proba_prima.c $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ proba_prima.c -lm
 
-proba_astra: proba_astra.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
-	$(CC) $(CFLAGS) -o $@ proba_astra.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
+proba_astra: proba_astra.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ proba_astra.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
-proba_planeta: proba_planeta.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
-	$(CC) $(CFLAGS) -o $@ proba_planeta.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
+proba_planeta: proba_planeta.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ proba_planeta.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
-proba_caelae: proba_caelae.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
-	$(CC) $(CFLAGS) -o $@ proba_caelae.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
+proba_caelae: proba_caelae.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ proba_caelae.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
-proba_visio: proba_visio.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
-	$(CC) $(CFLAGS) -o $@ proba_visio.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
+proba_visio: proba_visio.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ proba_visio.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
-caele: caele.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
-	$(CC) $(CFLAGS) -o $@ caele.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
+caele: caele.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ caele.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
-genera: genera.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
-	$(CC) $(CFLAGS) -o $@ genera.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
+genera: genera.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ genera.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
-redde: redde.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
-	$(CC) $(CFLAGS) -o $@ redde.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
+redde: redde.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ redde.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
 astra_animare: astra_animare.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ astra_animare.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)

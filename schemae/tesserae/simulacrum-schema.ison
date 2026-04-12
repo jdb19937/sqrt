@@ -1,0 +1,15 @@
+{
+    "titulus": "simulacrum",
+    "properties": {
+        "tessella": {
+            "$ref": "tessella-schema.ison"
+        },
+        "planetella": {
+            "$ref": "planetella-schema.ison"
+        },
+        "simulacrulum": {
+            "$ref": "simulacrulum-schema.ison"
+        }
+    },
+    "required": []
+}

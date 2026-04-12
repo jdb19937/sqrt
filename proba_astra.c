@@ -47,7 +47,7 @@ int main(void)
         .halo_radius = 3.0, .halo_vis = 0.08,
         .saturatio = 1.4
     };
-    caela_t *caela = caela_ex_formula(&form, 0);
+    caela_t *caela   = caela_ex_formula(&form, 0);
     campus_t *campus = campus_ex_caela(caela, &instr_campus);
     caela_destruere(caela);
 

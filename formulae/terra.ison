@@ -266,6 +266,29 @@
             }
         },
         {
+            "nomen": "Vortexa",
+            "scala": 0.40,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.9,
+                    "semen": 99901
+                },
+                "simulacrulum": {
+                    "nomen": "cordalis"
+                }
+            },
+            "orbita": {
+                "cx": 700.0,
+                "cy": 540.0,
+                "amplitudo_x": 500.0,
+                "amplitudo_y": 20.0,
+                "phase_y": 1.5708,
+                "periodus": 150,
+                "amplitudo_z": 0.2,
+                "phase_z": 1.5708
+            }
+        },
+        {
             "nomen": "Stella Caerulea",
             "scala": 0.35,
             "planeta": {

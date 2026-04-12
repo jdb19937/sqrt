@@ -35,7 +35,8 @@ typedef enum {
     PLANETA_GLACIALE,    /* Uranus, Neptunus */
     PLANETA_PARVUM,      /* Pluto, Ceres, lunae parvae */
     PLANETA_SOL,         /* stella proxima — fusio completa */
-    PLANETA_NEBULA       /* nubes gasei procedurale */
+    PLANETA_NEBULA,      /* nubes gasei procedurale */
+    PLANETA_SIMULACRUM   /* GIF animatum ex plica */
 } planetarius_t;
 
 /* proprietates communes omnium planetarum (diminutiva) */
@@ -56,6 +57,7 @@ typedef struct {
 #include "planetae/parvum.h"
 #include "planetae/sol.h"
 #include "planetae/nebula.h"
+#include "planetae/simulacrum.h"
 
 /* ================================================================
  * planeta_t — unio omnium generum planetarum
@@ -74,7 +76,8 @@ typedef struct {
         glaciale_t glaciale;
         parvum_t   parvum;
         sol_t      sol;
-        nebula_t   nebula;
+        nebula_t      nebula;
+        simulacrum_t  simulacrum;
     } ubi;
 } planeta_t;
 

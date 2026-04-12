@@ -1,0 +1,9 @@
+{
+    "titulus": "simulacrulum",
+    "properties": {
+        "nomen": {
+            "type": "string"
+        }
+    },
+    "required": ["nomen"]
+}
