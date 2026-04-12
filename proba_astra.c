@@ -8,6 +8,7 @@
 #include "instrumentum.h"
 #include "tessera.h"
 #include "campus.h"
+#include "formula.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,8 +34,9 @@ int main(void)
 
     /* --- campum stellarum --- */
     fprintf(stderr, "Campum generans (256x128)...\n");
-    campus_t *campus = campus_creare(256, 128);
-    campus_parametri_t par = {
+    formula_t form = {
+        .latitudo = 256,
+        .altitudo = 128,
         .numerus_stellarum = 2000,
         .densitas_galaxiae = 0.7,
         .inclinatio_galaxiae = 0.3,
@@ -45,7 +47,9 @@ int main(void)
         .halo_radius = 3.0, .halo_vis = 0.08,
         .saturatio = 1.4
     };
-    campus_generare(campus, &par, &instr_campus);
+    caela_t *caela = caela_ex_formula(&form, 0);
+    campus_t *campus = campus_ex_caela(caela, &instr_campus);
+    caela_destruere(caela);
 
     /* probatio: aliqui pixels non nigri */
     int activi = 0;
