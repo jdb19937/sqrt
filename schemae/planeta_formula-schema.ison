@@ -1,0 +1,22 @@
+{
+    "titulus": "planeta_formula",
+    "properties": {
+        "nomen": {
+            "type": "string"
+        },
+        "scala": {
+            "type": "number"
+        },
+        "planeta": {
+            "$ref": "tesserae/planeta-schema.ison"
+        },
+        "orbita": {
+            "$ref": "orbita-schema.ison"
+        }
+    },
+    "required": [
+        "nomen",
+        "planeta",
+        "orbita"
+    ]
+}

@@ -17,4 +17,8 @@ typedef struct {
     sequentiola_t res;
 } sequentia_t;
 
+void reddere_sequentia(unsigned char *fen, const sequentia_t *s, const instrumentum_t *instr);
+void sequentia_in_ison(FILE *f, const sequentia_t *s);
+void sequentia_ex_ison(sequentia_t *s, const char *ison);
+
 #endif /* SIDUS_SEQUENTIA_H */

@@ -1,15 +1,15 @@
 {
-  "titulus": "gigas_rubrum",
-  "properties": {
-    "tessella": {
-      "$ref": "tessella-schema.ison"
+    "titulus": "gigas_rubrum",
+    "properties": {
+        "tessella": {
+            "$ref": "tessella-schema.ison"
+        },
+        "sidulum": {
+            "$ref": "sidulum-schema.ison"
+        },
+        "gigulum_rubrum": {
+            "$ref": "gigulum_rubrum-schema.ison"
+        }
     },
-    "sidulum": {
-      "$ref": "sidulum-schema.ison"
-    },
-    "gigulum_rubrum": {
-      "$ref": "gigulum_rubrum-schema.ison"
-    }
-  },
-  "required": []
+    "required": []
 }

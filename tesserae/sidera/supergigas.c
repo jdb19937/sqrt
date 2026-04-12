@@ -1,4 +1,6 @@
-static void reddere_supergigas(
+#include "../sidus_communia.h"
+
+void reddere_supergigas(
     unsigned char *fen,
     const supergigas_t *s,
     const instrumentum_t *instr
@@ -17,10 +19,10 @@ static void reddere_supergigas(
     fen_punctum(fen, SEMI, SEMI, r_disc, col, luciditas * 0.2);
 
     /* maculae (cellulae convectionis) — perturbationes coloris */
-    semen_g = (unsigned int)(s->pro.temperatura * 1000);
+    sidus_semen_g = (unsigned int)(s->pro.temperatura * 1000);
     for (int i = 0; i < 5; i++) {
-        double mx = SEMI + alea_gauss() * r_disc * 0.4;
-        double my = SEMI + alea_gauss() * r_disc * 0.4;
+        double mx = SEMI + sidus_alea_gauss() * r_disc * 0.4;
+        double my = SEMI + sidus_alea_gauss() * r_disc * 0.4;
         double dx = mx - SEMI, dy = my - SEMI;
         if (dx * dx + dy * dy > r_disc * r_disc * 0.6)
             continue;
@@ -48,9 +50,15 @@ static void reddere_supergigas(
         );
 }
 
-static void supergigas_ex_ison(sidus_t *s, const char *ison)
+void supergigas_ex_ison(supergigas_t *s, const char *ison)
 {
-    s->qui = SIDUS_SUPERGIGAS;
-    s->ubi.supergigas.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
-    s->ubi.supergigas.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 4000);
+    s->pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 4000);
+}
+
+void supergigas_in_ison(FILE *f, const supergigas_t *s)
+{
+    fprintf(f, "{\"sidulum\": {\"magnitudo\": %.3f, \"temperatura\": %.1f}", s->pro.magnitudo, s->pro.temperatura);
+    fprintf(f, ", \"supergigulum\": {}");
+    fprintf(f, "}");
 }

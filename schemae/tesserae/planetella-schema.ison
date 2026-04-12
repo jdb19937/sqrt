@@ -1,18 +1,18 @@
 {
-  "titulus": "planetella",
-  "properties": {
-    "radius": {
-      "type": "number"
+    "titulus": "planetella",
+    "properties": {
+        "radius": {
+            "type": "number"
+        },
+        "inclinatio": {
+            "type": "number"
+        },
+        "rotatio": {
+            "type": "number"
+        },
+        "semen": {
+            "type": "integer"
+        }
     },
-    "inclinatio": {
-      "type": "number"
-    },
-    "rotatio": {
-      "type": "number"
-    },
-    "semen": {
-      "type": "integer"
-    }
-  },
-  "required": []
+    "required": []
 }

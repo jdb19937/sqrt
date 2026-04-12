@@ -1,0 +1,90 @@
+{
+    "latitudo": 1024,
+    "altitudo": 1024,
+    "numerus_stellarum": 10000,
+    "semen": 99,
+    "planetae": [
+        {
+            "nomen": "Terra",
+            "scala": 0.5,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.9,
+                    "inclinatio": 0.41,
+                    "rotatio": 4.0,
+                    "semen": 30137
+                },
+                "saxosculum": {
+                    "silicata": 0.35,
+                    "ferrum": 0.10,
+                    "aqua": 0.71,
+                    "continentes": 6,
+                    "tectonica": 0.7,
+                    "pressio_kPa": 101.0,
+                    "n2": 0.78,
+                    "o2": 0.21,
+                    "nubes": 0.30
+                }
+            },
+            "orbita": {
+                "cx": 500.0,
+                "cy": 300.0,
+                "periodus": 360
+            }
+        },
+        {
+            "nomen": "Jupiter",
+            "scala": 0.45,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.9,
+                    "inclinatio": 0.055,
+                    "rotatio": 0.0,
+                    "semen": 5971
+                },
+                "gaseosculum": {
+                    "h2": 0.90,
+                    "he": 0.10,
+                    "fasciae": 12,
+                    "fasciae_contrast": 0.75,
+                    "maculae": 1,
+                    "macula_lat": -0.38,
+                    "macula_lon": 0.3,
+                    "macula_radius": 0.15,
+                    "macula_obscuritas": 0.8
+                }
+            },
+            "orbita": {
+                "cx": 100.0,
+                "cy": 800.0,
+                "periodus": 360
+            }
+        },
+        {
+            "nomen": "Sol",
+            "scala": 1.0,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.88,
+                    "semen": 77777
+                },
+                "soliculum": {
+                    "fusio": 1.0,
+                    "temperatura": 5778,
+                    "corona": 0.65,
+                    "granulatio": 0.50,
+                    "h2": 0.735,
+                    "he": 0.248,
+                    "maculae": 4,
+                    "macula_radius": 0.8,
+                    "macula_obscuritas": 0.55
+                }
+            },
+            "orbita": {
+                "cx": 700.0,
+                "cy": 560.0,
+                "periodus": 360
+            }
+        }
+    ]
+}

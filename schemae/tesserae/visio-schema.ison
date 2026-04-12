@@ -1,14 +1,14 @@
 {
-  "titulus": "visio",
-  "oneOf": [
-    {
-      "$ref": "torus-schema.ison"
-    },
-    {
-      "$ref": "navis-schema.ison"
-    },
-    {
-      "$ref": "zeppelinus-schema.ison"
-    }
-  ]
+    "titulus": "visio",
+    "oneOf": [
+        {
+            "$ref": "torus-schema.ison"
+        },
+        {
+            "$ref": "navis-schema.ison"
+        },
+        {
+            "$ref": "zeppelinus-schema.ison"
+        }
+    ]
 }

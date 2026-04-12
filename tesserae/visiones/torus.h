@@ -27,4 +27,8 @@ typedef struct {
     toriculus_t res;
 } torus_t;
 
+void torus_reddere(unsigned char *fenestra, const torus_t *t);
+void torus_in_ison(FILE *f, const torus_t *s);
+void torus_ex_ison(torus_t *s, const char *ison);
+
 #endif /* VISIO_TORUS_H */

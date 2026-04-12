@@ -1,84 +1,84 @@
 {
-  "titulus": "parvulum",
-  "properties": {
-    "silicata": {
-      "type": "number"
+    "titulus": "parvulum",
+    "properties": {
+        "silicata": {
+            "type": "number"
+        },
+        "ferrum": {
+            "type": "number"
+        },
+        "sulphur": {
+            "type": "number"
+        },
+        "carbo": {
+            "type": "number"
+        },
+        "glacies": {
+            "type": "number"
+        },
+        "glacies_co2": {
+            "type": "number"
+        },
+        "malachita": {
+            "type": "number"
+        },
+        "aqua": {
+            "type": "number"
+        },
+        "aqua_profunditas": {
+            "type": "number"
+        },
+        "continentes": {
+            "type": "integer"
+        },
+        "scala": {
+            "type": "number"
+        },
+        "tectonica": {
+            "type": "number"
+        },
+        "craterae": {
+            "type": "number"
+        },
+        "maria": {
+            "type": "number"
+        },
+        "vulcanismus": {
+            "type": "number"
+        },
+        "pressio_kPa": {
+            "type": "number"
+        },
+        "n2": {
+            "type": "number"
+        },
+        "o2": {
+            "type": "number"
+        },
+        "co2": {
+            "type": "number"
+        },
+        "ch4": {
+            "type": "number"
+        },
+        "h2": {
+            "type": "number"
+        },
+        "he": {
+            "type": "number"
+        },
+        "nh3": {
+            "type": "number"
+        },
+        "pulvis": {
+            "type": "number"
+        },
+        "nubes": {
+            "type": "number"
+        },
+        "polaris": {
+            "type": "number"
+        }
     },
-    "ferrum": {
-      "type": "number"
-    },
-    "sulphur": {
-      "type": "number"
-    },
-    "carbo": {
-      "type": "number"
-    },
-    "glacies": {
-      "type": "number"
-    },
-    "glacies_co2": {
-      "type": "number"
-    },
-    "malachita": {
-      "type": "number"
-    },
-    "aqua": {
-      "type": "number"
-    },
-    "aqua_profunditas": {
-      "type": "number"
-    },
-    "continentes": {
-      "type": "integer"
-    },
-    "scala": {
-      "type": "number"
-    },
-    "tectonica": {
-      "type": "number"
-    },
-    "craterae": {
-      "type": "number"
-    },
-    "maria": {
-      "type": "number"
-    },
-    "vulcanismus": {
-      "type": "number"
-    },
-    "pressio_kPa": {
-      "type": "number"
-    },
-    "n2": {
-      "type": "number"
-    },
-    "o2": {
-      "type": "number"
-    },
-    "co2": {
-      "type": "number"
-    },
-    "ch4": {
-      "type": "number"
-    },
-    "h2": {
-      "type": "number"
-    },
-    "he": {
-      "type": "number"
-    },
-    "nh3": {
-      "type": "number"
-    },
-    "pulvis": {
-      "type": "number"
-    },
-    "nubes": {
-      "type": "number"
-    },
-    "polaris": {
-      "type": "number"
-    }
-  },
-  "required": []
+    "required": []
 }

@@ -9,10 +9,55 @@
 #include "instrumentum.h"
 #include "tessera.h"
 #include "campus.h"
+#include "ison.h"
 
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* ================================================================
+ * ISON
+ * ================================================================ */
+
+void instrumentum_ex_ison(instrumentum_t *inst, const char *ison)
+{
+    memset(inst, 0, sizeof(*inst));
+    inst->spiculae      = (int)ison_da_f(ison, "spiculae", 0);
+    inst->spiculae_long = ison_da_f(ison, "spiculae_long", 0);
+    inst->spiculae_ang  = ison_da_f(ison, "spiculae_ang", 0);
+    inst->halo_radius   = ison_da_f(ison, "halo_radius", 0);
+    inst->halo_vis      = ison_da_f(ison, "halo_vis", 0);
+    inst->amplificatio  = ison_da_f(ison, "amplificatio", 0);
+    inst->saturatio     = ison_da_f(ison, "saturatio", 1.0);
+    inst->aberratio     = ison_da_f(ison, "aberratio", 0.0);
+    inst->visio         = ison_da_f(ison, "visio", 0.0);
+    inst->scintillatio  = ison_da_f(ison, "scintillatio", 0.0);
+    inst->caeli_lumen   = ison_da_f(ison, "caeli_lumen", 0.0);
+    inst->refractio     = ison_da_f(ison, "refractio", 0.0);
+    inst->florescentia  = ison_da_f(ison, "florescentia", 0.0);
+    inst->acuitas       = ison_da_f(ison, "acuitas", 0.0);
+    inst->vignetta      = ison_da_f(ison, "vignetta", 0.0);
+    inst->distorsio     = ison_da_f(ison, "distorsio", 0.0);
+    inst->fenestra      = ison_da_f(ison, "fenestra", 0.0);
+}
+
+void instrumentum_in_ison(FILE *f, const instrumentum_t *inst)
+{
+    fprintf(
+        f, "{\"spiculae\": %d, \"spiculae_long\": %.2f, \"spiculae_ang\": %.3f"
+        ", \"halo_radius\": %.2f, \"halo_vis\": %.2f"
+        ", \"amplificatio\": %.2f, \"saturatio\": %.2f, \"aberratio\": %.2f"
+        ", \"visio\": %.2f, \"scintillatio\": %.2f, \"caeli_lumen\": %.2f"
+        ", \"refractio\": %.2f, \"florescentia\": %.2f, \"acuitas\": %.2f"
+        ", \"vignetta\": %.2f, \"distorsio\": %.2f, \"fenestra\": %.2f}",
+        inst->spiculae, inst->spiculae_long, inst->spiculae_ang,
+        inst->halo_radius, inst->halo_vis,
+        inst->amplificatio, inst->saturatio, inst->aberratio,
+        inst->visio, inst->scintillatio, inst->caeli_lumen,
+        inst->refractio, inst->florescentia, inst->acuitas,
+        inst->vignetta, inst->distorsio, inst->fenestra
+    );
+}
 
 /* ================================================================
  * generans numerum pseudo-aleatorium (copia ex astra.c)
@@ -558,7 +603,7 @@ static void pp_fenestra(
 }
 
 /* pipeline post-processationis — omnes effectus in ordine physico */
-void isonl_post_processare(
+void campus_post_processare(
     campus_t *c,
     const instrumentum_t *inst
 ) {
@@ -670,7 +715,7 @@ campus_t *campus_tabulam_dynamicam(
     /* semen temporale — mutamus semen_g globalem ante effectus */
     semen_g = (unsigned int)(tabula * 73856093u + 42);
 
-    isonl_post_processare(out, &dyn);
+    campus_post_processare(out, &dyn);
 
     return out;
 }

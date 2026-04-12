@@ -26,4 +26,8 @@ typedef struct {
     naviculus_t  res;
 } navis_t;
 
+void navis_reddere(unsigned char *fenestra, const navis_t *n);
+void navis_in_ison(FILE *f, const navis_t *s);
+void navis_ex_ison(navis_t *s, const char *ison);
+
 #endif /* VISIO_NAVIS_H */

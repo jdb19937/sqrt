@@ -16,3 +16,5 @@ redde
 *.gif
 libsqrt.a
 genera
+*.swp
+*.swo

@@ -46,4 +46,8 @@ typedef struct {
     gaseosculum_t res;
 } gaseosum_t;
 
+void reddere_gaseosum(unsigned char *fen, const gaseosum_t *p);
+void gaseosum_in_ison(FILE *f, const gaseosum_t *s);
+void gaseosum_ex_ison(gaseosum_t *s, const char *ison);
+
 #endif /* PLANETA_GASEOSUM_H */

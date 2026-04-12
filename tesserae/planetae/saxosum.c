@@ -1,6 +1,7 @@
+#include "../planeta_communia.h"
 /* saxosum.c — renderer planetae saxosi (included from planeta.c) */
 
-static double continent_mask(double lon, double lat, const saxosum_t *p)
+double continent_mask(double lon, double lat, const saxosum_t *p)
 {
     if (p->res.aqua < 0.01)
         return 1.0; /* nulla aqua → tota terra */
@@ -49,9 +50,8 @@ static double continent_mask(double lon, double lat, const saxosum_t *p)
     return (terrain > limen) ? 1.0 : 0.0;
 }
 
-static void reddere_saxosum(
-    unsigned char *fen, const saxosum_t *p,
-    const planeta_perceptus_t *perc
+void reddere_saxosum(
+    unsigned char *fen, const saxosum_t *p
 ) {
     double rad      = p->pro.radius;
     double pnorm    = fmin(1.0, p->res.pressio_kPa / 101.0); /* [0,1] normalized */
@@ -67,15 +67,6 @@ static void reddere_saxosum(
                 )
             )
                 continue;
-
-            double illum = illuminatio(px, py, rad, perc->aspectus.situs, perc->aspectus.angulus) * perc->aspectus.lumen;
-            if (perc->coaspectus.lumen > 0.001)
-                illum += illuminatio(px, py, rad, perc->coaspectus.situs, perc->coaspectus.angulus) * perc->coaspectus.lumen;
-            if (illum < 0.003) {
-                /* latus obscurum — opacum nigrum ne stellae transluceant */
-                fen_pixel(fen, px, py, 0.0, 0.0, 0.0, 1.0);
-                continue;
-            }
 
             /* coordinatae strepitus — scala pro detallo ad 256px */
             double nx = lon / DPI * 10.0;
@@ -201,7 +192,6 @@ static void reddere_saxosum(
                             lava = (color_t){0.8 + 0.2 * t2, 0.15 + 0.55 * t2, 0.02 + 0.2 * t2, 1.0};
                         }
                         col   = miscere(col, lava, t);
-                        illum = fmax(illum, t * 0.8);
                     }
                 }
             } else {
@@ -255,17 +245,6 @@ static void reddere_saxosum(
                 prof = fmax(0.0, fmin(1.0, prof));
                 col  = color_aquae(prof, var);
 
-                /* specularis: reflexio solaris */
-                double dx   = (px - SEMI) / (rad * SEMI);
-                double dy   = (py - SEMI) / (rad * SEMI);
-                double sx   = dx + cos(perc->aspectus.angulus) * 0.20;
-                double sy   = dy + sin(perc->aspectus.angulus) * 0.20;
-                double spec = exp(-(sx * sx + sy * sy) * 6.0);
-                spec *= (1.0 - perc->aspectus.situs) * 0.35;
-                col.r = fmin(1.0, col.r + spec);
-                col.g = fmin(1.0, col.g + spec * 0.95);
-                col.b = fmin(1.0, col.b + spec * 0.85);
-
                 /* micro undae oceani */
                 double wave = strepitus2(nx * 30.0 + 91.0, ny * 30.0 + 97.0);
                 col.r *= 0.95 + 0.05 * wave;
@@ -308,55 +287,6 @@ static void reddere_saxosum(
                 }
             }
 
-            /* bump mapping: terrain elevatio modulat normalem superficiei */
-            if (terra) {
-                double h = 0.002;
-                double e_here = fbm_warp(
-                    nx + (p->pro.semen & 0xFF) * 0.13,
-                    ny + ((p->pro.semen >> 8) & 0xFF) * 0.13,
-                    5, 0.5, 1.0 + p->res.tectonica * 3.0
-                );
-                double nx_e = (lon + h) / DPI * 10.0;
-                double ny_n = ((lat + h) / PI + 0.5) * 5.0;
-                double e_east = fbm_warp(
-                    nx_e + (p->pro.semen & 0xFF) * 0.13,
-                    ny + ((p->pro.semen >> 8) & 0xFF) * 0.13,
-                    5, 0.5, 1.0 + p->res.tectonica * 3.0
-                );
-                double e_north = fbm_warp(
-                    nx + (p->pro.semen & 0xFF) * 0.13,
-                    ny_n + ((p->pro.semen >> 8) & 0xFF) * 0.13,
-                    5, 0.5, 1.0 + p->res.tectonica * 3.0
-                );
-                double dlon_b = (e_east - e_here) * 8.0;
-                double dlat_b = (e_north - e_here) * 8.0;
-                double bump   = -dlon_b * cos(perc->aspectus.angulus) - dlat_b * sin(perc->aspectus.angulus);
-                illum *= fmax(0.3, 1.0 + bump * 0.6);
-            }
-
-            /* umbrae nubium: offset in directione lucis simulat umbram proiectam */
-            if (p->res.nubes > 0.05 && p->res.pressio_kPa > 0.3 && illum > 0.1) {
-                double umbra_dx = cos(perc->aspectus.angulus) * 0.03;
-                double umbra_dy = sin(perc->aspectus.angulus) * 0.03;
-                double shadow_lon = lon + umbra_dx;
-                double shadow_lat = lat + umbra_dy;
-                double snx = shadow_lon / DPI * 10.0;
-                double sny = (shadow_lat / PI + 0.5) * 5.0;
-                double scn = fbm_warp(snx * 0.1 + 50.0, sny * 0.1 + 50.0, 7, 0.55, 2.0);
-                double scn2 = fbm(snx * 0.25 + 80.0, sny * 0.25 + 80.0, 5, 0.5);
-                scn = scn * 0.65 + scn2 * 0.35;
-                double sthr = 1.0 - p->res.nubes * 0.6;
-                if (scn > sthr) {
-                    double shadow_t = (scn - sthr) / fmax(0.01, 1.0 - sthr);
-                    shadow_t        = shadow_t * shadow_t;
-                    illum *= 1.0 - shadow_t * 0.35;
-                }
-            }
-
-            col.r *= illum;
-            col.g *= illum;
-            col.b *= illum;
-
             /* atmosphaera limbus: crescit cum pressione */
             if (pnorm > 0.003) {
                 double dx   = (px - SEMI) / (rad * SEMI);
@@ -384,13 +314,7 @@ static void reddere_saxosum(
                 double d  = sqrt(r2);
                 double al = (1.0 - (d - interior) / (1.0 - interior));
                 al        = al * al * al * pnorm * 0.4;
-                double il = illuminatio(
-                    px, py, halo_ext, perc->aspectus.situs, perc->aspectus.angulus
-                ) * perc->aspectus.lumen;
-                if (perc->coaspectus.lumen > 0.001)
-                    il += illuminatio(
-                        px, py, halo_ext, perc->coaspectus.situs, perc->coaspectus.angulus
-                    ) * perc->coaspectus.lumen;
+                double il = 1.0;
                 al *= fmax(0.1, il);
                 fen_pixel(fen, px, py, atm_col.r, atm_col.g, atm_col.b, al);
             }
@@ -398,39 +322,49 @@ static void reddere_saxosum(
     }
 }
 
-static planeta_t *saxosum_ex_ison(const char *ison)
+void saxosum_ex_ison(saxosum_t *v, const char *ison)
 {
-    planeta_t *v = calloc(1, sizeof(planeta_t));
-    v->qui = PLANETA_SAXOSUM;
-    v->ubi.saxosum.pro.radius     = ison_f(ison, "planetella.radius", 0.9);
-    v->ubi.saxosum.pro.inclinatio = ison_f(ison, "planetella.inclinatio", 0.0);
-    v->ubi.saxosum.pro.rotatio    = ison_f(ison, "planetella.rotatio", 0.0);
-    v->ubi.saxosum.pro.semen      = (unsigned)ison_f(ison, "planetella.semen", 42);
-    v->ubi.saxosum.res.silicata         = ison_f(ison, "saxosculum.silicata", 0.0);
-    v->ubi.saxosum.res.ferrum           = ison_f(ison, "saxosculum.ferrum", 0.0);
-    v->ubi.saxosum.res.sulphur          = ison_f(ison, "saxosculum.sulphur", 0.0);
-    v->ubi.saxosum.res.carbo            = ison_f(ison, "saxosculum.carbo", 0.0);
-    v->ubi.saxosum.res.glacies          = ison_f(ison, "saxosculum.glacies", 0.0);
-    v->ubi.saxosum.res.glacies_co2      = ison_f(ison, "saxosculum.glacies_co2", 0.0);
-    v->ubi.saxosum.res.malachita        = ison_f(ison, "saxosculum.malachita", 0.0);
-    v->ubi.saxosum.res.aqua             = ison_f(ison, "saxosculum.aqua", 0.0);
-    v->ubi.saxosum.res.aqua_profunditas = ison_f(ison, "saxosculum.aqua_profunditas", 0.5);
-    v->ubi.saxosum.res.continentes      = (int)ison_f(ison, "saxosculum.continentes", 0);
-    v->ubi.saxosum.res.scala            = ison_f(ison, "saxosculum.scala", 1.0);
-    v->ubi.saxosum.res.tectonica        = ison_f(ison, "saxosculum.tectonica", 0.3);
-    v->ubi.saxosum.res.craterae         = ison_f(ison, "saxosculum.craterae", 0.0);
-    v->ubi.saxosum.res.maria            = ison_f(ison, "saxosculum.maria", 0.0);
-    v->ubi.saxosum.res.vulcanismus      = ison_f(ison, "saxosculum.vulcanismus", 0.0);
-    v->ubi.saxosum.res.pressio_kPa      = ison_f(ison, "saxosculum.pressio_kPa", 0.0);
-    v->ubi.saxosum.res.n2               = ison_f(ison, "saxosculum.n2", 0.0);
-    v->ubi.saxosum.res.o2               = ison_f(ison, "saxosculum.o2", 0.0);
-    v->ubi.saxosum.res.co2              = ison_f(ison, "saxosculum.co2", 0.0);
-    v->ubi.saxosum.res.ch4              = ison_f(ison, "saxosculum.ch4", 0.0);
-    v->ubi.saxosum.res.h2               = ison_f(ison, "saxosculum.h2", 0.0);
-    v->ubi.saxosum.res.he               = ison_f(ison, "saxosculum.he", 0.0);
-    v->ubi.saxosum.res.nh3              = ison_f(ison, "saxosculum.nh3", 0.0);
-    v->ubi.saxosum.res.pulvis           = ison_f(ison, "saxosculum.pulvis", 0.0);
-    v->ubi.saxosum.res.nubes            = ison_f(ison, "saxosculum.nubes", 0.0);
-    v->ubi.saxosum.res.polaris          = ison_f(ison, "saxosculum.polaris", 0.0);
-    return v;
+    v->pro.radius     = ison_f(ison, "planetella.radius", 0.9);
+    v->pro.inclinatio = ison_f(ison, "planetella.inclinatio", 0.0);
+    v->pro.rotatio    = ison_f(ison, "planetella.rotatio", 0.0);
+    v->pro.semen      = (unsigned)ison_f(ison, "planetella.semen", 42);
+    v->res.silicata         = ison_f(ison, "saxosculum.silicata", 0.0);
+    v->res.ferrum           = ison_f(ison, "saxosculum.ferrum", 0.0);
+    v->res.sulphur          = ison_f(ison, "saxosculum.sulphur", 0.0);
+    v->res.carbo            = ison_f(ison, "saxosculum.carbo", 0.0);
+    v->res.glacies          = ison_f(ison, "saxosculum.glacies", 0.0);
+    v->res.glacies_co2      = ison_f(ison, "saxosculum.glacies_co2", 0.0);
+    v->res.malachita        = ison_f(ison, "saxosculum.malachita", 0.0);
+    v->res.aqua             = ison_f(ison, "saxosculum.aqua", 0.0);
+    v->res.aqua_profunditas = ison_f(ison, "saxosculum.aqua_profunditas", 0.5);
+    v->res.continentes      = (int)ison_f(ison, "saxosculum.continentes", 0);
+    v->res.scala            = ison_f(ison, "saxosculum.scala", 1.0);
+    v->res.tectonica        = ison_f(ison, "saxosculum.tectonica", 0.3);
+    v->res.craterae         = ison_f(ison, "saxosculum.craterae", 0.0);
+    v->res.maria            = ison_f(ison, "saxosculum.maria", 0.0);
+    v->res.vulcanismus      = ison_f(ison, "saxosculum.vulcanismus", 0.0);
+    v->res.pressio_kPa      = ison_f(ison, "saxosculum.pressio_kPa", 0.0);
+    v->res.n2               = ison_f(ison, "saxosculum.n2", 0.0);
+    v->res.o2               = ison_f(ison, "saxosculum.o2", 0.0);
+    v->res.co2              = ison_f(ison, "saxosculum.co2", 0.0);
+    v->res.ch4              = ison_f(ison, "saxosculum.ch4", 0.0);
+    v->res.h2               = ison_f(ison, "saxosculum.h2", 0.0);
+    v->res.he               = ison_f(ison, "saxosculum.he", 0.0);
+    v->res.nh3              = ison_f(ison, "saxosculum.nh3", 0.0);
+    v->res.pulvis           = ison_f(ison, "saxosculum.pulvis", 0.0);
+    v->res.nubes            = ison_f(ison, "saxosculum.nubes", 0.0);
+    v->res.polaris          = ison_f(ison, "saxosculum.polaris", 0.0);
+}
+
+void saxosum_in_ison(FILE *f, const saxosum_t *s)
+{
+    fprintf(f, "{\"planetella\": {\"radius\": %.2f, \"inclinatio\": %.3f, \"rotatio\": %.1f, \"semen\": %u}",
+        s->pro.radius, s->pro.inclinatio, s->pro.rotatio, s->pro.semen);
+    fprintf(f, ", \"saxosculum\": {\"silicata\": %.2f, \"ferrum\": %.2f, \"sulphur\": %.2f, \"carbo\": %.2f, \"glacies\": %.2f, \"glacies_co2\": %.2f, \"malachita\": %.2f, \"aqua\": %.2f, \"aqua_profunditas\": %.1f, \"continentes\": %d, \"scala\": %.1f, \"tectonica\": %.1f, \"craterae\": %.2f, \"maria\": %.2f, \"vulcanismus\": %.1f, \"pressio_kPa\": %.1f, \"n2\": %.3f, \"o2\": %.3f, \"co2\": %.3f, \"ch4\": %.3f, \"h2\": %.3f, \"he\": %.3f, \"nh3\": %.3f, \"pulvis\": %.1f, \"nubes\": %.2f, \"polaris\": %.2f}}",
+        s->res.silicata, s->res.ferrum, s->res.sulphur, s->res.carbo,
+        s->res.glacies, s->res.glacies_co2, s->res.malachita,
+        s->res.aqua, s->res.aqua_profunditas, s->res.continentes, s->res.scala,
+        s->res.tectonica, s->res.craterae, s->res.maria, s->res.vulcanismus,
+        s->res.pressio_kPa, s->res.n2, s->res.o2, s->res.co2, s->res.ch4,
+        s->res.h2, s->res.he, s->res.nh3, s->res.pulvis, s->res.nubes, s->res.polaris);
 }

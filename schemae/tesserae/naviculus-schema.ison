@@ -1,27 +1,27 @@
 {
-  "titulus": "naviculus",
-  "properties": {
-    "centrum_re": {
-      "type": "number"
+    "titulus": "naviculus",
+    "properties": {
+        "centrum_re": {
+            "type": "number"
+        },
+        "centrum_im": {
+            "type": "number"
+        },
+        "amplitudo": {
+            "type": "number"
+        },
+        "iterationes": {
+            "type": "integer"
+        },
+        "color_cyclus": {
+            "type": "number"
+        },
+        "color_phase": {
+            "type": "number"
+        },
+        "saturatio": {
+            "type": "number"
+        }
     },
-    "centrum_im": {
-      "type": "number"
-    },
-    "amplitudo": {
-      "type": "number"
-    },
-    "iterationes": {
-      "type": "integer"
-    },
-    "color_cyclus": {
-      "type": "number"
-    },
-    "color_phase": {
-      "type": "number"
-    },
-    "saturatio": {
-      "type": "number"
-    }
-  },
-  "required": []
+    "required": []
 }

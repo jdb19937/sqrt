@@ -19,3 +19,11 @@ planeta_aspectus_t planeta_aspectus_ex_ison(const char *ison)
     a.lumen   = ison_da_f(ison, "lumen",   1.0);
     return a;
 }
+
+void planeta_aspectus_in_ison(FILE *f, const planeta_aspectus_t *a)
+{
+    fprintf(
+        f, "{\"situs\": %.2f, \"angulus\": %.2f, \"lumen\": %.1f}",
+        a->situs, a->angulus, a->lumen
+    );
+}

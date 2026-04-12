@@ -1,3 +1,4 @@
+#include "../visio_communia.h"
 /* ================================================================
  * zeppelinus — corpus ellipsoidale cum gondola
  *
@@ -5,7 +6,7 @@
  * ================================================================ */
 
 /* ray-ellipsoid intersection: ellipsoid (x/a)^2 + (y/b)^2 + (z/c)^2 = 1 */
-static int ellipsoid_ictus(
+int ellipsoid_ictus(
     vec3_t orig, vec3_t dir,
     double a, double b, double c,
     double *t_res, vec3_t *norm_res
@@ -43,7 +44,7 @@ static int ellipsoid_ictus(
 }
 
 /* ray-box intersection (gondola) */
-static int arca_ictus(
+int arca_ictus(
     vec3_t orig, vec3_t dir,
     vec3_t bmin, vec3_t bmax,
     double *t_res, vec3_t *norm_res
@@ -115,7 +116,7 @@ static int arca_ictus(
     return 1;
 }
 
-static void zeppelinus_reddere(unsigned char *fenestra, const zeppelinus_t *z)
+void zeppelinus_reddere(unsigned char *fenestra, const zeppelinus_t *z)
 {
     double ratio = z->res.ratio > 0 ? z->res.ratio : 4.0;
     double incl  = z->res.inclinatio;
@@ -290,31 +291,38 @@ static void zeppelinus_reddere(unsigned char *fenestra, const zeppelinus_t *z)
     }
 }
 
-static visio_t *zeppelinus_ex_ison(const char *ison)
+void zeppelinus_ex_ison(zeppelinus_t *v, const char *ison)
 {
-    visio_t *v = (visio_t *)calloc(1, sizeof(visio_t));
-    if (!v) return NULL;
-    v->qui = VISIO_ZEPPELINUS;
-    v->ubi.zeppelinus.pro.semen = (unsigned)ison_da_n(ison, "visiuncula.semen", 42);
-    v->ubi.zeppelinus.res.ratio        = ison_da_f(ison, "zeppelinulus.ratio", 4.0);
-    v->ubi.zeppelinus.res.inclinatio   = ison_da_f(ison, "zeppelinulus.inclinatio", 0.0);
-    v->ubi.zeppelinus.res.azimuthus    = ison_da_f(ison, "zeppelinulus.azimuthus", 0.0);
-    v->ubi.zeppelinus.res.lux_angulus  = ison_da_f(ison, "zeppelinulus.lux_angulus", 0.8);
-    v->ubi.zeppelinus.res.lux_elevatio = ison_da_f(ison, "zeppelinulus.lux_elevatio", 0.6);
-    v->ubi.zeppelinus.res.involucrum   = (color_t){
+    v->pro.semen = (unsigned)ison_da_n(ison, "visiuncula.semen", 42);
+    v->res.ratio        = ison_da_f(ison, "zeppelinulus.ratio", 4.0);
+    v->res.inclinatio   = ison_da_f(ison, "zeppelinulus.inclinatio", 0.0);
+    v->res.azimuthus    = ison_da_f(ison, "zeppelinulus.azimuthus", 0.0);
+    v->res.lux_angulus  = ison_da_f(ison, "zeppelinulus.lux_angulus", 0.8);
+    v->res.lux_elevatio = ison_da_f(ison, "zeppelinulus.lux_elevatio", 0.6);
+    v->res.involucrum   = (color_t){
         ison_da_f(ison, "zeppelinulus.involucrum.r", 0.60),
         ison_da_f(ison, "zeppelinulus.involucrum.g", 0.62),
         ison_da_f(ison, "zeppelinulus.involucrum.b", 0.65),
         1.0
     };
-    v->ubi.zeppelinus.res.gondola = (color_t){
+    v->res.gondola = (color_t){
         ison_da_f(ison, "zeppelinulus.gondola.r", 0.25),
         ison_da_f(ison, "zeppelinulus.gondola.g", 0.18),
         ison_da_f(ison, "zeppelinulus.gondola.b", 0.12),
         1.0
     };
-    v->ubi.zeppelinus.res.elevatio  = ison_da_f(ison, "zeppelinulus.elevatio", 0.15);
-    v->ubi.zeppelinus.res.fenestrae = ison_da_f(ison, "zeppelinulus.fenestrae", 6.0);
-    v->ubi.zeppelinus.res.pinnae    = ison_da_f(ison, "zeppelinulus.pinnae", 0.4);
-    return v;
+    v->res.elevatio  = ison_da_f(ison, "zeppelinulus.elevatio", 0.15);
+    v->res.fenestrae = ison_da_f(ison, "zeppelinulus.fenestrae", 6.0);
+    v->res.pinnae    = ison_da_f(ison, "zeppelinulus.pinnae", 0.4);
+}
+
+void zeppelinus_in_ison(FILE *f, const zeppelinus_t *s)
+{
+    fprintf(f, "{\"visiuncula\": {\"semen\": %u}", s->pro.semen);
+    fprintf(f, ", \"zeppelinulus\": {\"ratio\": %.6f, \"inclinatio\": %.6f, \"azimuthus\": %.6f, \"lux_angulus\": %.6f, \"lux_elevatio\": %.6f, \"involucrum\": {\"r\": %.6f, \"g\": %.6f, \"b\": %.6f}, \"gondola\": {\"r\": %.6f, \"g\": %.6f, \"b\": %.6f}, \"elevatio\": %.6f, \"fenestrae\": %.6f, \"pinnae\": %.6f}}",
+        s->res.ratio, s->res.inclinatio, s->res.azimuthus,
+        s->res.lux_angulus, s->res.lux_elevatio,
+        s->res.involucrum.r, s->res.involucrum.g, s->res.involucrum.b,
+        s->res.gondola.r, s->res.gondola.g, s->res.gondola.b,
+        s->res.elevatio, s->res.fenestrae, s->res.pinnae);
 }

@@ -1,23 +1,57 @@
 {
-  "titulus": "instrumentum",
-  "properties": {
-    "spiculae":       {"type": "integer"},
-    "spiculae_long":  {"type": "number"},
-    "spiculae_ang":   {"type": "number"},
-    "halo_radius":    {"type": "number"},
-    "halo_vis":       {"type": "number"},
-    "amplificatio":   {"type": "number"},
-    "saturatio":      {"type": "number"},
-    "aberratio":      {"type": "number"},
-    "visio":          {"type": "number"},
-    "scintillatio":   {"type": "number"},
-    "caeli_lumen":    {"type": "number"},
-    "refractio":      {"type": "number"},
-    "florescentia":   {"type": "number"},
-    "acuitas":        {"type": "number"},
-    "vignetta":       {"type": "number"},
-    "distorsio":      {"type": "number"},
-    "fenestra":       {"type": "number"}
-  },
-  "required": []
+    "titulus": "instrumentum",
+    "properties": {
+        "spiculae": {
+            "type": "integer"
+        },
+        "spiculae_long": {
+            "type": "number"
+        },
+        "spiculae_ang": {
+            "type": "number"
+        },
+        "halo_radius": {
+            "type": "number"
+        },
+        "halo_vis": {
+            "type": "number"
+        },
+        "amplificatio": {
+            "type": "number"
+        },
+        "saturatio": {
+            "type": "number"
+        },
+        "aberratio": {
+            "type": "number"
+        },
+        "visio": {
+            "type": "number"
+        },
+        "scintillatio": {
+            "type": "number"
+        },
+        "caeli_lumen": {
+            "type": "number"
+        },
+        "refractio": {
+            "type": "number"
+        },
+        "florescentia": {
+            "type": "number"
+        },
+        "acuitas": {
+            "type": "number"
+        },
+        "vignetta": {
+            "type": "number"
+        },
+        "distorsio": {
+            "type": "number"
+        },
+        "fenestra": {
+            "type": "number"
+        }
+    },
+    "required": []
 }

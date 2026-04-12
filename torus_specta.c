@@ -25,6 +25,8 @@
 #include "instrumentum.h"
 #include "tessera.h"
 #include "campus.h"
+#include "formula.h"
+#include "orbita.h"
 #include "ison.h"
 
 #include "phantasma.h"
@@ -56,45 +58,6 @@ typedef struct {
 static sidus_registrum_t sidera[SIDERA_MAX];
 static int numerus_siderum = 0;
 
-static void catalogum_sidus_legere(const char *entry)
-{
-    if (numerus_siderum >= SIDERA_MAX)
-        return;
-
-    sidus_registrum_t *s = &sidera[numerus_siderum];
-    s->x = (int)ison_da_n(entry, "x", 0);
-    s->y = (int)ison_da_n(entry, "y", 0);
-    s->temperatura = ison_da_f(entry, "sidus.sidulum.temperatura", 5000);
-    s->magnitudo   = ison_da_f(entry, "sidus.sidulum.magnitudo", 6.0);
-
-    /* detege genus ex clavibus praesentibus in sidus */
-    static const struct {
-        const char *clavis;
-        const char *nomen;
-    } genera[] = {
-        {"sidus.vaganulus",      "vagans"},
-        {"sidus.galaxiola",      "galaxia"},
-        {"sidus.magnetarulum",   "magnetar"},
-        {"sidus.nanulum_album",  "nanum_album"},
-        {"sidus.gigulum_rubrum", "gigas_rubrum"},
-        {"sidus.supergigulum",   "supergigas"},
-        {"sidus.neutroniulum",   "neutronium"},
-        {"sidus.crystallulum",   "crystallinum"},
-    };
-    strcpy(s->genus, "sequentia");
-    for (int i = 0; i < 8; i++) {
-        char *tmp = ison_da_crudum(entry, genera[i].clavis);
-        if (tmp) {
-            free(tmp);
-            strncpy(s->genus, genera[i].nomen, 23);
-            s->genus[23] = '\0';
-            break;
-        }
-    }
-
-    numerus_siderum++;
-}
-
 /* indices 256 siderum lucidissimorum (magnitudo minima = lucidissimum) */
 static int sidera_lucida[256];
 static int numerus_lucidorum = 0;
@@ -122,26 +85,6 @@ static void sidera_lucida_computare(void)
     free(indices);
 }
 
-static void catalogum_elementum(const char *elem, void *ctx)
-{
-    (void)ctx;
-    catalogum_sidus_legere(elem);
-}
-
-static void catalogum_legere(const char *via_ison)
-{
-    numerus_siderum = 0;
-    char *ison      = ison_lege_plicam(via_ison);
-    if (!ison)
-        return;
-    ison_pro_quoque_elemento(ison, "sidera", catalogum_elementum, NULL);
-    free(ison);
-    sidera_lucida_computare();
-    fprintf(
-        stderr, "Catalogum: %d sidera, %d lucida.\n",
-        numerus_siderum, numerus_lucidorum
-    );
-}
 
 /* inveni sidus proximum inter 100 lucidissima, intra radium 40px */
 static int inveni_sidus(int cx, int cy, int cam_lat, int cam_alt)
@@ -617,15 +560,57 @@ int main(int argc, char **argv)
     int superficies_obsoleta = 0;
     fprintf(stderr, "Superficies parata: %zu vertices.\n", n_vert);
 
-    /* campum stellarum ex ISON reddere */
-    const char *via_caela = "caelae/terra.ison";
-    const char *via_instr = "instrumenta/oculus.ison";
-    fprintf(stderr, "Campum stellarum reddens: %s + %s\n", via_caela, via_instr);
-    campus_t *campus = campus_ex_ison_reddere(via_caela, via_instr);
-    if (!campus) {
-        fprintf(stderr, "ERROR: campus stellarum reddere non possum!\n");
+    /* formula et instrumentum legere */
+    const char *via_formula = argc > 1 ? argv[1] : "formulae/terra.ison";
+    const char *via_instr   = argc > 2 ? argv[2] : "instrumenta/oculus.ison";
+    fprintf(stderr, "Formulam legens: %s + %s\n", via_formula, via_instr);
+
+    char *form_ison = ison_lege_plicam(via_formula);
+    if (!form_ison) {
+        fprintf(stderr, "ERROR: %s legere non possum\n", via_formula);
         return 1;
     }
+    formula_t formula;
+    formula_ex_ison(&formula, form_ison);
+    free(form_ison);
+
+    char *instr_ison = ison_lege_plicam(via_instr);
+    if (!instr_ison) {
+        fprintf(stderr, "ERROR: %s legere non possum\n", via_instr);
+        return 1;
+    }
+    instrumentum_t inst;
+    instrumentum_ex_ison(&inst, instr_ison);
+    free(instr_ison);
+
+    /* caelam ex formula generare */
+    caela_t *caela = caela_ex_formula(&formula, 0);
+    if (!caela) {
+        fprintf(stderr, "ERROR: caelam generare non possum\n");
+        return 1;
+    }
+
+    /* fundum (sidera + via lactea) — non mutat */
+    campus_t *campus_fundus = campus_creare(caela->latitudo, caela->altitudo);
+    if (!campus_fundus) {
+        fprintf(stderr, "ERROR: campus creare non possum\n");
+        return 1;
+    }
+    campus_sidera_reddere(campus_fundus, caela, &inst);
+    campus_viam_lacteam_reddere(campus_fundus, caela);
+
+    /* campus activus — copiatur ex fundo, planetae adduntur */
+    size_t campus_sz = (size_t)caela->latitudo * caela->altitudo * 3;
+    campus_t *campus = campus_creare(caela->latitudo, caela->altitudo);
+    if (!campus) {
+        fprintf(stderr, "ERROR: campus creare non possum\n");
+        return 1;
+    }
+    memcpy(campus->pixels, campus_fundus->pixels, campus_sz);
+    campus_planetas_reddere(campus, caela);
+    campus_post_processare(campus, &inst);
+
+    int orbita_passus = 0;
     fprintf(stderr, "Campus stellarum paratus.\n");
 
     size_t n_pix = (size_t)LATITUDO_IMG * ALTITUDO_IMG;
@@ -715,7 +700,16 @@ int main(int argc, char **argv)
     char orbita_nomen[256] = {0};
 
     /* catalogum siderum legere */
-    catalogum_legere(via_caela);
+    /* catalogum siderum ex caela pro UI */
+    numerus_siderum = 0;
+    for (int i = 0; i < caela->numerus_siderum && numerus_siderum < SIDERA_MAX; i++) {
+        sidera[numerus_siderum].x   = caela->sidera[i].x;
+        sidera[numerus_siderum].y   = caela->sidera[i].y;
+        sidera[numerus_siderum].magnitudo = caela->sidera[i].sidus.ubi.sequentia.pro.magnitudo;
+        sidera[numerus_siderum].temperatura = caela->sidera[i].sidus.ubi.sequentia.pro.temperatura;
+        numerus_siderum++;
+    }
+    sidera_lucida_computare();
 
     /* curvatura (warp) status */
     int    curvatura_activa = 0;
@@ -1244,10 +1238,22 @@ int main(int argc, char **argv)
         cam.sursum  = productum_vectoriale(cam.dextrum, cam.ante);
         cam.focalis = 1.6;
 
-        /* fundum stellarum — toroidaliter volvitur cum (theta, phi) */
-        tabulam_purgare(&tab);
+        /* conspectus in campo toroidali */
         int delta_x = (int)(theta / DUO_PI * campus->latitudo);
         int delta_y = (int)(phi   / DUO_PI * campus->altitudo);
+
+        /* orbitas planetarum applicare et campus recreare */
+        orbita_passus++;
+        caela_orbitas_applicare(caela, &formula, orbita_passus);
+        memcpy(campus->pixels, campus_fundus->pixels, campus_sz);
+        campus_planetas_reddere_in_conspectu(
+            campus, caela,
+            delta_x, delta_y, LATITUDO_IMG, ALTITUDO_IMG
+        );
+        campus_post_processare(campus, &inst);
+
+        /* fundum stellarum — toroidaliter volvitur cum (theta, phi) */
+        tabulam_purgare(&tab);
         fundum_implere(
             &tab, campus->pixels,
             campus->latitudo, campus->altitudo,
@@ -1280,18 +1286,21 @@ int main(int argc, char **argv)
             /* fini curvatura cum animatio et generatio ambae perfectae */
             if (curv_tabula >= CURV_TABULAE && curv_generatum) {
                 campus_destruere(campus);
-                campus = campus_ex_ison_reddere(
-                    "/tmp/sqrt_caelae.ison", via_instr
-                );
+                {
+                    char *ci    = ison_lege_plicam("/tmp/sqrt_caelae.ison");
+                    caela_t *cl = ci ? caela_ex_ison(ci) : NULL;
+                    free(ci);
+                    campus = cl ? campus_ex_caela(cl, &inst) : NULL;
+                    caela_destruere(cl);
+                }
                 if (campus) {
-                    catalogum_legere("/tmp/sqrt_caelae.ison");
                     snprintf(
                         status_nuntius, sizeof(status_nuntius),
                         "Systema novum: %d sidera", numerus_siderum
                     );
                 } else {
-                    /* fallback: restitue campus originale */
-                    campus = campus_ex_ison_reddere(via_caela, via_instr);
+                    /* fallback: restitue ex formula */
+                    campus = campus_ex_caela(caela, &inst);
                     snprintf(
                         status_nuntius, sizeof(status_nuntius),
                         "ERRATUM: campus reddere non possum"

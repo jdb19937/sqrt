@@ -1,6 +1,7 @@
+#include "../planeta_communia.h"
 /* nebula.c — renderer nebulae (included from planeta.c) */
 
-static void reddere_nebula(unsigned char *fen, const nebula_t *p)
+void reddere_nebula(unsigned char *fen, const nebula_t *p)
 {
     double ox = (double)( p->pro.semen        & 0xFF) * 0.37;
     double oy = (double)((p->pro.semen >>  8) & 0xFF) * 0.37;
@@ -105,20 +106,26 @@ static void reddere_nebula(unsigned char *fen, const nebula_t *p)
     }
 }
 
-static planeta_t *nebula_ex_ison(const char *ison)
+void nebula_ex_ison(nebula_t *v, const char *ison)
 {
-    planeta_t *v = calloc(1, sizeof(planeta_t));
-    v->qui = PLANETA_NEBULA;
-    v->ubi.nebula.pro.radius     = ison_f(ison, "planetella.radius", 0.9);
-    v->ubi.nebula.pro.inclinatio = ison_f(ison, "planetella.inclinatio", 0.0);
-    v->ubi.nebula.pro.rotatio    = ison_f(ison, "planetella.rotatio", 0.0);
-    v->ubi.nebula.pro.semen      = (unsigned)ison_f(ison, "planetella.semen", 42);
-    v->ubi.nebula.res.temperatura      = ison_f(ison, "nebulula.temperatura", 0.0);
-    v->ubi.nebula.res.luminositas      = ison_f(ison, "nebulula.luminositas", 1.0);
-    v->ubi.nebula.res.h2               = ison_f(ison, "nebulula.h2", 0.0);
-    v->ubi.nebula.res.o2               = ison_f(ison, "nebulula.o2", 0.0);
-    v->ubi.nebula.res.carbo            = ison_f(ison, "nebulula.carbo", 0.0);
-    v->ubi.nebula.res.tectonica        = ison_f(ison, "nebulula.tectonica", 0.5);
-    v->ubi.nebula.res.nubes            = ison_f(ison, "nebulula.nubes", 0.4);
-    return v;
+    v->pro.radius     = ison_f(ison, "planetella.radius", 0.9);
+    v->pro.inclinatio = ison_f(ison, "planetella.inclinatio", 0.0);
+    v->pro.rotatio    = ison_f(ison, "planetella.rotatio", 0.0);
+    v->pro.semen      = (unsigned)ison_f(ison, "planetella.semen", 42);
+    v->res.temperatura      = ison_f(ison, "nebulula.temperatura", 0.0);
+    v->res.luminositas      = ison_f(ison, "nebulula.luminositas", 1.0);
+    v->res.h2               = ison_f(ison, "nebulula.h2", 0.0);
+    v->res.o2               = ison_f(ison, "nebulula.o2", 0.0);
+    v->res.carbo            = ison_f(ison, "nebulula.carbo", 0.0);
+    v->res.tectonica        = ison_f(ison, "nebulula.tectonica", 0.5);
+    v->res.nubes            = ison_f(ison, "nebulula.nubes", 0.4);
+}
+
+void nebula_in_ison(FILE *f, const nebula_t *s)
+{
+    fprintf(f, "{\"planetella\": {\"radius\": %.2f, \"inclinatio\": %.3f, \"rotatio\": %.1f, \"semen\": %u}",
+        s->pro.radius, s->pro.inclinatio, s->pro.rotatio, s->pro.semen);
+    fprintf(f, ", \"nebulula\": {\"temperatura\": %.0f, \"luminositas\": %.1f, \"h2\": %.2f, \"o2\": %.2f, \"carbo\": %.2f, \"tectonica\": %.1f, \"nubes\": %.1f}}",
+        s->res.temperatura, s->res.luminositas,
+        s->res.h2, s->res.o2, s->res.carbo, s->res.tectonica, s->res.nubes);
 }

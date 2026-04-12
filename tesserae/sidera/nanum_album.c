@@ -1,4 +1,6 @@
-static void reddere_nanum_album(
+#include "../sidus_communia.h"
+
+void reddere_nanum_album(
     unsigned char *fen,
     const nanum_album_t *s,
     const instrumentum_t *instr
@@ -17,9 +19,15 @@ static void reddere_nanum_album(
     (void)instr;
 }
 
-static void nanum_album_ex_ison(sidus_t *s, const char *ison)
+void nanum_album_ex_ison(nanum_album_t *s, const char *ison)
 {
-    s->qui = SIDUS_NANUM_ALBUM;
-    s->ubi.nanum_album.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
-    s->ubi.nanum_album.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 10000);
+    s->pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 10000);
+}
+
+void nanum_album_in_ison(FILE *f, const nanum_album_t *s)
+{
+    fprintf(f, "{\"sidulum\": {\"magnitudo\": %.3f, \"temperatura\": %.1f}", s->pro.magnitudo, s->pro.temperatura);
+    fprintf(f, ", \"nanulum_album\": {}");
+    fprintf(f, "}");
 }

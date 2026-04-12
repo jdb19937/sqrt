@@ -1,15 +1,15 @@
 {
-  "titulus": "nebula",
-  "properties": {
-    "tessella": {
-      "$ref": "tessella-schema.ison"
+    "titulus": "nebula",
+    "properties": {
+        "tessella": {
+            "$ref": "tessella-schema.ison"
+        },
+        "planetella": {
+            "$ref": "planetella-schema.ison"
+        },
+        "nebulula": {
+            "$ref": "nebulula-schema.ison"
+        }
     },
-    "planetella": {
-      "$ref": "planetella-schema.ison"
-    },
-    "nebulula": {
-      "$ref": "nebulula-schema.ison"
-    }
-  },
-  "required": []
+    "required": []
 }

@@ -1,13 +1,14 @@
-static void vagans_ex_ison(sidus_t *s, const char *ison)
+#include "../sidus_communia.h"
+
+void vagans_ex_ison(vagans_t *s, const char *ison)
 {
-    s->qui = SIDUS_VAGANS;
-    s->ubi.vagans.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
-    s->ubi.vagans.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 5000);
-    s->ubi.vagans.res.phase       = ison_da_f(ison, "vaganulus.phase", 0.0);
-    s->ubi.vagans.res.angulus     = ison_da_f(ison, "vaganulus.angulus", 0.0);
+    s->pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 5000);
+    s->res.phase       = ison_da_f(ison, "vaganulus.phase", 0.0);
+    s->res.angulus     = ison_da_f(ison, "vaganulus.angulus", 0.0);
 }
 
-static void reddere_vagans(
+void reddere_vagans(
     unsigned char *fen,
     const vagans_t *s,
     const instrumentum_t *instr
@@ -78,4 +79,12 @@ static void reddere_vagans(
             fen[idx + 3] = 255;
         }
     }
+}
+
+void vagans_in_ison(FILE *f, const vagans_t *s)
+{
+    fprintf(f, "{\"sidulum\": {\"magnitudo\": %.3f, \"temperatura\": %.1f}", s->pro.magnitudo, s->pro.temperatura);
+    fprintf(f, ", \"vaganulus\": {\"phase\": %.3f, \"angulus\": %.3f}",
+        s->res.phase, s->res.angulus);
+    fprintf(f, "}");
 }

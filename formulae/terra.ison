@@ -1,0 +1,269 @@
+{
+    "latitudo": 4096,
+    "altitudo": 4096,
+    "numerus_stellarum": 500000,
+    "densitas_galaxiae": 0.80,
+    "inclinatio_galaxiae": 0.22,
+    "latitudo_galaxiae": 0.12,
+    "semen": 42,
+    "galaxia_glow": 1.0,
+    "galaxia_rift": 0.7,
+    "galaxia_nebulae": 6,
+    "max_supergigantes": 2,
+    "max_gigantes": 6,
+    "max_exotica": 0,
+    "numerus_planetarum": 0,
+    "planetae_temp_min": 4200,
+    "planetae_temp_max": 5800,
+    "numerus_galaxiarum": 800,
+    "max_galaxiae": 0,
+    "planetae": [
+        {
+            "nomen": "Nebula Diffusa",
+            "scala": 2.8,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.88,
+                    "semen": 31415
+                },
+                "nebulula": {
+                    "temperatura": 4000,
+                    "luminositas": 0.50,
+                    "h2": 0.55,
+                    "o2": 0.10,
+                    "carbo": 0.20,
+                    "tectonica": 0.55,
+                    "nubes": 0.45
+                }
+            },
+            "orbita": {
+                "cx": 1800.0,
+                "cy": 960.0,
+                "periodus": 360
+            }
+        },
+        {
+            "nomen": "Venus",
+            "scala": 0.30,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.9,
+                    "inclinatio": 0.046,
+                    "rotatio": 1.2,
+                    "semen": 20099
+                },
+                "saxosculum": {
+                    "silicata": 0.50,
+                    "ferrum": 0.20,
+                    "tectonica": 0.5,
+                    "vulcanismus": 0.4,
+                    "pressio_kPa": 9200.0,
+                    "co2": 0.965,
+                    "n2": 0.035,
+                    "nubes": 0.98,
+                    "pulvis": 0.3
+                }
+            },
+            "orbita": {
+                "cx": 700.0,
+                "cy": 520.0,
+                "amplitudo_x": 800.0,
+                "amplitudo_y": 30.0,
+                "phase_y": 1.5708,
+                "periodus": 360,
+                "amplitudo_z": 0.5,
+                "phase_z": 1.5708
+            }
+        },
+        {
+            "nomen": "Terra",
+            "scala": 0.45,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.9,
+                    "inclinatio": 0.4101,
+                    "rotatio": 4.0,
+                    "semen": 30137
+                },
+                "saxosculum": {
+                    "silicata": 0.35,
+                    "ferrum": 0.10,
+                    "malachita": 0.50,
+                    "glacies": 0.05,
+                    "aqua": 0.71,
+                    "aqua_profunditas": 0.6,
+                    "continentes": 6,
+                    "tectonica": 0.7,
+                    "pressio_kPa": 101.0,
+                    "n2": 0.78,
+                    "o2": 0.21,
+                    "nubes": 0.30,
+                    "polaris": 0.12
+                }
+            },
+            "orbita": {
+                "cx": 700.0,
+                "cy": 600.0,
+                "amplitudo_x": 900.0,
+                "amplitudo_y": 40.0,
+                "phase_x": 3.1416,
+                "phase_y": 4.7124,
+                "periodus": 360,
+                "amplitudo_z": 0.5,
+                "phase_z": 4.7124
+            }
+        },
+        {
+            "nomen": "Mars",
+            "scala": 0.35,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.9,
+                    "inclinatio": 0.4396,
+                    "rotatio": 5.2,
+                    "semen": 50211
+                },
+                "saxosculum": {
+                    "silicata": 0.30,
+                    "ferrum": 0.55,
+                    "carbo": 0.05,
+                    "craterae": 0.45,
+                    "pressio_kPa": 0.6,
+                    "co2": 0.953,
+                    "n2": 0.027,
+                    "pulvis": 0.6,
+                    "nubes": 0.04,
+                    "polaris": 0.06
+                }
+            },
+            "orbita": {
+                "cx": 0.0,
+                "cy": 640.0,
+                "amplitudo_y": 60.0,
+                "frequentia_y": 2,
+                "revolutiones_x": 1,
+                "periodus": 480,
+                "cz": 0.3
+            }
+        },
+        {
+            "nomen": "Jupiter",
+            "scala": 0.8,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.9,
+                    "inclinatio": 0.0547,
+                    "rotatio": 0.0,
+                    "semen": 5971
+                },
+                "gaseosculum": {
+                    "h2": 0.90,
+                    "he": 0.10,
+                    "nh3": 0.003,
+                    "fasciae": 12,
+                    "fasciae_contrast": 0.75,
+                    "maculae": 1,
+                    "macula_lat": -0.38,
+                    "macula_lon": 0.3,
+                    "macula_radius": 0.15,
+                    "macula_obscuritas": 0.8
+                }
+            },
+            "orbita": {
+                "cx": 0.0,
+                "cy": 700.0,
+                "amplitudo_y": 80.0,
+                "frequentia_y": 3,
+                "revolutiones_x": 2,
+                "periodus": 360,
+                "cz": 0.3
+            }
+        },
+        {
+            "nomen": "Saturnus",
+            "scala": 0.7,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.9,
+                    "inclinatio": 0.4667,
+                    "rotatio": 0.0,
+                    "semen": 6833
+                },
+                "gaseosculum": {
+                    "h2": 0.96,
+                    "he": 0.03,
+                    "nh3": 0.01,
+                    "fasciae": 10,
+                    "fasciae_contrast": 0.35
+                }
+            },
+            "orbita": {
+                "cx": 0.0,
+                "cy": 400.0,
+                "amplitudo_y": 100.0,
+                "frequentia_y": 2,
+                "revolutiones_x": 1,
+                "periodus": 360,
+                "cz": 0.5
+            }
+        },
+        {
+            "nomen": "Neptunus",
+            "scala": 0.5,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.9,
+                    "inclinatio": 0.4943,
+                    "rotatio": 0.0,
+                    "semen": 8241
+                },
+                "glaciellum": {
+                    "h2": 0.80,
+                    "he": 0.19,
+                    "ch4": 0.015,
+                    "fasciae": 6,
+                    "fasciae_contrast": 0.20,
+                    "maculae": 1,
+                    "macula_lat": -0.34,
+                    "macula_lon": 4.20,
+                    "macula_radius": 0.10
+                }
+            },
+            "orbita": {
+                "cx": 0.0,
+                "cy": 850.0,
+                "amplitudo_y": 120.0,
+                "frequentia_y": 1,
+                "revolutiones_x": 1,
+                "periodus": 480,
+                "cz": 0.7
+            }
+        },
+        {
+            "nomen": "Sol",
+            "scala": 1.0,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.88,
+                    "semen": 77777
+                },
+                "soliculum": {
+                    "fusio": 1.0,
+                    "temperatura": 5778,
+                    "corona": 0.65,
+                    "granulatio": 0.50,
+                    "h2": 0.735,
+                    "he": 0.248,
+                    "maculae": 4,
+                    "macula_radius": 0.8,
+                    "macula_obscuritas": 0.55
+                }
+            },
+            "orbita": {
+                "cx": 700.0,
+                "cy": 560.0,
+                "periodus": 360
+            }
+        }
+    ]
+}

@@ -1,15 +1,15 @@
 {
-  "titulus": "glaciale",
-  "properties": {
-    "tessella": {
-      "$ref": "tessella-schema.ison"
+    "titulus": "glaciale",
+    "properties": {
+        "tessella": {
+            "$ref": "tessella-schema.ison"
+        },
+        "planetella": {
+            "$ref": "planetella-schema.ison"
+        },
+        "glaciellum": {
+            "$ref": "glaciellum-schema.ison"
+        }
     },
-    "planetella": {
-      "$ref": "planetella-schema.ison"
-    },
-    "glaciellum": {
-      "$ref": "glaciellum-schema.ison"
-    }
-  },
-  "required": []
+    "required": []
 }

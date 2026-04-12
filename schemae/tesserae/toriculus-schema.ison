@@ -1,36 +1,36 @@
 {
-  "titulus": "toriculus",
-  "properties": {
-    "methodus": {
-      "type": "string"
+    "titulus": "toriculus",
+    "properties": {
+        "methodus": {
+            "type": "string"
+        },
+        "thema": {
+            "type": "integer"
+        },
+        "strata": {
+            "type": "integer"
+        },
+        "radius_maior": {
+            "type": "number"
+        },
+        "radius_minor": {
+            "type": "number"
+        },
+        "gradus_u": {
+            "type": "integer"
+        },
+        "gradus_v": {
+            "type": "integer"
+        },
+        "distantia": {
+            "type": "number"
+        },
+        "elevatio": {
+            "type": "number"
+        },
+        "azimuthus": {
+            "type": "number"
+        }
     },
-    "thema": {
-      "type": "integer"
-    },
-    "strata": {
-      "type": "integer"
-    },
-    "radius_maior": {
-      "type": "number"
-    },
-    "radius_minor": {
-      "type": "number"
-    },
-    "gradus_u": {
-      "type": "integer"
-    },
-    "gradus_v": {
-      "type": "integer"
-    },
-    "distantia": {
-      "type": "number"
-    },
-    "elevatio": {
-      "type": "number"
-    },
-    "azimuthus": {
-      "type": "number"
-    }
-  },
-  "required": []
+    "required": []
 }

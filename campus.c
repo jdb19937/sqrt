@@ -1,8 +1,9 @@
 /*
- * campus.c — campus stellarum, generatio et compositio
+ * campus.c — campus stellarum, compositio et redditio
  */
 
 #include "campus.h"
+#include "caela.h"
 #include "vectores.h"
 #include "tessera.h"
 #include "instrumentum.h"
@@ -17,26 +18,6 @@
 
 #define FEN SIDUS_FENESTRA
 #define SEMI (FEN / 2)
-
-/* ================================================================
- * generans numerum pseudo-aleatorium
- * ================================================================ */
-
-static unsigned int semen_g = 1;
-
-static unsigned int alea(void)
-{
-    semen_g ^= semen_g << 13;
-    semen_g ^= semen_g >> 17;
-    semen_g ^= semen_g << 5;
-    return semen_g;
-}
-
-/* [0, 1) */
-static double alea_f(void)
-{
-    return (double)(alea() & 0xFFFFFF) / (double)0x1000000;
-}
 
 /* ================================================================
  * campus stellarum
@@ -63,12 +44,10 @@ void campus_pixel_scribere(
     campus_t *c, int x, int y,
     unsigned char r, unsigned char g, unsigned char b
 ) {
-    /* topologia toroidalis */
     x       = ((x % c->latitudo) + c->latitudo) % c->latitudo;
     y       = ((y % c->altitudo) + c->altitudo) % c->altitudo;
     int idx = (y * c->latitudo + x) * 3;
 
-    /* additiva saturans */
     int cr = c->pixels[idx + 0] + r;
     if (cr > 255)
         cr = 255;
@@ -98,7 +77,6 @@ void sidus_in_campum(
             int px    = cx + dx - SEMI;
             int py    = cy + dy - SEMI;
 
-            /* topologia toroidalis */
             px = ((px % c->latitudo) + c->latitudo) % c->latitudo;
             py = ((py % c->altitudo) + c->altitudo) % c->altitudo;
 
@@ -121,7 +99,6 @@ void sidus_in_campum(
 
 int campus_regio_vacua(const campus_t *c, int cx, int cy, int radius)
 {
-    /* inspicit pixeles in cruce circa centrum */
     for (int d = 1; d <= radius; d++) {
         int puncta[8][2] = {
             {cx + d, cy}, {cx - d, cy}, {cx, cy + d}, {cx, cy - d},
@@ -171,7 +148,6 @@ void planeta_in_campum(
             py = ((py % c->altitudo) + c->altitudo) % c->altitudo;
 
             int ci = (py * c->latitudo + px) * 3;
-            /* alpha blending: planeta tegit fundum (non additiva) */
             c->pixels[ci + 0] = (unsigned char)(fenestra[fi + 0] * af + c->pixels[ci + 0] * (1.0 - af));
             c->pixels[ci + 1] = (unsigned char)(fenestra[fi + 1] * af + c->pixels[ci + 1] * (1.0 - af));
             c->pixels[ci + 2] = (unsigned char)(fenestra[fi + 2] * af + c->pixels[ci + 2] * (1.0 - af));
@@ -179,472 +155,16 @@ void planeta_in_campum(
     }
 }
 
-void campus_generare(
-    campus_t *c, const campus_parametri_t *p,
-    const instrumentum_t *instrumentum
-) {
-    semen_g = p->semen;
-    memset(c->pixels, 0, (size_t)c->latitudo * c->altitudo * 3);
-
-    double cos_inc = cos(p->inclinatio_galaxiae);
-    double sin_inc = sin(p->inclinatio_galaxiae);
-    int n_gigantes = 0, n_supergigantes = 0, n_exotica = 0;
-
-    /* --- stellae --- */
-    for (int i = 0; i < p->numerus_stellarum; i++) {
-        double fx = alea_f() * c->latitudo;
-        double fy = alea_f() * c->altitudo;
-
-        double tx       = fx / c->latitudo;
-        double ty       = fy / c->altitudo;
-        double y_fascia = 0.5 + (p->inclinatio_galaxiae / 3.0) * sin(DUO_PI * tx);
-        double dy_g     = ty - y_fascia;
-        if (dy_g > 0.5)
-            dy_g -= 1.0;
-        if (dy_g < -0.5)
-            dy_g += 1.0;
-        double dist_gal = fabs(dy_g) / (p->latitudo_galaxiae + 0.001);
-
-        if (
-            alea_f() > p->densitas_galaxiae * exp(-dist_gal * dist_gal * 8.0)
-            + (1.0 - p->densitas_galaxiae)
-        )
-            continue;
-
-        /* mag = 6 - 6r^4: pleraeque mag 5-6, paucissimae lucidae */
-        double r_mag = alea_f();
-        double mag   = 6.0 - 6.0 * r_mag * r_mag * r_mag * r_mag;
-
-        /* genus ex IMF (Kroupa 2001) */
-        sidereus_t genus;
-        double gr = alea_f();
-        if (gr < 0.06)
-            genus = SIDUS_NANUM_ALBUM;
-        else if (gr < 0.96)
-            genus = SIDUS_SEQUENTIA;
-        else if (gr < 0.98)
-            genus = SIDUS_GIGAS_RUBRUM;
-        else if (gr < 0.985)
-            genus = SIDUS_SUPERGIGAS;
-        else if (gr < 0.992)
-            genus = SIDUS_NEUTRONIUM;
-        else if (gr < 0.9995)
-            genus = SIDUS_SEQUENTIA;
-        else if (gr < 0.99975)
-            genus = SIDUS_CRYSTALLINUM;
-        else
-            genus = SIDUS_MAGNETAR;
-
-        /* limites per genus */
-        if (
-            genus == SIDUS_GIGAS_RUBRUM && p->max_gigantes > 0
-            && n_gigantes >= p->max_gigantes
-        )
-            genus = SIDUS_SEQUENTIA;
-        if (
-            genus == SIDUS_SUPERGIGAS && p->max_supergigantes > 0
-            && n_supergigantes >= p->max_supergigantes
-        )
-            genus = SIDUS_SEQUENTIA;
-        if (
-            (
-                genus == SIDUS_NEUTRONIUM || genus == SIDUS_CRYSTALLINUM
-                || genus == SIDUS_MAGNETAR
-            ) && p->max_exotica > 0
-            && n_exotica >= p->max_exotica
-        )
-            genus = SIDUS_SEQUENTIA;
-
-        /* T_eff per classem spectralem (Gray & Corbally 2009) */
-        double temp;
-        {
-            double tr = alea_f();
-            if (tr < 0.40)
-                temp = 2400 + alea_f() * 1300;
-            else if (tr < 0.76)
-                temp = 3700 + alea_f() * 1500;
-            else if (tr < 0.88)
-                temp = 5200 + alea_f() * 800;
-            else if (tr < 0.95)
-                temp = 6000 + alea_f() * 1500;
-            else if (tr < 0.98)
-                temp = 7500 + alea_f() * 2500;
-            else
-                temp = 10000 + alea_f() * 20000;
-        }
-
-        switch (genus) {
-        case SIDUS_NANUM_ALBUM:
-            temp = 4000 + alea_f() * 30000;
-            mag  = 4.0 + alea_f() * 2.0;
-            break;
-        case SIDUS_GIGAS_RUBRUM:
-            temp = 2500 + alea_f() * 2500;
-            mag  = 1.5 + alea_f() * 2.5;
-            n_gigantes++;
-            break;
-        case SIDUS_SUPERGIGAS:
-            temp = 3000 + alea_f() * 25000;
-            mag  = 0.5 + alea_f() * 1.5;
-            n_supergigantes++;
-            break;
-        case SIDUS_NEUTRONIUM:
-            temp = 500000;
-            mag  = 3.0 + alea_f() * 3.0;
-            n_exotica++;
-            break;
-        case SIDUS_CRYSTALLINUM:
-            temp = 6000 + alea_f() * 10000;
-            mag  = 2.0 + alea_f() * 3.0;
-            n_exotica++;
-            break;
-        case SIDUS_MAGNETAR:
-            temp = 5000000;
-            mag  = 1.0 + alea_f() * 2.0;
-            n_exotica++;
-            break;
-        default: break;
-        }
-
-        /* spatium minimum */
-        int spatium = 1;
-        if (mag < 5.0)
-            spatium = 2;
-        if (mag < 4.0)
-            spatium = 4;
-        if (mag < 2.5)
-            spatium = 8;
-        if (mag < 1.5)
-            spatium = 14;
-
-        if (!campus_regio_vacua(c, (int)fx, (int)fy, spatium))
-            continue;
-
-        sidus_t sidus = {0};
-        sidus.qui = genus;
-        sidus.ubi.sequentia.pro = (sidulum_t){mag, temp};
-
-        /* instrumentum applicare — spiculae pro lucidis */
-        instrumentum_t instr = {.saturatio = 1.0};
-        if (mag < 1.5 && instrumentum && instrumentum->spiculae > 0) {
-            double bright = 1.5 - mag;
-            instr = *instrumentum;
-            instr.spiculae_long = instrumentum->spiculae_long * bright + 2.0;
-            instr.spiculae_ang += alea_f() * 0.1;
-            instr.halo_radius = instrumentum->halo_radius * bright + 1.0;
-            instr.halo_vis    = instrumentum->halo_vis * bright;
-        } else if (mag < 2.5 && instrumentum && instrumentum->halo_radius > 0.01) {
-            instr.halo_radius = instrumentum->halo_radius * (2.5 - mag) * 0.5;
-            instr.halo_vis    = instrumentum->halo_vis * (2.5 - mag) * 0.5;
-        }
-
-        unsigned char fenestra[FEN * FEN * 4];
-        sidus_reddere(fenestra, &sidus, &instr);
-        sidus_in_campum(c, (int)fx, (int)fy, fenestra);
-    }
-
-    /* --- planetae --- */
-    for (int i = 0; i < p->numerus_planetarum; i++) {
-        double temp = p->planetae_temp_min
-            + alea_f() * (p->planetae_temp_max - p->planetae_temp_min);
-        double mag   = 1.0 + alea_f() * 3.0;
-        double phase = alea_f() * 0.45;
-        double ang   = alea_f() * DUO_PI;
-
-        sidus_t sidus_vagans = {.qui = SIDUS_VAGANS, .ubi.vagans.pro = {mag, temp}, .ubi.vagans.res = {phase, ang}};
-        instrumentum_t instr = {.saturatio = 1.0};
-
-        unsigned char fenestra[FEN * FEN * 4];
-        sidus_reddere(fenestra, &sidus_vagans, &instr);
-
-        int px = (int)(alea_f() * c->latitudo);
-        int py = (int)(alea_f() * c->altitudo);
-        if (campus_regio_vacua(c, px, py, 10))
-            sidus_in_campum(c, px, py, fenestra);
-    }
-
-    /* --- galaxiae distantes --- */
-    /* distributio magnitudinis Schechter (1976): pleraeque debiles.
-     * implementatio: mag = 3 + 3·(1-r^0.4) dat concentrationem
-     * circa mag 5-6 cum cauda rara ad mag 3 (lucidae ut M31).
-     * morphologia ex distributione observata (Lintott+ 2008,
-     * Galaxy Zoo; Conselice 2006):
-     *   ~15% ellipticae, ~35% spirales, ~25% barratae,
-     *   ~15% lenticulares, ~10% irregulares. */
-    {
-        int n_gal = 0;
-        for (int i = 0; i < p->numerus_galaxiarum; i++) {
-            if (p->max_galaxiae > 0 && n_gal >= p->max_galaxiae)
-                break;
-
-            /* magnitudo: Schechter — pleraeque debiles */
-            double r_mag = alea_f();
-            double mag   = 3.0 + 3.0 * (1.0 - pow(r_mag, 0.4));
-
-            /* morphologia */
-            galaxia_morphologia_t morph;
-            double mr = alea_f();
-            if (mr < 0.15)
-                morph = GALAXIA_ELLIPTICA;
-            else if (mr < 0.50)
-                morph = GALAXIA_SPIRALIS;
-            else if (mr < 0.75)
-                morph = GALAXIA_SPIRALIS_BARRATA;
-            else if (mr < 0.90)
-                morph = GALAXIA_LENTICULARIS;
-            else
-                morph = GALAXIA_IRREGULARIS;
-
-            /* inclinatio: cos(i) uniformis in [0,1] (orientationes
-             * aleatoriae in spatio 3D). codificamus ut T/10000. */
-            double cos_incl  = alea_f();
-            double temp_code = cos_incl * 10000.0;
-
-            double ang = alea_f() * DUO_PI;
-
-            sidus_t sidus_gal = {.qui = SIDUS_GALAXIA, .ubi.galaxia.pro = {mag, temp_code}, .ubi.galaxia.res = {morph, ang}};
-            instrumentum_t instr = {.saturatio = 1.0};
-
-            unsigned char fenestra[FEN * FEN * 4];
-            sidus_reddere(fenestra, &sidus_gal, &instr);
-
-            int px      = (int)(alea_f() * c->latitudo);
-            int py      = (int)(alea_f() * c->altitudo);
-            int spatium = (mag < 4.0) ? 8 : (mag < 5.0) ? 4 : 2;
-            if (campus_regio_vacua(c, px, py, spatium)) {
-                sidus_in_campum(c, px, py, fenestra);
-                n_gal++;
-            }
-        }
-    }
-
-    /* --- via lactea glow (supra stellas) --- */
-    if (p->galaxia_glow > 0.001) {
-        unsigned int sem = semen_g;
-        for (int y = 0; y < c->altitudo; y++) {
-            for (int x = 0; x < c->latitudo; x++) {
-                double lrx  = (double)x / c->latitudo - 0.5;
-                double lry  = (double)y / c->altitudo - 0.5;
-                double d    = -lrx * sin_inc + lry * cos_inc;
-                double band = exp(-d * d / (0.06 * 0.06));
-
-                double dx_nuc  = lrx - 0.15;
-                double nucleus = exp(-(dx_nuc * dx_nuc + d * d) / (0.04 * 0.04));
-                band += nucleus * 0.6;
-
-                sem ^= sem << 13;
-                sem ^= sem >> 17;
-                sem ^= sem << 5;
-                double r1 = (double)(sem & 0xFF) / 255.0;
-                sem ^= sem << 13;
-                sem ^= sem >> 17;
-                sem ^= sem << 5;
-                double r2     = (double)(sem & 0xFF) / 255.0;
-                double rumore = r1 * 0.6 + r2 * 0.4;
-
-                double f = band * (0.04 + rumore * 0.03) * p->galaxia_glow;
-                if (f < 0.003)
-                    continue;
-
-                unsigned char cr = (unsigned char)(f * 220);
-                unsigned char cg = (unsigned char)(f * 200);
-                unsigned char cb = (unsigned char)(f * 170);
-                campus_pixel_scribere(c, x, y, cr, cg, cb);
-            }
-        }
-
-        /* fasciae pulveris (Great Rift) */
-        if (p->galaxia_rift > 0.001) {
-            sem = semen_g + 4217;
-            for (int y = 0; y < c->altitudo; y++) {
-                for (int x = 0; x < c->latitudo; x++) {
-                    double lrx = (double)x / c->latitudo - 0.5;
-                    double lry = (double)y / c->altitudo - 0.5;
-                    double d   = -lrx * sin_inc + lry * cos_inc;
-                    if (fabs(d) > 0.08)
-                        continue;
-                    double along = lrx * cos_inc + lry * sin_inc;
-
-                    sem ^= sem << 13;
-                    sem ^= sem >> 17;
-                    sem ^= sem << 5;
-                    double rumore = (double)(sem & 0xFF) / 255.0;
-
-                    double rift = 0.0;
-                    rift += 0.5 * sin(along * 25.0 + 1.3) * exp(-d * d / (0.015 * 0.015));
-                    rift += 0.3 * sin(along * 40.0 + 2.7) * exp(-d * d / (0.010 * 0.010));
-                    rift += 0.2 * rumore * exp(-d * d / (0.02 * 0.02));
-                    if (rift < 0.15)
-                        continue;
-                    double obscura = rift * 0.5 * p->galaxia_rift;
-                    if (obscura > 0.8)
-                        obscura = 0.8;
-
-                    int px = ((x % c->latitudo) + c->latitudo) % c->latitudo;
-                    int py = ((y % c->altitudo) + c->altitudo) % c->altitudo;
-                    int idx = (py * c->latitudo + px) * 3;
-                    c->pixels[idx + 0] = (unsigned char)(c->pixels[idx + 0] * (1.0 - obscura));
-                    c->pixels[idx + 1] = (unsigned char)(c->pixels[idx + 1] * (1.0 - obscura));
-                    c->pixels[idx + 2] = (unsigned char)(c->pixels[idx + 2] * (1.0 - obscura));
-                }
-            }
-        }
-
-        /* nebulosae emissionis */
-        sem = semen_g + 1571;
-        for (int i = 0; i < p->galaxia_nebulae; i++) {
-            sem ^= sem << 13;
-            sem ^= sem >> 17;
-            sem ^= sem << 5;
-            double nx = (double)(sem & 0xFFFFF) / (double)0x100000;
-            sem ^= sem << 13;
-            sem ^= sem >> 17;
-            sem ^= sem << 5;
-            double ny = (double)(sem & 0xFFFFF) / (double)0x100000;
-            double gx = nx * c->latitudo;
-            double gy = c->altitudo * 0.5 + (nx - 0.5) * sin_inc * c->altitudo
-                + (ny - 0.5) * 0.08 * c->altitudo;
-            sem ^= sem << 13;
-            sem ^= sem >> 17;
-            sem ^= sem << 5;
-            double radius = 8 + (double)(sem & 0x1F);
-            unsigned char nr, ng, nb;
-            if (i % 3 == 0) {
-                nr = 40;
-                ng = 15;
-                nb = 15;
-            }else if (i % 3 == 1) {
-                nr = 12;
-                ng = 30;
-                nb = 20;
-            }else {
-                nr = 25;
-                ng = 20;
-                nb = 30;
-            }
-            for (int dy = -(int)radius; dy <= (int)radius; dy++) {
-                for (int dx = -(int)radius; dx <= (int)radius; dx++) {
-                    double d2 = (double)(dx * dx + dy * dy);
-                    double f  = exp(-d2 / (radius * radius * 0.4));
-                    if (f < 0.05)
-                        continue;
-                    campus_pixel_scribere(
-                        c, (int)gx + dx, (int)gy + dy,
-                        (unsigned char)(nr * f), (unsigned char)(ng * f),
-                        (unsigned char)(nb * f)
-                    );
-                }
-            }
-        }
-    }
-}
-
 /* ================================================================
- * ISONL redditor — campum ex ISONL et instrumento reddit
+ * Via Lactea
  * ================================================================ */
 
-
 typedef struct {
-    campus_t *campus;
     double galaxia_glow, galaxia_rift, inclinatio;
     int    galaxia_nebulae;
-    int    meta_lecta;
-    /* instrumentum */
-    int    i_spic;
-    double i_spic_long, i_spic_ang;
-    double i_halo_r, i_halo_v;
-} isonl_ctx_t;
+} via_lactea_ctx_t;
 
-static void isonl_linea_reddere(const char *linea, void *ctx_v)
-{
-    isonl_ctx_t *ctx = (isonl_ctx_t *)ctx_v;
-    char *internum;
-    ison_par_t pp[64];
-    int n;
-
-    /* {"_meta": {...}} */
-    internum = ison_da_crudum(linea, "_meta");
-    if (internum) {
-        n = ison_lege(internum, pp, 64);
-        free(internum);
-        if (n > 0) {
-            int lat = (int)ison_pares_n(pp, n, "latitudo", 1024);
-            int alt = (int)ison_pares_n(pp, n, "altitudo", 512);
-            ctx->galaxia_glow    = ison_pares_f(pp, n, "galaxia_glow", 0);
-            ctx->galaxia_rift    = ison_pares_f(pp, n, "galaxia_rift", 0);
-            ctx->galaxia_nebulae = (int)ison_pares_n(pp, n, "galaxia_nebulae", 0);
-            ctx->inclinatio      = ison_pares_f(pp, n, "inclinatio_galaxiae", 0);
-            ctx->campus = campus_creare(lat, alt);
-            ctx->meta_lecta = 1;
-        }
-        return;
-    }
-
-    if (!ctx->meta_lecta || !ctx->campus)
-        return;
-
-    /* {"planeta": {...}} */
-    internum = ison_da_crudum(linea, "planeta");
-    if (internum) {
-        char *per_s   = ison_da_crudum(internum, "perceptus");
-        int x         = (int)ison_da_n(internum, "x", 0);
-        int y         = (int)ison_da_n(internum, "y", 0);
-        double sc     = ison_da_f(internum, "scala", 1.0);
-        char *pl_ison = ison_da_crudum(internum, "planeta");
-        planeta_t *pl = pl_ison ? planeta_ex_ison(pl_ison) : NULL;
-        free(pl_ison);
-        free(internum);
-        if (pl) {
-            planeta_perceptus_t perc = planeta_perceptus_ex_ison(per_s);
-            free(per_s);
-            unsigned char *fen = (unsigned char *)calloc(
-                (size_t)PLANETA_FENESTRA * PLANETA_FENESTRA * 4, 1
-            );
-            if (fen) {
-                planeta_reddere(fen, pl, &perc);
-                planeta_perceptum_applicare(fen, &perc);
-                planeta_in_campum(ctx->campus, x, y, fen, sc);
-                free(fen);
-            }
-            free(pl);
-        } else {
-            free(per_s);
-        }
-        return;
-    }
-
-    /* {"sidus": {...}} */
-    internum = ison_da_crudum(linea, "sidus");
-    if (!internum)
-        return;
-
-    int x = (int)ison_da_n(internum, "x", 0);
-    int y = (int)ison_da_n(internum, "y", 0);
-
-    sidus_t sidus;
-    sidus_ex_ison(&sidus, internum);
-    double mag = sidus.ubi.sequentia.pro.magnitudo;
-    free(internum);
-
-    instrumentum_t instr = {.saturatio = 1.0};
-    if (mag < 1.5 && ctx->i_spic > 0) {
-        double bright       = 1.5 - mag;
-        instr.spiculae      = ctx->i_spic;
-        instr.spiculae_long = ctx->i_spic_long * bright + 2.0;
-        instr.spiculae_ang  = ctx->i_spic_ang;
-        instr.halo_radius   = ctx->i_halo_r * bright + 1.0;
-        instr.halo_vis      = ctx->i_halo_v * bright;
-    } else if (mag < 2.5 && ctx->i_halo_r > 0.01) {
-        instr.halo_radius = ctx->i_halo_r * (2.5 - mag) * 0.5;
-        instr.halo_vis    = ctx->i_halo_v * (2.5 - mag) * 0.5;
-    }
-
-    unsigned char fen[FEN * FEN * 4];
-    sidus_reddere(fen, &sidus, &instr);
-    sidus_in_campum(ctx->campus, x, y, fen);
-}
-
-static void isonl_galaxiam_reddere(campus_t *c, const isonl_ctx_t *m)
+static void viam_lacteam_reddere(campus_t *c, const via_lactea_ctx_t *m)
 {
     if (m->galaxia_glow < 0.001)
         return;
@@ -669,10 +189,7 @@ static void isonl_galaxiam_reddere(campus_t *c, const isonl_ctx_t *m)
                 dx_nuc -= 1.0;
             if (dx_nuc < -0.5)
                 dx_nuc += 1.0;
-            double nucleus = exp(
-                -(dx_nuc * dx_nuc * 4.0 + d * d)
-                / (0.04 * 0.04)
-            );
+            double nucleus = exp(-(dx_nuc * dx_nuc * 4.0 + d * d) / (0.04 * 0.04));
             band += nucleus * 0.6;
 
             sem ^= sem << 13;
@@ -691,9 +208,7 @@ static void isonl_galaxiam_reddere(campus_t *c, const isonl_ctx_t *m)
 
             campus_pixel_scribere(
                 c, x, y,
-                (unsigned char)(f * 220),
-                (unsigned char)(f * 200),
-                (unsigned char)(f * 170)
+                (unsigned char)(f * 220), (unsigned char)(f * 200), (unsigned char)(f * 170)
             );
         }
     }
@@ -720,10 +235,8 @@ static void isonl_galaxiam_reddere(campus_t *c, const isonl_ctx_t *m)
                 double rumore = (double)(sem & 0xFF) / 255.0;
 
                 double rift = 0.0;
-                rift += 0.5 * sin(along * 25.0 + 1.3)
-                * exp(-d * d / (0.015 * 0.015));
-                rift += 0.3 * sin(along * 40.0 + 2.7)
-                * exp(-d * d / (0.010 * 0.010));
+                rift += 0.5 * sin(along * 25.0 + 1.3) * exp(-d * d / (0.015 * 0.015));
+                rift += 0.3 * sin(along * 40.0 + 2.7) * exp(-d * d / (0.010 * 0.010));
                 rift += 0.2 * rumore * exp(-d * d / (0.02 * 0.02));
                 if (rift < 0.15)
                     continue;
@@ -734,18 +247,9 @@ static void isonl_galaxiam_reddere(campus_t *c, const isonl_ctx_t *m)
                 int px  = ((x % c->latitudo) + c->latitudo) % c->latitudo;
                 int py  = ((y % c->altitudo) + c->altitudo) % c->altitudo;
                 int idx = (py * c->latitudo + px) * 3;
-                c->pixels[idx + 0] = (unsigned char)(
-                    c->pixels[idx + 0]
-                    * (1.0 - obscura)
-                );
-                c->pixels[idx + 1] = (unsigned char)(
-                    c->pixels[idx + 1]
-                    * (1.0 - obscura)
-                );
-                c->pixels[idx + 2] = (unsigned char)(
-                    c->pixels[idx + 2]
-                    * (1.0 - obscura)
-                );
+                c->pixels[idx + 0] = (unsigned char)(c->pixels[idx + 0] * (1.0 - obscura));
+                c->pixels[idx + 1] = (unsigned char)(c->pixels[idx + 1] * (1.0 - obscura));
+                c->pixels[idx + 2] = (unsigned char)(c->pixels[idx + 2] * (1.0 - obscura));
             }
         }
     }
@@ -768,7 +272,7 @@ static void isonl_galaxiam_reddere(campus_t *c, const isonl_ctx_t *m)
         sem ^= sem << 5;
         double radius = 8 + (double)(sem & 0x1F);
         unsigned char nr, ng, nb;
-        if (i % 3 == 0) {
+        if (i % 3 == 0)      {
             nr = 40;
             ng = 15;
             nb = 15;
@@ -776,7 +280,7 @@ static void isonl_galaxiam_reddere(campus_t *c, const isonl_ctx_t *m)
             nr = 12;
             ng = 30;
             nb = 20;
-        }else {
+        }else                  {
             nr = 25;
             ng = 20;
             nb = 30;
@@ -789,198 +293,165 @@ static void isonl_galaxiam_reddere(campus_t *c, const isonl_ctx_t *m)
                     continue;
                 campus_pixel_scribere(
                     c, (int)gx + dx, (int)gy + dy,
-                    (unsigned char)(nr * f), (unsigned char)(ng * f),
-                    (unsigned char)(nb * f)
+                    (unsigned char)(nr * f), (unsigned char)(ng * f), (unsigned char)(nb * f)
                 );
             }
         }
     }
 }
 
-campus_t *campus_ex_isonl_reddere(
-    const char *via_isonl,
-    const char *via_instrumentum
+/* ================================================================
+ * campus redditio — quattuor phases
+ * ================================================================ */
+
+void campus_sidera_reddere(
+    campus_t *c, const caela_t *caela, const instrumentum_t *inst
 ) {
-    char *isonl = ison_lege_plicam(via_isonl);
-    if (!isonl) {
-        fprintf(stderr, "astra: %s legere non possum\n", via_isonl);
-        return NULL;
+    int i_spic         = inst->spiculae;
+    double i_spic_long = inst->spiculae_long;
+    double i_spic_ang  = inst->spiculae_ang;
+    double i_halo_r    = inst->halo_radius;
+    double i_halo_v    = inst->halo_vis;
+
+    for (int i = 0; i < caela->numerus_siderum; i++) {
+        const sidus_caeli_t *sc = &caela->sidera[i];
+        double mag = sc->sidus.ubi.sequentia.pro.magnitudo;
+
+        instrumentum_t si = {.saturatio = 1.0};
+        if (mag < 1.5 && i_spic > 0) {
+            double bright    = 1.5 - mag;
+            si.spiculae      = i_spic;
+            si.spiculae_long = i_spic_long * bright + 2.0;
+            si.spiculae_ang  = i_spic_ang;
+            si.halo_radius   = i_halo_r * bright + 1.0;
+            si.halo_vis      = i_halo_v * bright;
+        } else if (mag < 2.5 && i_halo_r > 0.01) {
+            si.halo_radius = i_halo_r * (2.5 - mag) * 0.5;
+            si.halo_vis    = i_halo_v * (2.5 - mag) * 0.5;
+        }
+
+        unsigned char fen[FEN * FEN * 4];
+        sidus_reddere(fen, &sc->sidus, &si);
+        sidus_in_campum(c, sc->x, sc->y, fen);
     }
+}
 
-    char *instr_ison = ison_lege_plicam(via_instrumentum);
-    if (!instr_ison) {
-        fprintf(stderr, "astra: %s legere non possum\n", via_instrumentum);
-        free(isonl);
-        return NULL;
+void campus_viam_lacteam_reddere(campus_t *c, const caela_t *caela)
+{
+    via_lactea_ctx_t vl = {
+        .galaxia_glow    = caela->galaxia_glow,
+        .galaxia_rift    = caela->galaxia_rift,
+        .galaxia_nebulae = caela->galaxia_nebulae,
+        .inclinatio      = caela->inclinatio_galaxiae
+    };
+    viam_lacteam_reddere(c, &vl);
+}
+
+/* inspicit an bbox planetae viewport tangat (toroidale) */
+static int planeta_in_conspectu(
+    const planeta_caeli_t *pc, int lat, int alt,
+    int vx, int vy, int vw, int vh
+) {
+    if (vw <= 0 || vh <= 0)
+        return 1; /* nullum viewport = omnia */
+    int dim  = (int)(PLANETA_FENESTRA * pc->scala);
+    int semi = dim / 2;
+
+    /* distantia toroidalis minima inter centrum planetae et centrum viewport */
+    int cx  = (int)pc->x, cy = (int)pc->y;
+    int vcx = vx + vw / 2, vcy = vy + vh / 2;
+
+    int dx = abs(cx - vcx);
+    if (dx > lat / 2)
+        dx = lat - dx;
+    int dy = abs(cy - vcy);
+    if (dy > alt / 2)
+        dy = alt - dy;
+
+    return dx < (semi + vw / 2 + 1) && dy < (semi + vh / 2 + 1);
+}
+
+void campus_planetas_reddere(campus_t *c, const caela_t *caela)
+{
+    campus_planetas_reddere_in_conspectu(c, caela, 0, 0, 0, 0);
+}
+
+typedef struct {
+    int    index;
+    double z;
+} planeta_z_ordo_t;
+
+static int cmp_planeta_z(const void *a, const void *b)
+{
+    double za = ((const planeta_z_ordo_t *)a)->z;
+    double zb = ((const planeta_z_ordo_t *)b)->z;
+    return (za < zb) ? -1 : (za > zb) ? 1 : 0;
+}
+
+void campus_planetas_reddere_in_conspectu(
+    campus_t *c, const caela_t *caela,
+    int vx, int vy, int vw, int vh
+) {
+    int n = caela->numerus_planetarum;
+    if (n <= 0)
+        return;
+
+    /* ordina per z (longinquiores primo) */
+    planeta_z_ordo_t *ordo = malloc((size_t)n * sizeof(planeta_z_ordo_t));
+    if (!ordo)
+        return;
+
+    for (int i = 0; i < n; i++) {
+        ordo[i].index = i;
+        ordo[i].z     = caela->planetae[i].z;
     }
+    qsort(ordo, (size_t)n, sizeof(planeta_z_ordo_t), cmp_planeta_z);
 
-    isonl_ctx_t ctx;
-    memset(&ctx, 0, sizeof(ctx));
-    ctx.i_spic      = (int)ison_da_f(instr_ison, "spiculae", 0);
-    ctx.i_spic_long = ison_da_f(instr_ison, "spiculae_long", 0);
-    ctx.i_spic_ang  = ison_da_f(instr_ison, "spiculae_ang", 0);
-    ctx.i_halo_r    = ison_da_f(instr_ison, "halo_radius", 0);
-    ctx.i_halo_v    = ison_da_f(instr_ison, "halo_vis", 0);
+    size_t fen_sz = (size_t)PLANETA_FENESTRA * PLANETA_FENESTRA * 4;
 
-    instrumentum_t inst;
-    memset(&inst, 0, sizeof(inst));
-    inst.saturatio    = ison_da_f(instr_ison, "saturatio", 1.0);
-    inst.aberratio    = ison_da_f(instr_ison, "aberratio", 0.0);
-    inst.visio        = ison_da_f(instr_ison, "visio", 0.0);
-    inst.scintillatio = ison_da_f(instr_ison, "scintillatio", 0.0);
-    inst.caeli_lumen  = ison_da_f(instr_ison, "caeli_lumen", 0.0);
-    inst.florescentia = ison_da_f(instr_ison, "florescentia", 0.0);
-    inst.acuitas      = ison_da_f(instr_ison, "acuitas", 0.0);
-    inst.refractio    = ison_da_f(instr_ison, "refractio", 0.0);
-    inst.vignetta     = ison_da_f(instr_ison, "vignetta", 0.0);
-    inst.distorsio    = ison_da_f(instr_ison, "distorsio", 0.0);
-    inst.fenestra     = ison_da_f(instr_ison, "fenestra", 0.0);
-    free(instr_ison);
+    for (int j = 0; j < n; j++) {
+        planeta_caeli_t *pc = &caela->planetae[ordo[j].index];
+        if (!planeta_in_conspectu(pc, c->latitudo, c->altitudo, vx, vy, vw, vh))
+            continue;
 
-    ison_pro_quaque_linea_s(isonl, isonl_linea_reddere, &ctx);
-    free(isonl);
+        /* cache corpus planetae (sine illuminatione) */
+        if (!pc->fenestra_cacata) {
+            pc->fenestra_cacata = (unsigned char *)calloc(fen_sz, 1);
+            if (pc->fenestra_cacata)
+                planeta_reddere(pc->fenestra_cacata, &pc->planeta);
+        }
+        if (!pc->fenestra_cacata)
+            continue;
 
-    if (!ctx.campus) {
-        fprintf(stderr, "astra: _meta linea non inventa in %s\n", via_isonl);
-        return NULL;
+        /* copia cacatam, applica illuminationem (non soles/nebulae) et perceptum, compone */
+        unsigned char *pfen = (unsigned char *)malloc(fen_sz);
+        if (pfen) {
+            memcpy(pfen, pc->fenestra_cacata, fen_sz);
+            if (pc->planeta.qui != PLANETA_SOL && pc->planeta.qui != PLANETA_NEBULA)
+                planeta_illuminationem_applicare(pfen, pc->planeta.ubi.saxosum.pro.radius, &pc->perceptus);
+            planeta_perceptum_applicare(pfen, &pc->perceptus);
+            planeta_in_campum(c, (int)pc->x, (int)pc->y, pfen, pc->scala);
+            free(pfen);
+        }
     }
-
-    isonl_galaxiam_reddere(ctx.campus, &ctx);
-    isonl_post_processare(ctx.campus, &inst);
-
-    return ctx.campus;
+    free(ordo);
 }
 
 /* ================================================================
- * campus_ex_ison_reddere — legit caela .ison (non ISONL)
+ * campus_ex_caela — reddit campum ex caela et instrumento
  * ================================================================ */
 
-static void ison_sidus_reddere(const char *raw, void *ctx_v)
-{
-    isonl_ctx_t *ctx = (isonl_ctx_t *)ctx_v;
-    int x = (int)ison_da_n(raw, "x", 0);
-    int y = (int)ison_da_n(raw, "y", 0);
-
-    char *sidus_raw = ison_da_crudum(raw, "sidus");
-    sidus_t sidus;
-    if (sidus_raw) {
-        sidus_ex_ison(&sidus, sidus_raw);
-        free(sidus_raw);
-    } else {
-        memset(&sidus, 0, sizeof(sidus));
-        sidus.ubi.sequentia.pro.magnitudo   = 6.0;
-        sidus.ubi.sequentia.pro.temperatura = 5000;
-    }
-    double mag = sidus.ubi.sequentia.pro.magnitudo;
-
-    instrumentum_t si = {.saturatio = 1.0};
-    if (mag < 1.5 && ctx->i_spic > 0) {
-        double bright    = 1.5 - mag;
-        si.spiculae      = ctx->i_spic;
-        si.spiculae_long = ctx->i_spic_long * bright + 2.0;
-        si.spiculae_ang  = ctx->i_spic_ang;
-        si.halo_radius   = ctx->i_halo_r * bright + 1.0;
-        si.halo_vis      = ctx->i_halo_v * bright;
-    } else if (mag < 2.5 && ctx->i_halo_r > 0.01) {
-        si.halo_radius = ctx->i_halo_r * (2.5 - mag) * 0.5;
-        si.halo_vis    = ctx->i_halo_v * (2.5 - mag) * 0.5;
-    }
-
-    unsigned char fen[FEN * FEN * 4];
-    sidus_reddere(fen, &sidus, &si);
-    sidus_in_campum(ctx->campus, x, y, fen);
-}
-
-static void ison_planeta_reddere(const char *raw, void *ctx_v)
-{
-    isonl_ctx_t *ctx = (isonl_ctx_t *)ctx_v;
-    char *per_s   = ison_da_crudum(raw, "perceptus");
-    int x         = (int)ison_da_n(raw, "x", 0);
-    int y         = (int)ison_da_n(raw, "y", 0);
-    double sc     = ison_da_f(raw, "scala", 1.0);
-    char *pl_ison = ison_da_crudum(raw, "planeta");
-    planeta_t *pl = pl_ison ? planeta_ex_ison(pl_ison) : NULL;
-    free(pl_ison);
-    if (pl) {
-        planeta_perceptus_t perc = planeta_perceptus_ex_ison(per_s);
-        free(per_s);
-        unsigned char *pfen = (unsigned char *)calloc(
-            (size_t)PLANETA_FENESTRA * PLANETA_FENESTRA * 4, 1
-        );
-        if (pfen) {
-            planeta_reddere(pfen, pl, &perc);
-            planeta_perceptum_applicare(pfen, &perc);
-            planeta_in_campum(ctx->campus, x, y, pfen, sc);
-            free(pfen);
-        }
-        free(pl);
-    } else {
-        free(per_s);
-    }
-}
-
-campus_t *campus_ex_ison_reddere(
-    const char *via_ison,
-    const char *via_instrumentum
+campus_t *campus_ex_caela(
+    const caela_t *caela,
+    const instrumentum_t *inst
 ) {
-    char *ison = ison_lege_plicam(via_ison);
-    if (!ison) {
-        fprintf(stderr, "astra: %s legere non possum\n", via_ison);
+    campus_t *c = campus_creare(caela->latitudo, caela->altitudo);
+    if (!c)
         return NULL;
-    }
 
-    char *instr_ison = ison_lege_plicam(via_instrumentum);
-    if (!instr_ison) {
-        fprintf(stderr, "astra: %s legere non possum\n", via_instrumentum);
-        free(ison);
-        return NULL;
-    }
-
-    /* instrumentum */
-    isonl_ctx_t ctx;
-    memset(&ctx, 0, sizeof(ctx));
-    ctx.i_spic      = (int)ison_da_f(instr_ison, "spiculae", 0);
-    ctx.i_spic_long = ison_da_f(instr_ison, "spiculae_long", 0);
-    ctx.i_spic_ang  = ison_da_f(instr_ison, "spiculae_ang", 0);
-    ctx.i_halo_r    = ison_da_f(instr_ison, "halo_radius", 0);
-    ctx.i_halo_v    = ison_da_f(instr_ison, "halo_vis", 0);
-
-    instrumentum_t inst;
-    memset(&inst, 0, sizeof(inst));
-    inst.saturatio    = ison_da_f(instr_ison, "saturatio", 1.0);
-    inst.aberratio    = ison_da_f(instr_ison, "aberratio", 0.0);
-    inst.visio        = ison_da_f(instr_ison, "visio", 0.0);
-    inst.scintillatio = ison_da_f(instr_ison, "scintillatio", 0.0);
-    inst.caeli_lumen  = ison_da_f(instr_ison, "caeli_lumen", 0.0);
-    inst.florescentia = ison_da_f(instr_ison, "florescentia", 0.0);
-    inst.acuitas      = ison_da_f(instr_ison, "acuitas", 0.0);
-    inst.refractio    = ison_da_f(instr_ison, "refractio", 0.0);
-    inst.vignetta     = ison_da_f(instr_ison, "vignetta", 0.0);
-    inst.distorsio    = ison_da_f(instr_ison, "distorsio", 0.0);
-    inst.fenestra     = ison_da_f(instr_ison, "fenestra", 0.0);
-    free(instr_ison);
-
-    /* meta */
-    int lat = (int)ison_da_n(ison, "latitudo", 1024);
-    int alt = (int)ison_da_n(ison, "altitudo", 512);
-    ctx.galaxia_glow    = ison_da_f(ison, "galaxia_glow", 0);
-    ctx.galaxia_rift    = ison_da_f(ison, "galaxia_rift", 0);
-    ctx.galaxia_nebulae = (int)ison_da_n(ison, "galaxia_nebulae", 0);
-    ctx.inclinatio      = ison_da_f(ison, "inclinatio_galaxiae", 0);
-    ctx.campus = campus_creare(lat, alt);
-    if (!ctx.campus) {
-        free(ison);
-        return NULL;
-    }
-
-    /* sidera */
-    ison_pro_quoque_elemento(ison, "sidera", ison_sidus_reddere, &ctx);
-
-    /* planetae */
-    ison_pro_quoque_elemento(ison, "planetae", ison_planeta_reddere, &ctx);
-
-    free(ison);
-    isonl_galaxiam_reddere(ctx.campus, &ctx);
-    isonl_post_processare(ctx.campus, &inst);
-    return ctx.campus;
+    campus_sidera_reddere(c, caela, inst);
+    campus_viam_lacteam_reddere(c, caela);
+    campus_planetas_reddere(c, caela);
+    campus_post_processare(c, inst);
+    return c;
 }

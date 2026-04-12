@@ -1,23 +1,23 @@
 {
-  "titulus": "planeta",
-  "oneOf": [
-    {
-      "$ref": "saxosum-schema.ison"
-    },
-    {
-      "$ref": "gaseosum-schema.ison"
-    },
-    {
-      "$ref": "glaciale-schema.ison"
-    },
-    {
-      "$ref": "parvum-schema.ison"
-    },
-    {
-      "$ref": "sol-schema.ison"
-    },
-    {
-      "$ref": "nebula-schema.ison"
-    }
-  ]
+    "titulus": "planeta",
+    "oneOf": [
+        {
+            "$ref": "saxosum-schema.ison"
+        },
+        {
+            "$ref": "gaseosum-schema.ison"
+        },
+        {
+            "$ref": "glaciale-schema.ison"
+        },
+        {
+            "$ref": "parvum-schema.ison"
+        },
+        {
+            "$ref": "sol-schema.ison"
+        },
+        {
+            "$ref": "nebula-schema.ison"
+        }
+    ]
 }

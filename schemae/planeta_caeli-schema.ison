@@ -1,13 +1,32 @@
 {
-  "titulus": "planeta_campi",
-  "properties": {
-    "x":         {"type": "number"},
-    "y":         {"type": "number"},
-    "nomen":     {"type": "string"},
-    "genus":     {"type": "string"},
-    "scala":     {"type": "number"},
-    "perceptus": {"$ref": "perceptus-schema.ison"},
-    "planeta":   {"$ref": "tesserae/planeta-schema.ison"}
-  },
-  "required": ["x", "y", "nomen", "planeta"]
+    "titulus": "planeta_campi",
+    "properties": {
+        "x": {
+            "type": "number"
+        },
+        "y": {
+            "type": "number"
+        },
+        "nomen": {
+            "type": "string"
+        },
+        "genus": {
+            "type": "string"
+        },
+        "scala": {
+            "type": "number"
+        },
+        "perceptus": {
+            "$ref": "perceptus-schema.ison"
+        },
+        "planeta": {
+            "$ref": "tesserae/planeta-schema.ison"
+        }
+    },
+    "required": [
+        "x",
+        "y",
+        "nomen",
+        "planeta"
+    ]
 }

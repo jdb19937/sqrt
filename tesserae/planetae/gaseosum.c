@@ -1,6 +1,7 @@
+#include "../planeta_communia.h"
 /* gaseosum.c — renderer planetae gaseosi (included from planeta.c) */
 
-static void aplicare_fusionem(unsigned char *fen, const gaseosum_t *p)
+void aplicare_fusionem(unsigned char *fen, const gaseosum_t *p)
 {
     if (p->res.fusio < 0.001)
         return;
@@ -97,9 +98,8 @@ static void aplicare_fusionem(unsigned char *fen, const gaseosum_t *p)
     }
 }
 
-static void reddere_gaseosum(
-    unsigned char *fen, const gaseosum_t *p,
-    const planeta_perceptus_t *perc
+void reddere_gaseosum(
+    unsigned char *fen, const gaseosum_t *p
 ) {
     double rad      = p->pro.radius;
     color_t atm_col = color_atmosphaerae(p->res.n2, p->res.o2, p->res.co2, p->res.ch4, p->res.h2, p->res.he, p->res.nh3, p->res.pulvis, 0, 0);
@@ -125,14 +125,7 @@ static void reddere_gaseosum(
             )
                 continue;
 
-            double illum = illuminatio(px, py, rad, perc->aspectus.situs, perc->aspectus.angulus) * perc->aspectus.lumen;
-            if (perc->coaspectus.lumen > 0.001)
-                illum += illuminatio(px, py, rad, perc->coaspectus.situs, perc->coaspectus.angulus) * perc->coaspectus.lumen;
-            if (illum < 0.003) {
-                /* latus obscurum — opacum nigrum ne stellae transluceant */
-                fen_pixel(fen, px, py, 0.0, 0.0, 0.0, 1.0);
-                continue;
-            }
+            double illum = 1.0;
 
             double band_y = lat / (PI * 0.5);
             double nx     = lon / DPI * 8.0;
@@ -227,33 +220,44 @@ static void reddere_gaseosum(
     aplicare_fusionem(fen, p);
 }
 
-static planeta_t *gaseosum_ex_ison(const char *ison)
+void gaseosum_ex_ison(gaseosum_t *v, const char *ison)
 {
-    planeta_t *v = calloc(1, sizeof(planeta_t));
-    v->qui = PLANETA_GASEOSUM;
-    v->ubi.gaseosum.pro.radius     = ison_f(ison, "planetella.radius", 0.9);
-    v->ubi.gaseosum.pro.inclinatio = ison_f(ison, "planetella.inclinatio", 0.0);
-    v->ubi.gaseosum.pro.rotatio    = ison_f(ison, "planetella.rotatio", 0.0);
-    v->ubi.gaseosum.pro.semen      = (unsigned)ison_f(ison, "planetella.semen", 42);
-    v->ubi.gaseosum.res.n2               = ison_f(ison, "gaseosculum.n2", 0.0);
-    v->ubi.gaseosum.res.o2               = ison_f(ison, "gaseosculum.o2", 0.0);
-    v->ubi.gaseosum.res.co2              = ison_f(ison, "gaseosculum.co2", 0.0);
-    v->ubi.gaseosum.res.ch4              = ison_f(ison, "gaseosculum.ch4", 0.0);
-    v->ubi.gaseosum.res.h2               = ison_f(ison, "gaseosculum.h2", 0.0);
-    v->ubi.gaseosum.res.he               = ison_f(ison, "gaseosculum.he", 0.0);
-    v->ubi.gaseosum.res.nh3              = ison_f(ison, "gaseosculum.nh3", 0.0);
-    v->ubi.gaseosum.res.pulvis           = ison_f(ison, "gaseosculum.pulvis", 0.0);
-    v->ubi.gaseosum.res.fasciae          = (int)ison_f(ison, "gaseosculum.fasciae", 0);
-    v->ubi.gaseosum.res.fasciae_contrast = ison_f(ison, "gaseosculum.fasciae_contrast", 0.5);
-    v->ubi.gaseosum.res.maculae          = (int)ison_f(ison, "gaseosculum.maculae", 0);
-    v->ubi.gaseosum.res.macula_lat       = ison_f(ison, "gaseosculum.macula_lat", 0.0);
-    v->ubi.gaseosum.res.macula_lon       = ison_f(ison, "gaseosculum.macula_lon", 0.0);
-    v->ubi.gaseosum.res.macula_radius    = ison_f(ison, "gaseosculum.macula_radius", 0.1);
-    v->ubi.gaseosum.res.macula_obscuritas = ison_f(ison, "gaseosculum.macula_obscuritas", 0.5);
-    v->ubi.gaseosum.res.fusio            = ison_f(ison, "gaseosculum.fusio", 0.0);
-    v->ubi.gaseosum.res.temperatura      = ison_f(ison, "gaseosculum.temperatura", 0.0);
-    v->ubi.gaseosum.res.luminositas      = ison_f(ison, "gaseosculum.luminositas", 1.0);
-    v->ubi.gaseosum.res.corona           = ison_f(ison, "gaseosculum.corona", 0.0);
-    v->ubi.gaseosum.res.granulatio       = ison_f(ison, "gaseosculum.granulatio", 0.0);
-    return v;
+    v->pro.radius     = ison_f(ison, "planetella.radius", 0.9);
+    v->pro.inclinatio = ison_f(ison, "planetella.inclinatio", 0.0);
+    v->pro.rotatio    = ison_f(ison, "planetella.rotatio", 0.0);
+    v->pro.semen      = (unsigned)ison_f(ison, "planetella.semen", 42);
+    v->res.n2               = ison_f(ison, "gaseosculum.n2", 0.0);
+    v->res.o2               = ison_f(ison, "gaseosculum.o2", 0.0);
+    v->res.co2              = ison_f(ison, "gaseosculum.co2", 0.0);
+    v->res.ch4              = ison_f(ison, "gaseosculum.ch4", 0.0);
+    v->res.h2               = ison_f(ison, "gaseosculum.h2", 0.0);
+    v->res.he               = ison_f(ison, "gaseosculum.he", 0.0);
+    v->res.nh3              = ison_f(ison, "gaseosculum.nh3", 0.0);
+    v->res.pulvis           = ison_f(ison, "gaseosculum.pulvis", 0.0);
+    v->res.fasciae          = (int)ison_f(ison, "gaseosculum.fasciae", 0);
+    v->res.fasciae_contrast = ison_f(ison, "gaseosculum.fasciae_contrast", 0.5);
+    v->res.maculae          = (int)ison_f(ison, "gaseosculum.maculae", 0);
+    v->res.macula_lat       = ison_f(ison, "gaseosculum.macula_lat", 0.0);
+    v->res.macula_lon       = ison_f(ison, "gaseosculum.macula_lon", 0.0);
+    v->res.macula_radius    = ison_f(ison, "gaseosculum.macula_radius", 0.1);
+    v->res.macula_obscuritas = ison_f(ison, "gaseosculum.macula_obscuritas", 0.5);
+    v->res.fusio            = ison_f(ison, "gaseosculum.fusio", 0.0);
+    v->res.temperatura      = ison_f(ison, "gaseosculum.temperatura", 0.0);
+    v->res.luminositas      = ison_f(ison, "gaseosculum.luminositas", 1.0);
+    v->res.corona           = ison_f(ison, "gaseosculum.corona", 0.0);
+    v->res.granulatio       = ison_f(ison, "gaseosculum.granulatio", 0.0);
+}
+
+void gaseosum_in_ison(FILE *f, const gaseosum_t *s)
+{
+    fprintf(f, "{\"planetella\": {\"radius\": %.2f, \"inclinatio\": %.3f, \"rotatio\": %.1f, \"semen\": %u}",
+        s->pro.radius, s->pro.inclinatio, s->pro.rotatio, s->pro.semen);
+    fprintf(f, ", \"gaseosculum\": {\"n2\": %.3f, \"o2\": %.3f, \"co2\": %.3f, \"ch4\": %.3f, \"h2\": %.2f, \"he\": %.2f, \"nh3\": %.3f, \"pulvis\": %.1f, \"fasciae\": %d, \"fasciae_contrast\": %.2f, \"maculae\": %d, \"macula_lat\": %.2f, \"macula_lon\": %.1f, \"macula_radius\": %.2f, \"macula_obscuritas\": %.1f, \"fusio\": %.1f, \"temperatura\": %.0f, \"luminositas\": %.1f, \"corona\": %.2f, \"granulatio\": %.2f}}",
+        s->res.n2, s->res.o2, s->res.co2, s->res.ch4,
+        s->res.h2, s->res.he, s->res.nh3, s->res.pulvis,
+        s->res.fasciae, s->res.fasciae_contrast,
+        s->res.maculae, s->res.macula_lat, s->res.macula_lon,
+        s->res.macula_radius, s->res.macula_obscuritas,
+        s->res.fusio, s->res.temperatura, s->res.luminositas,
+        s->res.corona, s->res.granulatio);
 }

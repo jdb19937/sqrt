@@ -33,4 +33,8 @@ typedef struct {
     galaxiola_t res;
 } galaxia_t;
 
+void reddere_galaxia(unsigned char *fen, const galaxia_t *s, const instrumentum_t *instr);
+void galaxia_in_ison(FILE *f, const galaxia_t *s);
+void galaxia_ex_ison(galaxia_t *s, const char *ison);
+
 #endif /* SIDUS_GALAXIA_H */

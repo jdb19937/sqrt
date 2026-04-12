@@ -1,4 +1,6 @@
-static void reddere_sequentia(
+#include "../sidus_communia.h"
+
+void reddere_sequentia(
     unsigned char *fen,
     const sequentia_t *s,
     const instrumentum_t *instr
@@ -38,9 +40,14 @@ static void reddere_sequentia(
         );
 }
 
-static void sequentia_ex_ison(sidus_t *s, const char *ison)
+void sequentia_ex_ison(sequentia_t *s, const char *ison)
 {
-    s->qui = SIDUS_SEQUENTIA;
-    s->ubi.sequentia.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
-    s->ubi.sequentia.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 5000);
+    s->pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 5000);
+}
+
+void sequentia_in_ison(FILE *f, const sequentia_t *s)
+{
+    fprintf(f, "{\"sidulum\": {\"magnitudo\": %.3f, \"temperatura\": %.1f}", s->pro.magnitudo, s->pro.temperatura);
+    fprintf(f, "}");
 }

@@ -1,15 +1,15 @@
 {
-  "titulus": "sol",
-  "properties": {
-    "tessella": {
-      "$ref": "tessella-schema.ison"
+    "titulus": "sol",
+    "properties": {
+        "tessella": {
+            "$ref": "tessella-schema.ison"
+        },
+        "planetella": {
+            "$ref": "planetella-schema.ison"
+        },
+        "soliculum": {
+            "$ref": "soliculum-schema.ison"
+        }
     },
-    "planetella": {
-      "$ref": "planetella-schema.ison"
-    },
-    "soliculum": {
-      "$ref": "soliculum-schema.ison"
-    }
-  },
-  "required": []
+    "required": []
 }

@@ -1,9 +1,9 @@
 {
-  "titulus": "nanulum_album",
-  "properties": {
-    "res": {
-      "type": "integer"
-    }
-  },
-  "required": []
+    "titulus": "nanulum_album",
+    "properties": {
+        "res": {
+            "type": "integer"
+        }
+    },
+    "required": []
 }

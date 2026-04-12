@@ -9,6 +9,7 @@
 #ifndef ASPECTUS_H
 #define ASPECTUS_H
 
+#include <stdio.h>
 #include "ison.h"
 
 /* ================================================================
@@ -38,5 +39,7 @@ typedef struct {
  * Si campus non invenitur, praefinitum reddit (situs=0, angulus=0).
  */
 planeta_aspectus_t planeta_aspectus_ex_ison(const char *ison);
+
+void planeta_aspectus_in_ison(FILE *f, const planeta_aspectus_t *a);
 
 #endif /* ASPECTUS_H */

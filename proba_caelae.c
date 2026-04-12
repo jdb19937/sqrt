@@ -1,9 +1,9 @@
 /*
- * proba_caelae.c — probatio pipeline: caele → isonl → reddit
+ * proba_caelae.c — probatio pipeline: caele → ison → reddit
  *
- * Pro quaque plica .isonl in caelae/ directorio:
- *   1. legit campum stellarum via campus_ex_isonl_reddere()
- *   2. scribit PPM in proba_caelae/
+ * Pro quaque plica .ison in caelae/ directorio:
+ *   1. legit campum stellarum via caela_ex_ison() + campus_ex_caela()
+ *   2. scribit PPM in probae/caelae/
  *   3. numerat pixels non nigros
  *
  * Usus: ./proba_caelae [instrumentum.ison]
@@ -13,6 +13,7 @@
 #include "instrumentum.h"
 #include "tessera.h"
 #include "campus.h"
+#include "caela.h"
 #include "ison.h"
 
 #include <stdio.h>
@@ -70,28 +71,52 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    char *instr_ison = ison_lege_plicam(via_instr);
+    if (!instr_ison) {
+        fprintf(stderr, "ERROR: %s legere non possum\n", via_instr);
+        closedir(dir);
+        return 1;
+    }
+    instrumentum_t inst;
+    instrumentum_ex_ison(&inst, instr_ison);
+    free(instr_ison);
+
     struct dirent *ent;
     int n_bona = 0, n_mala = 0;
 
     while ((ent = readdir(dir)) != NULL) {
         const char *nomen = ent->d_name;
         size_t len        = strlen(nomen);
-        if (len < 7 || strcmp(nomen + len - 6, ".isonl") != 0)
+        if (len < 6 || strcmp(nomen + len - 5, ".ison") != 0)
             continue;
 
-        char via_isonl[256];
-        snprintf(via_isonl, sizeof(via_isonl), "caelae/%s", nomen);
+        char via_caela[256];
+        snprintf(via_caela, sizeof(via_caela), "caelae/%s", nomen);
 
-        campus_t *campus = campus_ex_isonl_reddere(via_isonl, via_instr);
+        char *caela_ison = ison_lege_plicam(via_caela);
+        if (!caela_ison) {
+            fprintf(stderr, "  MALUM: %s legere non possum\n", via_caela);
+            n_mala++;
+            continue;
+        }
+        caela_t *caela = caela_ex_ison(caela_ison);
+        free(caela_ison);
+        if (!caela) {
+            fprintf(stderr, "  MALUM: %s caelam legere non possum\n", via_caela);
+            n_mala++;
+            continue;
+        }
+        campus_t *campus = campus_ex_caela(caela, &inst);
+        caela_destruere(caela);
         if (!campus) {
-            fprintf(stderr, "  MALUM: %s reddere non possum\n", via_isonl);
+            fprintf(stderr, "  MALUM: %s reddere non possum\n", via_caela);
             n_mala++;
             continue;
         }
 
-        /* nomen sine .isonl */
+        /* nomen sine .ison */
         char basis[128];
-        size_t blen = len - 6;
+        size_t blen = len - 5;
         if (blen >= sizeof(basis))
             blen = sizeof(basis) - 1;
         strncpy(basis, nomen, blen);

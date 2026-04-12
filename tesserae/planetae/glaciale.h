@@ -38,4 +38,8 @@ typedef struct {
     glaciellum_t res;
 } glaciale_t;
 
+void reddere_glaciale(unsigned char *fen, const glaciale_t *p);
+void glaciale_in_ison(FILE *f, const glaciale_t *s);
+void glaciale_ex_ison(glaciale_t *s, const char *ison);
+
 #endif /* PLANETA_GLACIALE_H */

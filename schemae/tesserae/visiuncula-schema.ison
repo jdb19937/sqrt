@@ -1,9 +1,9 @@
 {
-  "titulus": "visiuncula",
-  "properties": {
-    "semen": {
-      "type": "integer"
-    }
-  },
-  "required": []
+    "titulus": "visiuncula",
+    "properties": {
+        "semen": {
+            "type": "integer"
+        }
+    },
+    "required": []
 }

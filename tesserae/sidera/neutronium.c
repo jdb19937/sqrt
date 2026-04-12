@@ -1,4 +1,6 @@
-static void reddere_neutronium(
+#include "../sidus_communia.h"
+
+void reddere_neutronium(
     unsigned char *fen,
     const neutronium_t *s,
     const instrumentum_t *instr
@@ -46,7 +48,7 @@ static void reddere_neutronium(
     }
 
     /* bipolar jets — duae spiculae oppositae */
-    double ang_jet = alea_f() * PI_GRAECUM;
+    double ang_jet = sidus_alea_f() * PI_GRAECUM;
     color_t jet_col = {0.5, 0.6, 1.0, 1.0};
     fen_spicula(
         fen, SEMI, SEMI, ang_jet, 12.0 * luciditas, 0.3,
@@ -58,9 +60,15 @@ static void reddere_neutronium(
     );
 }
 
-static void neutronium_ex_ison(sidus_t *s, const char *ison)
+void neutronium_ex_ison(neutronium_t *s, const char *ison)
 {
-    s->qui = SIDUS_NEUTRONIUM;
-    s->ubi.neutronium.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
-    s->ubi.neutronium.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 20000);
+    s->pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 20000);
+}
+
+void neutronium_in_ison(FILE *f, const neutronium_t *s)
+{
+    fprintf(f, "{\"sidulum\": {\"magnitudo\": %.3f, \"temperatura\": %.1f}", s->pro.magnitudo, s->pro.temperatura);
+    fprintf(f, ", \"neutroniulum\": {}");
+    fprintf(f, "}");
 }

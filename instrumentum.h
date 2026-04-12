@@ -5,6 +5,7 @@
 #ifndef INSTRUMENTUM_H
 #define INSTRUMENTUM_H
 
+#include <stdio.h>
 
 /*
  * Proprietates instrumenti optici — NON sideris ipsius.
@@ -194,5 +195,8 @@ typedef struct {
     double distorsio;        /* lens gravitationalis / barilis toroidale (0 = nulla) */
     double fenestra;         /* maschera superelliptica fractio (0 = nulla) */
 } instrumentum_t;
+
+void instrumentum_ex_ison(instrumentum_t *inst, const char *ison);
+void instrumentum_in_ison(FILE *f, const instrumentum_t *inst);
 
 #endif /* INSTRUMENTUM_H */

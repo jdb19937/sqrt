@@ -1,15 +1,15 @@
 {
-  "titulus": "supergigas",
-  "properties": {
-    "tessella": {
-      "$ref": "tessella-schema.ison"
+    "titulus": "supergigas",
+    "properties": {
+        "tessella": {
+            "$ref": "tessella-schema.ison"
+        },
+        "sidulum": {
+            "$ref": "sidulum-schema.ison"
+        },
+        "supergigulum": {
+            "$ref": "supergigulum-schema.ison"
+        }
     },
-    "sidulum": {
-      "$ref": "sidulum-schema.ison"
-    },
-    "supergigulum": {
-      "$ref": "supergigulum-schema.ison"
-    }
-  },
-  "required": []
+    "required": []
 }

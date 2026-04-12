@@ -31,4 +31,8 @@ typedef struct {
     nebulula_t   res;
 } nebula_t;
 
+void reddere_nebula(unsigned char *fen, const nebula_t *p);
+void nebula_in_ison(FILE *f, const nebula_t *s);
+void nebula_ex_ison(nebula_t *s, const char *ison);
+
 #endif /* PLANETA_NEBULA_H */

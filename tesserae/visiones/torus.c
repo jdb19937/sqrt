@@ -1,11 +1,10 @@
-#define FEN VISIO_FENESTRA
-#define SEMI (FEN / 2)
+#include "../visio_communia.h"
 
 /* ================================================================
  * torus — per codicem helvea existentem
  * ================================================================ */
 
-static void torus_reddere(unsigned char *fenestra, const torus_t *t)
+void torus_reddere(unsigned char *fenestra, const torus_t *t)
 {
     int gu   = t->res.gradus_u > 0 ? t->res.gradus_u : 800;
     int gv   = t->res.gradus_v > 0 ? t->res.gradus_v : 400;
@@ -90,33 +89,48 @@ static void torus_reddere(unsigned char *fenestra, const torus_t *t)
     free(tab.profunditatis);
 }
 
-static visio_t *torus_ex_ison(const char *ison)
+void torus_ex_ison(torus_t *v, const char *ison)
 {
-    visio_t *v = (visio_t *)calloc(1, sizeof(visio_t));
-    if (!v) return NULL;
-    v->qui = VISIO_TORUS;
-    v->ubi.torus.pro.semen = (unsigned)ison_da_n(ison, "visiuncula.semen", 42);
+    v->pro.semen = (unsigned)ison_da_n(ison, "visiuncula.semen", 42);
 
     char *m = ison_da_chordam(ison, "toriculus.methodus");
-    if (!m) { free(v); return NULL; }
+    if (!m) return;
     if (strcmp(m, "borrelli") == 0)
-        v->ubi.torus.res.methodus = HELVEA_BORRELLI;
+        v->res.methodus = HELVEA_BORRELLI;
     else if (strcmp(m, "borrelli_t") == 0)
-        v->ubi.torus.res.methodus = HELVEA_BORRELLI_T;
+        v->res.methodus = HELVEA_BORRELLI_T;
     else if (strcmp(m, "planus") == 0)
-        v->ubi.torus.res.methodus = HELVEA_PLANUS;
-    else { free(m); free(v); return NULL; }
+        v->res.methodus = HELVEA_PLANUS;
+    else { free(m); return; }
     free(m);
 
-    v->ubi.torus.res.thema        = (int)ison_da_n(ison, "toriculus.thema", 0);
-    v->ubi.torus.res.strata       = (int)ison_da_n(ison, "toriculus.strata", 0);
-    v->ubi.torus.res.radius_maior = ison_da_f(ison, "toriculus.radius_maior", HELVEA_RADIUS_MAIOR);
-    v->ubi.torus.res.radius_minor = ison_da_f(ison, "toriculus.radius_minor", HELVEA_RADIUS_MINOR);
-    v->ubi.torus.res.gradus_u     = (int)ison_da_n(ison, "toriculus.gradus_u", 800);
-    v->ubi.torus.res.gradus_v     = (int)ison_da_n(ison, "toriculus.gradus_v", 400);
-    v->ubi.torus.res.distantia    = ison_da_f(ison, "toriculus.distantia", 3.5);
-    v->ubi.torus.res.elevatio     = ison_da_f(ison, "toriculus.elevatio", 0.55);
-    v->ubi.torus.res.azimuthus    = ison_da_f(ison, "toriculus.azimuthus", -0.65);
-    return v;
+    v->res.thema        = (int)ison_da_n(ison, "toriculus.thema", 0);
+    v->res.strata       = (int)ison_da_n(ison, "toriculus.strata", 0);
+    v->res.radius_maior = ison_da_f(ison, "toriculus.radius_maior", HELVEA_RADIUS_MAIOR);
+    v->res.radius_minor = ison_da_f(ison, "toriculus.radius_minor", HELVEA_RADIUS_MINOR);
+    v->res.gradus_u     = (int)ison_da_n(ison, "toriculus.gradus_u", 800);
+    v->res.gradus_v     = (int)ison_da_n(ison, "toriculus.gradus_v", 400);
+    v->res.distantia    = ison_da_f(ison, "toriculus.distantia", 3.5);
+    v->res.elevatio     = ison_da_f(ison, "toriculus.elevatio", 0.55);
+    v->res.azimuthus    = ison_da_f(ison, "toriculus.azimuthus", -0.65);
+}
+
+void torus_in_ison(FILE *f, const torus_t *s)
+{
+    fprintf(f, "{\"visiuncula\": {\"semen\": %u}", s->pro.semen);
+
+    const char *m;
+    switch (s->res.methodus) {
+    case HELVEA_BORRELLI:   m = "borrelli";   break;
+    case HELVEA_BORRELLI_T: m = "borrelli_t"; break;
+    case HELVEA_PLANUS:     m = "planus";     break;
+    default:                m = "borrelli";   break;
+    }
+
+    fprintf(f, ", \"toriculus\": {\"methodus\": \"%s\", \"thema\": %d, \"strata\": %d, \"radius_maior\": %.6f, \"radius_minor\": %.6f, \"gradus_u\": %d, \"gradus_v\": %d, \"distantia\": %.6f, \"elevatio\": %.6f, \"azimuthus\": %.6f}}",
+        m, s->res.thema, s->res.strata,
+        s->res.radius_maior, s->res.radius_minor,
+        s->res.gradus_u, s->res.gradus_v,
+        s->res.distantia, s->res.elevatio, s->res.azimuthus);
 }
 

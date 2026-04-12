@@ -54,4 +54,8 @@ typedef struct {
     saxosculum_t res;
 } saxosum_t;
 
+void reddere_saxosum(unsigned char *fen, const saxosum_t *p);
+void saxosum_in_ison(FILE *f, const saxosum_t *s);
+void saxosum_ex_ison(saxosum_t *s, const char *ison);
+
 #endif /* PLANETA_SAXOSUM_H */

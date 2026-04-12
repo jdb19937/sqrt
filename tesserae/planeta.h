@@ -16,6 +16,7 @@
 #include "../instrumentum.h"
 
 #include <math.h>
+#include <stdio.h>
 
 /* ================================================================
  * constantes
@@ -82,11 +83,17 @@ typedef struct {
  * ================================================================ */
 
 void planeta_reddere(
-    unsigned char *fenestra, const planeta_t *planeta,
-    const planeta_perceptus_t *perceptus
+    unsigned char *fenestra, const planeta_t *planeta
+);
+
+void planeta_illuminationem_applicare(
+    unsigned char *fen, double radius,
+    const planeta_perceptus_t *perc
 );
 
 planeta_t *planeta_ex_ison(const char *ison);
+
+void planeta_in_ison(FILE *f, const planeta_t *p);
 
 void planeta_instrumentum_applicare(
     double pressio_kPa,

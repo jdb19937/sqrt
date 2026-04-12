@@ -1,32 +1,32 @@
 {
-  "titulus": "sidus",
-  "oneOf": [
-    {
-      "$ref": "nanum_album-schema.ison"
-    },
-    {
-      "$ref": "sequentia-schema.ison"
-    },
-    {
-      "$ref": "gigas_rubrum-schema.ison"
-    },
-    {
-      "$ref": "supergigas-schema.ison"
-    },
-    {
-      "$ref": "neutronium-schema.ison"
-    },
-    {
-      "$ref": "crystallinum-schema.ison"
-    },
-    {
-      "$ref": "magnetar-schema.ison"
-    },
-    {
-      "$ref": "galaxia-schema.ison"
-    },
-    {
-      "$ref": "vagans-schema.ison"
-    }
-  ]
+    "titulus": "sidus",
+    "oneOf": [
+        {
+            "$ref": "nanum_album-schema.ison"
+        },
+        {
+            "$ref": "sequentia-schema.ison"
+        },
+        {
+            "$ref": "gigas_rubrum-schema.ison"
+        },
+        {
+            "$ref": "supergigas-schema.ison"
+        },
+        {
+            "$ref": "neutronium-schema.ison"
+        },
+        {
+            "$ref": "crystallinum-schema.ison"
+        },
+        {
+            "$ref": "magnetar-schema.ison"
+        },
+        {
+            "$ref": "galaxia-schema.ison"
+        },
+        {
+            "$ref": "vagans-schema.ison"
+        }
+    ]
 }

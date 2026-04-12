@@ -53,4 +53,8 @@ typedef struct {
     parvulum_t   res;
 } parvum_t;
 
+void reddere_parvum(unsigned char *fen, const parvum_t *p);
+void parvum_in_ison(FILE *f, const parvum_t *s);
+void parvum_ex_ison(parvum_t *s, const char *ison);
+
 #endif /* PLANETA_PARVUM_H */

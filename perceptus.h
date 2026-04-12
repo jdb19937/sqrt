@@ -27,4 +27,6 @@ void planeta_perceptum_applicare(
     const planeta_perceptus_t *p
 );
 
+void planeta_perceptus_in_ison(FILE *f, const planeta_perceptus_t *p);
+
 #endif /* PERCEPTUS_H */

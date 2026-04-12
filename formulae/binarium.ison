@@ -1,0 +1,20 @@
+{
+    "latitudo": 2048,
+    "altitudo": 1024,
+    "numerus_stellarum": 60000,
+    "densitas_galaxiae": 0.4,
+    "inclinatio_galaxiae": 1.1,
+    "latitudo_galaxiae": 0.15,
+    "semen": 616,
+    "galaxia_glow": 0.6,
+    "galaxia_rift": 0.4,
+    "galaxia_nebulae": 3,
+    "max_supergigantes": 1,
+    "max_gigantes": 4,
+    "max_exotica": 0,
+    "numerus_planetarum": 2,
+    "planetae_temp_min": 3400,
+    "planetae_temp_max": 5800,
+    "numerus_galaxiarum": 150,
+    "max_galaxiae": 0
+}

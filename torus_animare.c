@@ -11,6 +11,8 @@
 #include "instrumentum.h"
 #include "tessera.h"
 #include "campus.h"
+#include "caela.h"
+#include "ison.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +24,7 @@
 
 int main(int argc, char **argv)
 {
-    const char *via_isonl = "caelae/terra.isonl";
+    const char *via_caela = "caelae/terra.ison";
     const char *via_instr = "instrumenta/oculus.ison";
     int numerus_imaginum = 72;
     int argi = 1;
@@ -30,15 +32,35 @@ int main(int argc, char **argv)
         numerus_imaginum = atoi(argv[argi++]);
     }
     if (argi < argc)
-        via_isonl = argv[argi++];
+        via_caela = argv[argi++];
     if (argi < argc)
         via_instr = argv[argi++];
     if (numerus_imaginum < 1)
         numerus_imaginum = 72;
 
-    /* campum stellarum ex ISONL reddere */
-    fprintf(stderr, "Campum stellarum reddens: %s + %s\n", via_isonl, via_instr);
-    campus_t *campus = campus_ex_isonl_reddere(via_isonl, via_instr);
+    /* campum stellarum ex caela reddere */
+    fprintf(stderr, "Campum stellarum reddens: %s + %s\n", via_caela, via_instr);
+    char *caela_ison = ison_lege_plicam(via_caela);
+    if (!caela_ison) {
+        fprintf(stderr, "ERROR: %s legere non possum\n", via_caela);
+        return 1;
+    }
+    caela_t *caela = caela_ex_ison(caela_ison);
+    free(caela_ison);
+    if (!caela) {
+        fprintf(stderr, "ERROR: caelam legere non possum\n");
+        return 1;
+    }
+    char *instr_ison = ison_lege_plicam(via_instr);
+    if (!instr_ison) {
+        fprintf(stderr, "ERROR: %s legere non possum\n", via_instr);
+        return 1;
+    }
+    instrumentum_t inst;
+    instrumentum_ex_ison(&inst, instr_ison);
+    free(instr_ison);
+    campus_t *campus = campus_ex_caela(caela, &inst);
+    caela_destruere(caela);
     if (!campus) {
         fprintf(stderr, "ERROR: campus stellarum reddere non possum!\n");
         return 1;

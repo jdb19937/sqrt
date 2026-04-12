@@ -1,12 +1,12 @@
 {
-  "titulus": "vaganulus",
-  "properties": {
-    "phase": {
-      "type": "number"
+    "titulus": "vaganulus",
+    "properties": {
+        "phase": {
+            "type": "number"
+        },
+        "angulus": {
+            "type": "number"
+        }
     },
-    "angulus": {
-      "type": "number"
-    }
-  },
-  "required": []
+    "required": []
 }

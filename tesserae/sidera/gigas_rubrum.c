@@ -1,4 +1,6 @@
-static void reddere_gigas_rubrum(
+#include "../sidus_communia.h"
+
+void reddere_gigas_rubrum(
     unsigned char *fen,
     const gigas_rubrum_t *s,
     const instrumentum_t *instr
@@ -34,9 +36,15 @@ static void reddere_gigas_rubrum(
     }
 }
 
-static void gigas_rubrum_ex_ison(sidus_t *s, const char *ison)
+void gigas_rubrum_ex_ison(gigas_rubrum_t *s, const char *ison)
 {
-    s->qui = SIDUS_GIGAS_RUBRUM;
-    s->ubi.gigas_rubrum.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
-    s->ubi.gigas_rubrum.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 3500);
+    s->pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 3500);
+}
+
+void gigas_rubrum_in_ison(FILE *f, const gigas_rubrum_t *s)
+{
+    fprintf(f, "{\"sidulum\": {\"magnitudo\": %.3f, \"temperatura\": %.1f}", s->pro.magnitudo, s->pro.temperatura);
+    fprintf(f, ", \"gigulum_rubrum\": {}");
+    fprintf(f, "}");
 }

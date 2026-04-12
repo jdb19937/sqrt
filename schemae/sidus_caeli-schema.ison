@@ -1,9 +1,19 @@
 {
-  "titulus": "sidus_caeli",
-  "properties": {
-    "x":     {"type": "integer"},
-    "y":     {"type": "integer"},
-    "sidus": {"$ref": "tesserae/sidus-schema.ison"}
-  },
-  "required": ["x", "y", "sidus"]
+    "titulus": "sidus_caeli",
+    "properties": {
+        "x": {
+            "type": "integer"
+        },
+        "y": {
+            "type": "integer"
+        },
+        "sidus": {
+            "$ref": "tesserae/sidus-schema.ison"
+        }
+    },
+    "required": [
+        "x",
+        "y",
+        "sidus"
+    ]
 }

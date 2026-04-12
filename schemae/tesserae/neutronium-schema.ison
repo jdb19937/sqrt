@@ -1,15 +1,15 @@
 {
-  "titulus": "neutronium",
-  "properties": {
-    "tessella": {
-      "$ref": "tessella-schema.ison"
+    "titulus": "neutronium",
+    "properties": {
+        "tessella": {
+            "$ref": "tessella-schema.ison"
+        },
+        "sidulum": {
+            "$ref": "sidulum-schema.ison"
+        },
+        "neutroniulum": {
+            "$ref": "neutroniulum-schema.ison"
+        }
     },
-    "sidulum": {
-      "$ref": "sidulum-schema.ison"
-    },
-    "neutroniulum": {
-      "$ref": "neutroniulum-schema.ison"
-    }
-  },
-  "required": []
+    "required": []
 }

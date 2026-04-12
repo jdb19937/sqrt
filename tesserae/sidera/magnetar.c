@@ -1,9 +1,10 @@
-static void magnetar_ex_ison(sidus_t *s, const char *ison)
+#include "../sidus_communia.h"
+
+void magnetar_ex_ison(magnetar_t *s, const char *ison)
 {
-    s->qui = SIDUS_MAGNETAR;
-    s->ubi.magnetar.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
-    s->ubi.magnetar.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 20000);
-    s->ubi.magnetar.res.phase       = ison_da_f(ison, "magnetarulum.phase", 0.0);
+    s->pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 20000);
+    s->res.phase       = ison_da_f(ison, "magnetarulum.phase", 0.0);
 }
 
 /* Magnetar: stella neutronium cum B ~10^9-10^11 T.
@@ -14,7 +15,7 @@ static void magnetar_ex_ison(sidus_t *s, const char *ison)
  * Precession geodaetica causat jets spirales (Lense-Thirring).
  * Halo birefringens: vacuum QED prope B_Schwinger lucem
  * in duos modos polares separat (Heisenberg-Euler 1936). */
-static void reddere_magnetar(
+void reddere_magnetar(
     unsigned char *fen,
     const magnetar_t *s,
     const instrumentum_t *instr
@@ -26,7 +27,7 @@ static void reddere_magnetar(
      * antea: semen ex sola temperatura, sed magnetares omnes T=5×10⁶ K
      * habent, ergo omnes eandem orientationem reddebant.
      * nunc magnitudinem addimus ut variatio inter magnetares oriatur. */
-    semen_g = (unsigned int)(
+    sidus_semen_g = (unsigned int)(
         s->pro.temperatura * 71
         + s->pro.magnitudo * 100003 + s->res.phase * 70001
     );
@@ -36,7 +37,7 @@ static void reddere_magnetar(
      * congruere necesse est (obliquitas typica 10°-60°, Lander & Jones
      * 2009). axis proiectus in planum caeli quemlibet angulum habere
      * potest, ergo DUO_PI non PI_GRAECUM adhibemus. */
-    double axis_ang = alea_f() * DUO_PI;
+    double axis_ang = sidus_alea_f() * DUO_PI;
     double ax       = cos(axis_ang), ay = sin(axis_ang);
 
     /* variatio individualis magnetaris:
@@ -44,11 +45,11 @@ static void reddere_magnetar(
      * B fortior → jets longiores et collimatiores (Bucciantini+ 2006).
      * periodus rotationis P = 2-12 s → precession rate variat.
      * aetas τ = P/(2Ṗ) ~ 10³-10⁵ a → jets seniores latiores et debiliores. */
-    double jet_long     = 16.0 + alea_f() * 20.0;    /* 16-36 pixeles */
-    double jet_apertura = 3.0 + alea_f() * 6.0;  /* amplitudo spiralis */
-    double jet_freq     = 8.0 + alea_f() * 10.0;     /* frequentia spiralis */
-    int    jet_fil      = 2 + (int)(alea_f() * 3);     /* 2-4 filamenta */
-    double halo_long    = 2.0 + alea_f() * 3.0;     /* elongatio hali */
+    double jet_long     = 16.0 + sidus_alea_f() * 20.0;    /* 16-36 pixeles */
+    double jet_apertura = 3.0 + sidus_alea_f() * 6.0;  /* amplitudo spiralis */
+    double jet_freq     = 8.0 + sidus_alea_f() * 10.0;     /* frequentia spiralis */
+    int    jet_fil      = 2 + (int)(sidus_alea_f() * 3);     /* 2-4 filamenta */
+    double halo_long    = 2.0 + sidus_alea_f() * 3.0;     /* elongatio hali */
 
     /* nucleus: album intensum cum halo asymmetrico (birefringentia) */
     color_t album = {1.0, 1.0, 1.0, 1.0};
@@ -142,18 +143,25 @@ static void reddere_magnetar(
      * Gear 1985) et in GRBs (Rees & Mészáros 1994) confirmatum.
      * in magnetaribus, giant flares (ut SGR 1806-20, Palmer+ 2005)
      * nodos similes per eruptiones in jets creant. */
-    int n_nodi = 2 + (int)(alea_f() * 3);
+    int n_nodi = 2 + (int)(sidus_alea_f() * 3);
     for (int pol = -1; pol <= 1; pol += 2) {
         double dir = (double)pol;
         for (int k = 0; k < n_nodi; k++) {
-            double t    = 0.15 + alea_f() * 0.6;
+            double t    = 0.15 + sidus_alea_f() * 0.6;
             double dist = t * jet_long * 0.9;
             double px   = SEMI + dir * dist * ax;
             double py   = SEMI + dir * dist * ay;
             fen_punctum(
-                fen, px, py, 0.8 + alea_f() * 0.5, album,
-                luciditas * (0.2 + alea_f() * 0.3)
+                fen, px, py, 0.8 + sidus_alea_f() * 0.5, album,
+                luciditas * (0.2 + sidus_alea_f() * 0.3)
             );
         }
     }
+}
+
+void magnetar_in_ison(FILE *f, const magnetar_t *s)
+{
+    fprintf(f, "{\"sidulum\": {\"magnitudo\": %.3f, \"temperatura\": %.1f}", s->pro.magnitudo, s->pro.temperatura);
+    fprintf(f, ", \"magnetarulum\": {\"phase\": %.3f}", s->res.phase);
+    fprintf(f, "}");
 }

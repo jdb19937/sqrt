@@ -8,47 +8,59 @@ LDFLAGS = -lm `cat $(PREFIX)/lib/nexus_phantasma`
 LIBISON = $(PREFIX)/lib/libison.a
 LIBPHANTASMA = $(PREFIX)/lib/libphantasma.a
 
-OBJECTA = pictura.o helvea.o campus.o instrumentum.o \
+OBJECTA = pictura.o helvea.o campus.o instrumentum.o caela.o formula.o orbita.o \
           aspectus.o perceptus.o \
-          tesserae/sidus.o tesserae/planeta.o tesserae/visio.o
+          tesserae/sidus.o tesserae/planeta.o tesserae/visio.o \
+          tesserae/sidera/nanum_album.o tesserae/sidera/sequentia.o \
+          tesserae/sidera/gigas_rubrum.o tesserae/sidera/supergigas.o \
+          tesserae/sidera/neutronium.o tesserae/sidera/crystallinum.o \
+          tesserae/sidera/magnetar.o tesserae/sidera/galaxia.o \
+          tesserae/sidera/vagans.o \
+          tesserae/planetae/saxosum.o tesserae/planetae/gaseosum.o \
+          tesserae/planetae/glaciale.o tesserae/planetae/parvum.o \
+          tesserae/planetae/sol.o tesserae/planetae/nebula.o \
+          tesserae/visiones/torus.o tesserae/visiones/navis.o \
+          tesserae/visiones/zeppelinus.o
 BIBLIOTHECA = libsqrt.a
-CAPITA = campus.h instrumentum.h aspectus.h \
+CAPITA = campus.h instrumentum.h aspectus.h caela.h formula.h orbita.h \
          perceptus.h color.h vectores.h pictura.h helvea.h bessel.h \
-         tesserae/sidus.h tesserae/planeta.h tesserae/visio.h \
+         tesserae/sidus.h tesserae/sidus_communia.h \
+         tesserae/planeta.h tesserae/planeta_communia.h \
+         tesserae/visio.h tesserae/visio_communia.h \
          tessera.h tessella.h
 
 CAELAE = caelae/terra.ison caelae/hubble.ison caelae/jwst.ison \
          caelae/nuclei.ison caelae/vacuum.ison caelae/mortis.ison \
          caelae/binarium.ison
 
-omnia: torus_planus torus_animare torus_specta proba_astra caele genera redde astra_animare proba_planeta proba_caelae proba_visio
+omnia: torus_planus torus_animare torus_specta caele genera redde astra_animare proba_planeta proba_caelae proba_visio
 
 omnia: $(NOMEN)
 
 caelae: $(CAELAE)
 
-caelae/terra.ison: campi/terra.ison caele
-	./caele campi/terra.ison > caelae/terra.ison
+caelae/terra.ison: formulae/terra.ison caele
+	./caele formulae/terra.ison > caelae/terra.ison
 
-caelae/hubble.ison: campi/hubble.ison caele
-	./caele campi/hubble.ison > caelae/hubble.ison
+caelae/hubble.ison: formulae/hubble.ison caele
+	./caele formulae/hubble.ison > caelae/hubble.ison
 
-caelae/jwst.ison: campi/jwst.ison caele
-	./caele campi/jwst.ison > caelae/jwst.ison
+caelae/jwst.ison: formulae/jwst.ison caele
+	./caele formulae/jwst.ison > caelae/jwst.ison
 
-caelae/nuclei.ison: campi/nuclei.ison caele
-	./caele campi/nuclei.ison > caelae/nuclei.ison
+caelae/nuclei.ison: formulae/nuclei.ison caele
+	./caele formulae/nuclei.ison > caelae/nuclei.ison
 
-caelae/vacuum.ison: campi/vacuum.ison caele
-	./caele campi/vacuum.ison > caelae/vacuum.ison
+caelae/vacuum.ison: formulae/vacuum.ison caele
+	./caele formulae/vacuum.ison > caelae/vacuum.ison
 
-caelae/mortis.ison: campi/mortis.ison caele
-	./caele campi/mortis.ison > caelae/mortis.ison
+caelae/mortis.ison: formulae/mortis.ison caele
+	./caele formulae/mortis.ison > caelae/mortis.ison
 
-caelae/binarium.ison: campi/binarium.ison caele
-	./caele campi/binarium.ison > caelae/binarium.ison
+caelae/binarium.ison: formulae/binarium.ison caele
+	./caele formulae/binarium.ison > caelae/binarium.ison
 
-lude: torus_specta caelae/terra.ison
+lude: torus_specta
 	./torus_specta
 
 # objecta

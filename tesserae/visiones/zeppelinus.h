@@ -30,4 +30,8 @@ typedef struct {
     zeppelinulus_t res;
 } zeppelinus_t;
 
+void zeppelinus_reddere(unsigned char *fenestra, const zeppelinus_t *z);
+void zeppelinus_in_ison(FILE *f, const zeppelinus_t *s);
+void zeppelinus_ex_ison(zeppelinus_t *s, const char *ison);
+
 #endif /* VISIO_ZEPPELINUS_H */

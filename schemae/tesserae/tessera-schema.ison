@@ -1,19 +1,19 @@
 {
-  "titulus": "tessera",
-  "phyla": [
-    "sidus",
-    "planeta",
-    "visio"
-  ],
-  "oneOf": [
-    {
-      "$ref": "sidus-schema.ison"
-    },
-    {
-      "$ref": "planeta-schema.ison"
-    },
-    {
-      "$ref": "visio-schema.ison"
-    }
-  ]
+    "titulus": "tessera",
+    "phyla": [
+        "sidus",
+        "planeta",
+        "visio"
+    ],
+    "oneOf": [
+        {
+            "$ref": "sidus-schema.ison"
+        },
+        {
+            "$ref": "planeta-schema.ison"
+        },
+        {
+            "$ref": "visio-schema.ison"
+        }
+    ]
 }

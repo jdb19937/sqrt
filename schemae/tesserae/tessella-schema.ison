@@ -1,9 +1,9 @@
 {
-  "titulus": "tessella",
-  "properties": {
-    "res": {
-      "type": "integer"
-    }
-  },
-  "required": []
+    "titulus": "tessella",
+    "properties": {
+        "res": {
+            "type": "integer"
+        }
+    },
+    "required": []
 }

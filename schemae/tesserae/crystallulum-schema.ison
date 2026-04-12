@@ -1,9 +1,9 @@
 {
-  "titulus": "crystallulum",
-  "properties": {
-    "res": {
-      "type": "integer"
-    }
-  },
-  "required": []
+    "titulus": "crystallulum",
+    "properties": {
+        "res": {
+            "type": "integer"
+        }
+    },
+    "required": []
 }

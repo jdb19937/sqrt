@@ -1,12 +1,12 @@
 /*
  * astra_animare.c — animatio campi stellarum
  *
- * Reddit campum stellarum staticum ex ISONL + instrumento,
+ * Reddit campum stellarum staticum ex caela + instrumento,
  * deinde per tabulas effectus dynamicos applicat (scintillatio,
  * refractio atmosphaerica) et scribit MP4 et/vel GIF.
  *
  * Usus:
- *   ./astra_animare <stellae.isonl> <instrumentum.ison> [optiones]
+ *   ./astra_animare <caela.ison> <instrumentum.ison> [optiones]
  *
  * Optiones:
  *   -mp4 <via>        via plicae MP4
@@ -25,6 +25,7 @@
 #include "instrumentum.h"
 #include "tessera.h"
 #include "campus.h"
+#include "caela.h"
 #include "ison.h"
 #include "phantasma.h"
 
@@ -52,7 +53,7 @@ int main(int argc, char **argv)
     if (argc < 3) {
         fprintf(
             stderr,
-            "Usus: astra_animare <stellae.isonl> <instrumentum.ison> [optiones]\n"
+            "Usus: astra_animare <caela.ison> <instrumentum.ison> [optiones]\n"
             "  -mp4 <via>      plica MP4\n"
             "  -gif <via>      plica GIF\n"
             "  -n <num>        numerus tabularum (120)\n"
@@ -68,7 +69,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    const char *via_isonl = argv[1];
+    const char *via_caela = argv[1];
     const char *via_instr = argv[2];
     const char *via_mp4 = NULL;
     const char *via_gif = NULL;
@@ -115,31 +116,33 @@ int main(int argc, char **argv)
     }
 
     /* campum stellarum staticum reddere */
-    fprintf(stderr, "Campum reddens: %s + %s\n", via_isonl, via_instr);
-    campus_t *basis = campus_ex_isonl_reddere(via_isonl, via_instr);
+    fprintf(stderr, "Campum reddens: %s + %s\n", via_caela, via_instr);
+    char *caela_ison = ison_lege_plicam(via_caela);
+    if (!caela_ison) {
+        fprintf(stderr, "ERROR: %s legere non possum\n", via_caela);
+        return 1;
+    }
+    caela_t *caela = caela_ex_ison(caela_ison);
+    free(caela_ison);
+    if (!caela) {
+        fprintf(stderr, "ERROR: caelam legere non possum\n");
+        return 1;
+    }
+    /* instrumentum legere */
+    char *instr_ison = ison_lege_plicam(via_instr);
+    if (!instr_ison) {
+        fprintf(stderr, "ERROR: %s legere non possum\n", via_instr);
+        return 1;
+    }
+    instrumentum_t inst;
+    instrumentum_ex_ison(&inst, instr_ison);
+    free(instr_ison);
+
+    campus_t *basis = campus_ex_caela(caela, &inst);
+    caela_destruere(caela);
     if (!basis) {
         fprintf(stderr, "ERROR: campus reddere non possum\n");
         return 1;
-    }
-
-    /* instrumentum legere pro effectibus dynamicis */
-    char *instr_ison = ison_lege_plicam(via_instr);
-    instrumentum_t inst;
-    memset(&inst, 0, sizeof(inst));
-    inst.saturatio = 1.0;
-    if (instr_ison) {
-        char *v;
-        v = ison_da_chordam(instr_ison, "scintillatio");
-        if (v) {
-            inst.scintillatio = atof(v);
-            free(v);
-        }
-        v = ison_da_chordam(instr_ison, "refractio");
-        if (v) {
-            inst.refractio = atof(v);
-            free(v);
-        }
-        free(instr_ison);
     }
 
     int oL = basis->latitudo / scala;

@@ -1,27 +1,27 @@
 {
-  "titulus": "nebulula",
-  "properties": {
-    "temperatura": {
-      "type": "number"
+    "titulus": "nebulula",
+    "properties": {
+        "temperatura": {
+            "type": "number"
+        },
+        "luminositas": {
+            "type": "number"
+        },
+        "h2": {
+            "type": "number"
+        },
+        "o2": {
+            "type": "number"
+        },
+        "carbo": {
+            "type": "number"
+        },
+        "tectonica": {
+            "type": "number"
+        },
+        "nubes": {
+            "type": "number"
+        }
     },
-    "luminositas": {
-      "type": "number"
-    },
-    "h2": {
-      "type": "number"
-    },
-    "o2": {
-      "type": "number"
-    },
-    "carbo": {
-      "type": "number"
-    },
-    "tectonica": {
-      "type": "number"
-    },
-    "nubes": {
-      "type": "number"
-    }
-  },
-  "required": []
+    "required": []
 }

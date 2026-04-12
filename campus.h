@@ -62,43 +62,9 @@ typedef struct {
  *   CMB in scalis magnis naturaliter explicat (Luminet et al. 2003).
  * ================================================================ */
 
-/* parametri generationis campi stellarum */
-typedef struct {
-    int    numerus_stellarum;     /* stellae totales tentandae */
-    double densitas_galaxiae;     /* 0..1: intensitas concentrationis in fascia */
-    double inclinatio_galaxiae;   /* angulus fasciae (radianes) */
-    double latitudo_galaxiae;     /* latitudo fasciae (fractio altitudinis) */
-    unsigned int semen;           /* semen aleatorium */
-
-    /* via lactea — glow diffusum */
-    double galaxia_glow;          /* 0..1: intensitas glow (0 = nullum) */
-    double galaxia_rift;          /* 0..1: intensitas fasciae pulveris */
-    int    galaxia_nebulae;       /* numerus nebulosarum emissionis */
-
-    /* limites per genus (0 = illimitatum) */
-    int    max_supergigantes;
-    int    max_gigantes;
-    int    max_exotica;           /* crystallinum + magnetar + neutronium */
-
-    /* planetae */
-    int    numerus_planetarum;
-    double planetae_temp_min;     /* temperatura minima planetarum */
-    double planetae_temp_max;
-
-    /* galaxiae distantes */
-    int    numerus_galaxiarum;    /* galaxiae totales tentandae */
-    int    max_galaxiae;          /* maximum galaxiarum positarum (0 = illimitatum) */
-} campus_parametri_t;
-
 /* campum creare et destruere */
 campus_t *campus_creare(int latitudo, int altitudo);
 void campus_destruere(campus_t *c);
-
-/* campum stellarum generare — instrumentum separatum a campo */
-void campus_generare(
-    campus_t *c, const campus_parametri_t *p,
-    const instrumentum_t *instrumentum
-);
 
 /* pixel in campum toroidalem scribere (coordinatae modulantur) */
 void campus_pixel_scribere(
@@ -129,24 +95,22 @@ void planeta_in_campum(
     const unsigned char *fenestra, double scala
 );
 
-/*
- * campus_ex_isonl_reddere — campum stellarum ex ISONL et instrumento reddit.
- * Legit ISONL (stellae fixae ex caele), applicat instrumentum opticum,
- * reddit campum paratum. Vocans campum per campus_destruere liberet.
- * Reddit NULL si error.
- */
-campus_t *campus_ex_isonl_reddere(
-    const char *via_isonl,
-    const char *via_instrumentum
-);
+#include "caela.h"
 
-campus_t *campus_ex_ison_reddere(
-    const char *via_ison,
-    const char *via_instrumentum
+/* quattuor phases redditionis */
+void campus_sidera_reddere(campus_t *c, const caela_t *caela, const instrumentum_t *inst);
+void campus_viam_lacteam_reddere(campus_t *c, const caela_t *caela);
+void campus_planetas_reddere(campus_t *c, const caela_t *caela);
+void campus_planetas_reddere_in_conspectu(campus_t *c, const caela_t *caela, int vx, int vy, int vw, int vh);
+
+/* campum stellarum ex caela et instrumento reddere (omnes phases) */
+campus_t *campus_ex_caela(
+    const caela_t *caela,
+    const instrumentum_t *inst
 );
 
 /* post-processare: effectus instrumenti applicare ad campum */
-void isonl_post_processare(
+void campus_post_processare(
     campus_t *c,
     const instrumentum_t *inst
 );

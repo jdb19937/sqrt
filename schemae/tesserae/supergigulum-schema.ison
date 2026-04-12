@@ -1,9 +1,9 @@
 {
-  "titulus": "supergigulum",
-  "properties": {
-    "res": {
-      "type": "integer"
-    }
-  },
-  "required": []
+    "titulus": "supergigulum",
+    "properties": {
+        "res": {
+            "type": "integer"
+        }
+    },
+    "required": []
 }

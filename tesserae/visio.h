@@ -12,6 +12,7 @@
 #include "../tessella.h"
 
 #include <math.h>
+#include <stdio.h>
 
 /* ================================================================
  * constantes
@@ -80,5 +81,11 @@ void visio_reddere(unsigned char *fenestra, const visio_t *visio);
  * Reddit visio_t* allocatum (vocans liberet per free()).
  */
 visio_t *visio_ex_ison(const char *ison);
+
+/*
+ * visio_in_ison — scribit visionem in ISON ad FILE*.
+ * Dispatch per genus.
+ */
+void visio_in_ison(FILE *f, const visio_t *v);
 
 #endif /* VISIO_H */

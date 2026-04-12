@@ -35,6 +35,7 @@
 #include "../instrumentum.h"
 
 #include <math.h>
+#include <stdio.h>
 
 #define SIDUS_FENESTRA  64      /* latitudo et altitudo fenestrae sideris */
 
@@ -260,5 +261,8 @@ void sidus_ex_ison(sidus_t *sidus, const char *ison);
 
 /* colorem ex temperatura (Kelvin) per Planck approximare */
 color_t sidus_temperatura_ad_colorem(double kelvin);
+
+/* sidus in ISON scribere (in FILE) */
+void sidus_in_ison(FILE *f, const sidus_t *sidus);
 
 #endif /* SIDUS_H */

@@ -1,10 +1,10 @@
 /*
- * redde.c — campum stellarum ex ISONL in PPM reddit
+ * redde.c — campum stellarum ex caela in PPM reddit
  *
- * Legit ISONL stellarum (ex caele) et instrumentum ISON,
+ * Legit caelam stellarum (.ison) et instrumentum ISON,
  * applicat effectus opticos, reddit PPM.
  *
- * Usus: ./redde <stellae.isonl> <instrumentum.ison> [imago.ppm]
+ * Usus: ./redde <caela.ison> <instrumentum.ison> [imago.ppm]
  *
  * Si imago.ppm omittitur, scribit ad stdout.
  */
@@ -12,6 +12,8 @@
 #include "instrumentum.h"
 #include "tessera.h"
 #include "campus.h"
+#include "caela.h"
+#include "ison.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,12 +21,32 @@
 int main(int argc, char **argv)
 {
     if (argc < 3) {
-        fprintf(stderr, "Usus: redde <stellae.isonl> <instrumentum.ison> [imago.ppm]\n");
+        fprintf(stderr, "Usus: redde <caela.ison> <instrumentum.ison> [imago.ppm]\n");
         return 1;
     }
 
     fprintf(stderr, "Stellas reddens: %s + %s\n", argv[1], argv[2]);
-    campus_t *campus = campus_ex_isonl_reddere(argv[1], argv[2]);
+    char *caela_ison = ison_lege_plicam(argv[1]);
+    if (!caela_ison) {
+        fprintf(stderr, "ERROR: %s legere non possum\n", argv[1]);
+        return 1;
+    }
+    caela_t *caela = caela_ex_ison(caela_ison);
+    free(caela_ison);
+    if (!caela) {
+        fprintf(stderr, "ERROR: caelam legere non possum\n");
+        return 1;
+    }
+    char *instr_ison = ison_lege_plicam(argv[2]);
+    if (!instr_ison) {
+        fprintf(stderr, "ERROR: %s legere non possum\n", argv[2]);
+        return 1;
+    }
+    instrumentum_t inst;
+    instrumentum_ex_ison(&inst, instr_ison);
+    free(instr_ison);
+    campus_t *campus = campus_ex_caela(caela, &inst);
+    caela_destruere(caela);
     if (!campus) {
         fprintf(stderr, "ERROR: campus reddere non possum\n");
         return 1;

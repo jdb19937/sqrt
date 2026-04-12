@@ -17,4 +17,8 @@ typedef struct {
     supergigulum_t res;
 } supergigas_t;
 
+void reddere_supergigas(unsigned char *fen, const supergigas_t *s, const instrumentum_t *instr);
+void supergigas_in_ison(FILE *f, const supergigas_t *s);
+void supergigas_ex_ison(supergigas_t *s, const char *ison);
+
 #endif /* SIDUS_SUPERGIGAS_H */

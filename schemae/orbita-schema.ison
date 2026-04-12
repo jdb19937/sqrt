@@ -1,0 +1,52 @@
+{
+    "titulus": "orbita",
+    "properties": {
+        "cx": {
+            "type": "number"
+        },
+        "cy": {
+            "type": "number"
+        },
+        "amplitudo_x": {
+            "type": "number"
+        },
+        "amplitudo_y": {
+            "type": "number"
+        },
+        "frequentia_x": {
+            "type": "integer"
+        },
+        "frequentia_y": {
+            "type": "integer"
+        },
+        "phase_x": {
+            "type": "number"
+        },
+        "phase_y": {
+            "type": "number"
+        },
+        "revolutiones_x": {
+            "type": "integer"
+        },
+        "revolutiones_y": {
+            "type": "integer"
+        },
+        "periodus": {
+            "type": "integer"
+        },
+        "cz": {
+            "type": "number"
+        },
+        "amplitudo_z": {
+            "type": "number"
+        },
+        "phase_z": {
+            "type": "number"
+        }
+    },
+    "required": [
+        "cx",
+        "cy",
+        "periodus"
+    ]
+}

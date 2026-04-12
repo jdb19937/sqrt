@@ -37,4 +37,8 @@ typedef struct {
     soliculum_t  res;
 } sol_t;
 
+void reddere_sol(unsigned char *fen, const sol_t *p);
+void sol_in_ison(FILE *f, const sol_t *s);
+void sol_ex_ison(sol_t *s, const char *ison);
+
 #endif /* PLANETA_SOL_H */

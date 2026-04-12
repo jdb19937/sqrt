@@ -77,7 +77,8 @@ int main(void)
         planeta_perceptus_t perc = planeta_perceptus_ex_ison(per_raw);
         free(per_raw);
         memset(fen, 0, PLANETA_FENESTRA * PLANETA_FENESTRA * 4);
-        planeta_reddere(fen, p, &perc);
+        planeta_reddere(fen, p);
+        planeta_illuminationem_applicare(fen, p->ubi.saxosum.pro.radius, &perc);
         planeta_perceptum_applicare(fen, &perc);
 
         /* nomen sine extensione */

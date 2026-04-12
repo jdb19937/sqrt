@@ -21,4 +21,8 @@ typedef struct {
     vaganulus_t res;
 } vagans_t;
 
+void reddere_vagans(unsigned char *fen, const vagans_t *s, const instrumentum_t *instr);
+void vagans_in_ison(FILE *f, const vagans_t *s);
+void vagans_ex_ison(vagans_t *s, const char *ison);
+
 #endif /* SIDUS_VAGANS_H */

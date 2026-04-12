@@ -191,3 +191,20 @@ void planeta_perceptum_applicare(
 
     free(orig);
 }
+
+void planeta_perceptus_in_ison(FILE *f, const planeta_perceptus_t *p)
+{
+    fprintf(f, "{\"aspectus\": ");
+    planeta_aspectus_in_ison(f, &p->aspectus);
+    if (p->coaspectus.lumen > 0.001) {
+        fprintf(f, ", \"coaspectus\": ");
+        planeta_aspectus_in_ison(f, &p->coaspectus);
+    }
+    fprintf(
+        f, ", \"acuitas\": %.1f, \"detallum\": %.2f, \"granum\": %.2f",
+        p->acuitas, p->detallum, p->granum
+    );
+    if (p->aberratio > 0.001)
+        fprintf(f, ", \"aberratio\": %.2f", p->aberratio);
+    fprintf(f, "}");
+}

@@ -1,10 +1,11 @@
-static void galaxia_ex_ison(sidus_t *s, const char *ison)
+#include "../sidus_communia.h"
+
+void galaxia_ex_ison(galaxia_t *s, const char *ison)
 {
-    s->qui = SIDUS_GALAXIA;
-    s->ubi.galaxia.pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
-    s->ubi.galaxia.pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 5000);
-    s->ubi.galaxia.res.morphologia = (galaxia_morphologia_t)(int)ison_da_f(ison, "galaxiola.morphologia", 0);
-    s->ubi.galaxia.res.angulus     = ison_da_f(ison, "galaxiola.angulus", 0.0);
+    s->pro.magnitudo   = ison_da_f(ison, "sidulum.magnitudo", 5.0);
+    s->pro.temperatura = ison_da_f(ison, "sidulum.temperatura", 5000);
+    s->res.morphologia = (galaxia_morphologia_t)(int)ison_da_f(ison, "galaxiola.morphologia", 0);
+    s->res.angulus     = ison_da_f(ison, "galaxiola.angulus", 0.0);
 }
 
 /*
@@ -67,7 +68,7 @@ static void galaxia_ex_ison(sidus_t *s, const char *ison)
  *   implementatio: mag = mag_min + Δmag · (1-r^0.4)
  *   ubi r uniformis — pleraeque debiles, paucae lucidae.
  */
-static void reddere_galaxia(
+void reddere_galaxia(
     unsigned char *fen,
     const galaxia_t *s,
     const instrumentum_t *instr
@@ -75,7 +76,7 @@ static void reddere_galaxia(
     (void)instr;
 
     /* semen unicum ex omnibus proprietatibus */
-    semen_g = (unsigned int)(
+    sidus_semen_g = (unsigned int)(
         s->pro.temperatura * 137
         + s->pro.magnitudo * 100003 + (double)s->res.morphologia * 7001
         + s->res.angulus * 50021
@@ -106,7 +107,7 @@ static void reddere_galaxia(
      * discus circularis inclinatus: b/a = cos(i).
      * elliptica intrinseca: b/a ∈ [0.3, 1.0]. */
     double ba_ratio;  /* b/a axis ratio */
-    double ell_intrin = 0.7 + alea_f() * 0.3;  /* ellipticae: 0.7-1.0 */
+    double ell_intrin = 0.7 + sidus_alea_f() * 0.3;  /* ellipticae: 0.7-1.0 */
 
     switch (morph) {
     case GALAXIA_ELLIPTICA:
@@ -151,9 +152,9 @@ static void reddere_galaxia(
     }
 
     /* variatio individualis coloris */
-    double dR = (alea_f() - 0.5) * 0.15;
-    double dG = (alea_f() - 0.5) * 0.10;
-    double dB = (alea_f() - 0.5) * 0.10;
+    double dR = (sidus_alea_f() - 0.5) * 0.15;
+    double dG = (sidus_alea_f() - 0.5) * 0.10;
+    double dB = (sidus_alea_f() - 0.5) * 0.10;
     col_nuc.r += dR;
     col_nuc.g += dG;
     col_nuc.b += dB;
@@ -203,7 +204,7 @@ static void reddere_galaxia(
 
         /* barra (solum pro barratis) */
         if (morph == GALAXIA_SPIRALIS_BARRATA) {
-            double bar_len = r_eff * (0.4 + alea_f() * 0.3);
+            double bar_len = r_eff * (0.4 + sidus_alea_f() * 0.3);
             double bar_wid = r_eff * 0.12;
             for (int i = -40; i <= 40; i++) {
                 double t  = (double)i / 40.0;
@@ -229,14 +230,14 @@ static void reddere_galaxia(
          *   Sa: pitch ~10° (stricta), Sc: pitch ~25° (laxa).
          * duo brachia (m=2) dominans modus per theoriam Lin-Shu. */
         int n_brachia  = 2;
-        double pitch   = 0.3 + alea_f() * 0.4;  /* 0.3-0.7 rad (~17°-40°) */
+        double pitch   = 0.3 + sidus_alea_f() * 0.4;  /* 0.3-0.7 rad (~17°-40°) */
         double r_start = r_eff * 0.25;
         if (morph == GALAXIA_SPIRALIS_BARRATA)
             r_start = r_eff * 0.45;  /* brachia ex extremis barrae */
-        double arm_bright = 0.5 + alea_f() * 0.3;
+        double arm_bright = 0.5 + sidus_alea_f() * 0.3;
 
         for (int arm = 0; arm < n_brachia; arm++) {
-            double theta0 = DUO_PI * arm / n_brachia + alea_f() * 0.3;
+            double theta0 = DUO_PI * arm / n_brachia + sidus_alea_f() * 0.3;
             int n_steps   = 200;
             for (int j = 0; j < n_steps; j++) {
                 double t     = (double)j / (double)n_steps;
@@ -244,7 +245,7 @@ static void reddere_galaxia(
                 double r     = r_start + t * r_eff * 1.8;
 
                 /* spirala logarithmica cum perturbatione */
-                double perturb = alea_f() * 0.15 - 0.075;
+                double perturb = sidus_alea_f() * 0.15 - 0.075;
                 double x_arm   = r * cos(theta + perturb);
                 double y_arm   = r * sin(theta + perturb);
 
@@ -264,8 +265,8 @@ static void reddere_galaxia(
                  * formatio stellarum in undis densitatis.
                  * nodi lucidi stochastice distributi. */
                 double nod = 1.0;
-                if (alea_f() < 0.08)
-                    nod = 1.5 + alea_f();
+                if (sidus_alea_f() < 0.08)
+                    nod = 1.5 + sidus_alea_f();
                 double wid = 0.5 + t * 0.8;
                 fen_punctum(
                     fen, SEMI + px, SEMI + py, wid,
@@ -357,8 +358,8 @@ static void reddere_galaxia(
          * distributio spatiosa non symmetrica, nodi luminosi
          * (regiones HII gigantes, 30 Doradus in LMC exemplum)
          * cum fundo diffuso debili. */
-        double offset_x = (alea_f() - 0.5) * r_eff * 0.3;
-        double offset_y = (alea_f() - 0.5) * r_eff * 0.3;
+        double offset_x = (sidus_alea_f() - 0.5) * r_eff * 0.3;
+        double offset_y = (sidus_alea_f() - 0.5) * r_eff * 0.3;
 
         /* fundus diffusus asymmetricus */
         for (int dy = -20; dy <= 20; dy++) {
@@ -376,19 +377,27 @@ static void reddere_galaxia(
         }
 
         /* nodi starburst — 3-8 regiones luminosae */
-        int n_nodi = 3 + (int)(alea_f() * 6);
+        int n_nodi = 3 + (int)(sidus_alea_f() * 6);
         for (int k = 0; k < n_nodi; k++) {
-            double nx = (alea_f() - 0.5) * r_eff * 2.0;
-            double ny = (alea_f() - 0.5) * r_eff * 2.0;
-            double nr = 0.5 + alea_f() * 1.5;
-            double nf = luciditas * (0.3 + alea_f() * 0.5);
+            double nx = (sidus_alea_f() - 0.5) * r_eff * 2.0;
+            double ny = (sidus_alea_f() - 0.5) * r_eff * 2.0;
+            double nr = 0.5 + sidus_alea_f() * 1.5;
+            double nf = luciditas * (0.3 + sidus_alea_f() * 0.5);
             /* colores: caerulei (formatio stellarum) vel rosei (Hα) */
             color_t nc;
-            if (alea_f() < 0.6)
+            if (sidus_alea_f() < 0.6)
                 nc = (color_t){0.5, 0.7, 1.0, 1.0};  /* OB stellae */
             else
                 nc = (color_t){1.0, 0.5, 0.6, 1.0};  /* HII Hα */
             fen_punctum(fen, SEMI + nx, SEMI + ny, nr, nc, nf);
         }
     }
+}
+
+void galaxia_in_ison(FILE *f, const galaxia_t *s)
+{
+    fprintf(f, "{\"sidulum\": {\"magnitudo\": %.3f, \"temperatura\": %.1f}", s->pro.magnitudo, s->pro.temperatura);
+    fprintf(f, ", \"galaxiola\": {\"morphologia\": %d, \"angulus\": %.3f}",
+        (int)s->res.morphologia, s->res.angulus);
+    fprintf(f, "}");
 }

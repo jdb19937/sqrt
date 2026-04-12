@@ -1,12 +1,28 @@
 {
-  "titulus": "perceptus",
-  "properties": {
-    "aspectus":   {"$ref": "aspectus-schema.ison"},
-    "coaspectus": {"$ref": "aspectus-schema.ison"},
-    "acuitas":    {"type": "number", "description": "acuitas [0..2]"},
-    "detallum":   {"type": "number", "description": "synthesia texturarum [0..1]"},
-    "granum":     {"type": "number", "description": "granum pelliculae [0..1]"},
-    "aberratio":  {"type": "number", "description": "aberratio chromatica [0..1]"}
-  },
-  "required": []
+    "titulus": "perceptus",
+    "properties": {
+        "aspectus": {
+            "$ref": "aspectus-schema.ison"
+        },
+        "coaspectus": {
+            "$ref": "aspectus-schema.ison"
+        },
+        "acuitas": {
+            "type": "number",
+            "description": "acuitas [0..2]"
+        },
+        "detallum": {
+            "type": "number",
+            "description": "synthesia texturarum [0..1]"
+        },
+        "granum": {
+            "type": "number",
+            "description": "granum pelliculae [0..1]"
+        },
+        "aberratio": {
+            "type": "number",
+            "description": "aberratio chromatica [0..1]"
+        }
+    },
+    "required": []
 }
