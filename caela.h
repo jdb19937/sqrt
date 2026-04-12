@@ -21,12 +21,12 @@ typedef struct {
 /* planeta positum in caelo */
 typedef struct {
     double              x, y, z;
-    double              scala;          /* scala reddita = scala_naturalis * f(z) */
-    double              scala_naturalis;/* scala ad z=0 ex formula */
+    double              scala;           /* scala reddita = scala_naturalis * f(z) */
+    double              scala_naturalis; /* scala ad z=0 ex formula */
     char               *nomen;
     planeta_perceptus_t perceptus;
     planeta_t           planeta;
-    unsigned char      *fenestra_cacata;/* 512x512 RGBA, corpus sine illuminatione */
+    unsigned char      *fenestra_cacata; /* 512x512 RGBA, corpus sine illuminatione */
 } planeta_caeli_t;
 
 /* caela — campus stellarum */

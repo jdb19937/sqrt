@@ -509,8 +509,11 @@ static void computare_perceptum(
     if (situs > 0.9)
         situs = 0.9;
 
-    /* lumen inversus distantiae */
-    double lumen = 1.5 / (1.0 + dist / (diag * 0.3));
+    /* lumen inversus distantiae, proportionale luminositati solis */
+    double sol_lum = sol->planeta.ubi.sol.res.luminositas;
+    if (sol_lum < 0.01)
+        sol_lum = 1.0;
+    double lumen = sol_lum * 1.5 / (1.0 + dist / (diag * 0.3));
 
     pc->perceptus.aspectus.angulus = ang;
     pc->perceptus.aspectus.situs   = situs;

@@ -70,8 +70,8 @@
                 "amplitudo_x": 800.0,
                 "amplitudo_y": 30.0,
                 "phase_y": 1.5708,
-                "periodus": 360,
-                "amplitudo_z": 0.5,
+                "periodus": 180,
+                "amplitudo_z": 0.2,
                 "phase_z": 1.5708
             }
         },
@@ -108,8 +108,8 @@
                 "amplitudo_y": 40.0,
                 "phase_x": 3.1416,
                 "phase_y": 4.7124,
-                "periodus": 360,
-                "amplitudo_z": 0.5,
+                "periodus": 240,
+                "amplitudo_z": 0.2,
                 "phase_z": 4.7124
             }
         },
@@ -142,7 +142,7 @@
                 "amplitudo_y": 60.0,
                 "frequentia_y": 2,
                 "revolutiones_x": 1,
-                "periodus": 480,
+                "periodus": 540,
                 "cz": 0.3
             }
         },
@@ -175,7 +175,7 @@
                 "amplitudo_y": 80.0,
                 "frequentia_y": 3,
                 "revolutiones_x": 2,
-                "periodus": 360,
+                "periodus": 420,
                 "cz": 0.3
             }
         },
@@ -203,7 +203,7 @@
                 "amplitudo_y": 100.0,
                 "frequentia_y": 2,
                 "revolutiones_x": 1,
-                "periodus": 360,
+                "periodus": 310,
                 "cz": 0.5
             }
         },
@@ -235,7 +235,7 @@
                 "amplitudo_y": 120.0,
                 "frequentia_y": 1,
                 "revolutiones_x": 1,
-                "periodus": 480,
+                "periodus": 670,
                 "cz": 0.7
             }
         },
@@ -263,6 +263,33 @@
                 "cx": 700.0,
                 "cy": 560.0,
                 "periodus": 360
+            }
+        },
+        {
+            "nomen": "Stella Caerulea",
+            "scala": 0.35,
+            "planeta": {
+                "planetella": {
+                    "radius": 0.88,
+                    "semen": 19191
+                },
+                "soliculum": {
+                    "fusio": 1.0,
+                    "temperatura": 25000,
+                    "luminositas": 0.3,
+                    "corona": 0.15,
+                    "granulatio": 0.05,
+                    "h2": 0.74,
+                    "he": 0.25
+                }
+            },
+            "orbita": {
+                "cx": 700.0,
+                "cy": 560.0,
+                "amplitudo_x": 1800.0,
+                "amplitudo_y": 1800.0,
+                "phase_y": 1.5708,
+                "periodus": 2400
             }
         }
     ]
