@@ -1,11 +1,11 @@
 /*
  * genera.c — formulam proceduraliter generare
  *
- * Ex semine (et optionaliter sidere) systema planetarium
- * integrum generat. Reddit ISON formulae ad stdout.
+ * Ex semine systema planetarium integrum generat.
+ * Reddit ISON formulae ad stdout.
  *
  * Usus:
- *   ./genera <semen>
+ *   ./genera <temperatura> <semen>
  */
 
 #include "formula.h"
@@ -17,16 +17,23 @@
 
 int main(int argc, char **argv)
 {
-    if (argc < 2) {
-        fprintf(stderr, "Usus: genera <semen>\n");
+    if (argc < 3) {
+        fprintf(stderr, "Usus: genera <temperatura> <semen>\n");
         return 1;
     }
 
-    unsigned int semen = (unsigned int)strtoul(argv[1], NULL, 10);
+    double temp        = atof(argv[1]);
+    unsigned int semen = (unsigned int)strtoul(argv[2], NULL, 10);
+
+    sidus_t sidus;
+    memset(&sidus, 0, sizeof(sidus));
+    sidus.qui = SIDUS_SEQUENTIA;
+    sidus.ubi.sequentia.pro.temperatura = temp;
+    sidus.ubi.sequentia.pro.magnitudo = 3.0;
 
     formula_t f;
     memset(&f, 0, sizeof(f));
-    formula_generare(&f, semen);
+    formula_generare(&f, semen, &sidus, NULL);
 
     char *result = NULL;
     size_t sz    = 0;

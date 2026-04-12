@@ -795,11 +795,27 @@ int main(int argc, char **argv)
                         );
                         int habet_co = (ci >= 0 && (semen_novum & 0xFF) < 25);
 
+                        /* construere sidus_t ex sidere clicato */
+                        sidus_t sidus_click;
+                        memset(&sidus_click, 0, sizeof(sidus_click));
+                        sidus_click.qui = SIDUS_SEQUENTIA;
+                        sidus_click.ubi.sequentia.pro.temperatura = s->temperatura;
+                        sidus_click.ubi.sequentia.pro.magnitudo   = s->magnitudo;
+
+                        sidus_t cosidus_click;
+                        sidus_t *cosidus_ptr = NULL;
+                        if (habet_co) {
+                            memset(&cosidus_click, 0, sizeof(cosidus_click));
+                            cosidus_click.qui = SIDUS_SEQUENTIA;
+                            cosidus_click.ubi.sequentia.pro.temperatura = sidera[ci].temperatura;
+                            cosidus_click.ubi.sequentia.pro.magnitudo   = sidera[ci].magnitudo;
+                            cosidus_ptr = &cosidus_click;
+                        }
+
                         /* genera novam formulam directe */
                         formula_purgare(&formula);
                         memset(&formula, 0, sizeof(formula));
-                        formula.semen = semen_novum;
-                        formula_generare(&formula, semen_novum);
+                        formula_generare(&formula, semen_novum, &sidus_click, cosidus_ptr);
 
                         curvatura_activa = 1;
                         curv_tabula      = 0;

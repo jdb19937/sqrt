@@ -65,8 +65,11 @@ caela_t *caela_ex_formula(const formula_t *formula, int t);
 /* recomputat x, y, scala planetarum in caela ex orbitis formulae ad passum t */
 void caela_orbitas_applicare(caela_t *caela, const formula_t *formula, int t);
 
-/* generat formulam proceduraliter ex semine */
-void formula_generare(formula_t *f, unsigned int semen);
+/* generat formulam proceduraliter ex sidere (et cosidere optionali) */
+void formula_generare(
+    formula_t *f, unsigned int semen,
+    const sidus_t *sidus, const sidus_t *cosidus
+);
 
 /* liberat interna formulae (non formulam ipsam) */
 void formula_purgare(formula_t *f);

@@ -200,23 +200,6 @@ static void gen_stella_computa(double temp, gen_stella_t *s) {
         s->luminositas = 1e-6;
 }
 
-static double gen_temperatura(void) {
-    double r = gen_alea_f();
-    if (r < 0.20)
-        return gen_inter(2400, 3700);
-    if (r < 0.45)
-        return gen_inter(3700, 5200);
-    if (r < 0.70)
-        return gen_inter(5200, 6000);
-    if (r < 0.85)
-        return gen_inter(6000, 7500);
-    if (r < 0.95)
-        return gen_inter(7500, 10000);
-    if (r < 0.99)
-        return gen_inter(10000, 30000);
-    return gen_inter(30000, 50000);
-}
-
 static int gen_num_planetae(int classis) {
     switch (classis) {
     case 0: return gen_n(0, 1);
@@ -295,16 +278,18 @@ static void gen_adde_planetam(
     f->numerus_planetarum_formulae = n + 1;
 }
 
-void formula_generare(formula_t *f, unsigned int semen)
-{
+void formula_generare(
+    formula_t *f, unsigned int semen,
+    const sidus_t *sidus, const sidus_t *cosidus
+) {
     gen_semen = semen ? semen : 1;
     f->semen  = 1;
 
     int lat = LATITUDO_PRAEF;
     int alt = ALTITUDO_PRAEF;
 
-    /* stella */
-    double temp = gen_temperatura();
+    /* stella ex sidere */
+    double temp = sidus->ubi.sequentia.pro.temperatura;
     gen_stella_t stella;
     gen_stella_computa(temp, &stella);
 
@@ -360,6 +345,36 @@ void formula_generare(formula_t *f, unsigned int semen)
             s->res.macula_radius     = gen_inter(0.3, 0.9);
             s->res.macula_obscuritas = gen_inter(0.3, 0.7);
         }
+    }
+
+    /* cosidus — secundus sol */
+    if (cosidus) {
+        double cotemp = cosidus->ubi.sequentia.pro.temperatura;
+        gen_stella_t costella;
+        gen_stella_computa(cotemp, &costella);
+
+        gen_adde_planetam(f, "Sol Minor", gen_inter(0.3, 0.7), PLANETA_SOL, lat, alt);
+        planeta_formulae_t *pf = &f->planetae[f->numerus_planetarum_formulae - 1];
+        sol_t *s = &pf->planeta.ubi.sol;
+        s->pro.radius = 0.88;
+        s->pro.semen = gen_alea();
+        s->res.fusio = 1.0;
+        s->res.temperatura = cotemp;
+        s->res.luminositas = costella.luminositas / stella.luminositas;
+        if (s->res.luminositas > 1.0)
+            s->res.luminositas = 1.0;
+        s->res.corona     = gen_inter(0.3, 0.6);
+        s->res.granulatio = gen_inter(0.1, 0.5);
+        s->res.h2         = 0.735;
+        s->res.he         = 0.248;
+
+        /* cosol orbitat circa sol primarium */
+        pf->orbita.cx = f->planetae[0].orbita.cx;
+        pf->orbita.cy = f->planetae[0].orbita.cy;
+        pf->orbita.amplitudo_x = gen_inter(200, 600);
+        pf->orbita.amplitudo_y = gen_inter(200, 600);
+        pf->orbita.phase_y = 1.5708;
+        pf->orbita.periodus = gen_n(300, 800);
     }
 
     /* orbitae */
@@ -529,7 +544,7 @@ void formula_generare(formula_t *f, unsigned int semen)
             double amp_major = 500.0 + orbitae[i] * 400.0;
             if (amp_major > 1800)
                 amp_major = 1800;
-            double amp_minor = gen_inter(30, 100);
+            double amp_minor = gen_inter(200, 400);
             double phase     = gen_alea_f() * DUO_PI_F;
 
             /* planum aleatum: maioritas in x-z, y-z, vel inclinatum.
@@ -559,8 +574,9 @@ void formula_generare(formula_t *f, unsigned int semen)
                 pf->orbita.amplitudo_y = amp_major * gen_inter(0.3, 0.7);
                 pf->orbita.phase_z = phase + 1.5708;  /* sync cum x */
             }
+            double phase_diff      = gen_inter(1.1, 2.0);  /* ~63°-115°: ellipsis rotata sed non degeneras */
             pf->orbita.phase_x     = phase;
-            pf->orbita.phase_y     = phase + 1.5708;
+            pf->orbita.phase_y     = phase + phase_diff;
             pf->orbita.periodus    = 120 + (int)(orbitae[i] * 80);
             pf->orbita.amplitudo_z = gen_inter(0.3, 0.6);
         } else {
