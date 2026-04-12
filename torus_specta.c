@@ -714,8 +714,6 @@ int main(int argc, char **argv)
     /* curvatura (warp) status */
     int    curvatura_activa = 0;
     int    curv_tabula      = 0;
-    pid_t  curv_pid         = 0;
-    int    curv_generatum   = 0;
 
     /* indicium status in terminali */
     char status_nuntius[128] = "";
@@ -797,65 +795,14 @@ int main(int argc, char **argv)
                         );
                         int habet_co = (ci >= 0 && (semen_novum & 0xFF) < 25);
 
-                        /* scribe sidus ad /tmp */
-                        {
-                            FILE *fp = fopen("/tmp/sqrt_sidus.ison", "w");
-                            if (fp) {
-                                fprintf(
-                                    fp,
-                                    "{\n"
-                                    "  \"genus\": \"%s\",\n"
-                                    "  \"temperatura\": %.0f\n"
-                                    "}\n",
-                                    s->genus, s->temperatura
-                                );
-                                fclose(fp);
-                            }
-                        }
-                        if (habet_co) {
-                            FILE *fp = fopen("/tmp/sqrt_cosidus.ison", "w");
-                            if (fp) {
-                                fprintf(
-                                    fp,
-                                    "{\n"
-                                    "  \"genus\": \"%s\",\n"
-                                    "  \"temperatura\": %.0f\n"
-                                    "}\n",
-                                    sidera[ci].genus, sidera[ci].temperatura
-                                );
-                                fclose(fp);
-                            }
-                        }
-
-                        /* fork: genera + caele in fundo */
-                        curv_pid = fork();
-                        if (curv_pid == 0) {
-                            char mandatum[512];
-                            if (habet_co)
-                                snprintf(
-                                    mandatum, sizeof(mandatum),
-                                    "./genera /tmp/sqrt_sidus.ison"
-                                    " /tmp/sqrt_cosidus.ison %u"
-                                    " > /tmp/sqrt_campus.ison"
-                                    " && ./caele /tmp/sqrt_campus.ison"
-                                    " > /tmp/sqrt_caelae.ison",
-                                    semen_novum
-                                );
-                            else
-                                snprintf(
-                                    mandatum, sizeof(mandatum),
-                                    "./genera /tmp/sqrt_sidus.ison %u"
-                                    " > /tmp/sqrt_campus.ison"
-                                    " && ./caele /tmp/sqrt_campus.ison"
-                                    " > /tmp/sqrt_caelae.ison",
-                                    semen_novum
-                                );
-                            _exit(system(mandatum));
-                        }
+                        /* genera novam formulam directe */
+                        formula_purgare(&formula);
+                        memset(&formula, 0, sizeof(formula));
+                        formula.semen = semen_novum;
+                        formula_generare(&formula, semen_novum);
 
                         curvatura_activa = 1;
                         curv_tabula      = 0;
-                        curv_generatum   = 0;
 
                         snprintf(
                             status_nuntius, sizeof(status_nuntius),
@@ -1273,41 +1220,53 @@ int main(int argc, char **argv)
 
         /* curvatura animatio */
         if (curvatura_activa) {
-            /* inspice si generatio finita */
-            if (!curv_generatum && curv_pid > 0) {
-                int wstat;
-                if (waitpid(curv_pid, &wstat, WNOHANG) > 0)
-                    curv_generatum = 1;
-            }
-
             curvatura_reddere(&tab, curv_tabula);
             curv_tabula++;
 
-            /* fini curvatura cum animatio et generatio ambae perfectae */
-            if (curv_tabula >= CURV_TABULAE && curv_generatum) {
-                campus_destruere(campus);
-                {
-                    char *ci    = ison_lege_plicam("/tmp/sqrt_caelae.ison");
-                    caela_t *cl = ci ? caela_ex_ison(ci) : NULL;
-                    free(ci);
-                    campus = cl ? campus_ex_caela(cl, &inst) : NULL;
-                    caela_destruere(cl);
-                }
-                if (campus) {
+            /* fini curvatura cum animatio perfecta */
+            if (curv_tabula >= CURV_TABULAE) {
+                caela_destruere(caela);
+                caela = caela_ex_formula(&formula, 0);
+
+                if (caela) {
+                    /* recreare campus_fundus */
+                    campus_destruere(campus_fundus);
+                    campus_fundus = campus_creare(caela->latitudo, caela->altitudo);
+                    campus_sidera_reddere(campus_fundus, caela, &inst);
+                    campus_viam_lacteam_reddere(campus_fundus, caela);
+                    campus_sz = (size_t)caela->latitudo * caela->altitudo * 3;
+
+                    campus_destruere(campus);
+                    campus = campus_creare(caela->latitudo, caela->altitudo);
+                    memcpy(campus->pixels, campus_fundus->pixels, campus_sz);
+                    campus_planetas_reddere(campus, caela);
+                    campus_post_processare(campus, &inst);
+
+                    /* catalogum siderum recreare */
+                    numerus_siderum = 0;
+                    for (int i = 0; i < caela->numerus_siderum && numerus_siderum < SIDERA_MAX; i++) {
+                        sidera[numerus_siderum].x   = caela->sidera[i].x;
+                        sidera[numerus_siderum].y   = caela->sidera[i].y;
+                        sidera[numerus_siderum].magnitudo = caela->sidera[i].sidus.ubi.sequentia.pro.magnitudo;
+                        sidera[numerus_siderum].temperatura = caela->sidera[i].sidus.ubi.sequentia.pro.temperatura;
+                        numerus_siderum++;
+                    }
+                    sidera_lucida_computare();
+
+                    orbita_passus = 0;
                     snprintf(
                         status_nuntius, sizeof(status_nuntius),
                         "Systema novum: %d sidera", numerus_siderum
                     );
                 } else {
-                    /* fallback: restitue ex formula */
-                    campus = campus_ex_caela(caela, &inst);
+                    /* fallback: restitue ex formula originali */
+                    caela = caela_ex_formula(&formula, 0);
                     snprintf(
                         status_nuntius, sizeof(status_nuntius),
                         "ERRATUM: campus reddere non possum"
                     );
                 }
                 curvatura_activa = 0;
-                curv_pid         = 0;
             }
         }
 

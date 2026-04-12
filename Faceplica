@@ -110,8 +110,8 @@ proba_visio: proba_visio.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
 caele: caele.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ caele.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
 
-genera: genera.c $(LIBISON)
-	$(CC) $(CFLAGS) -o $@ genera.c $(LIBISON) -lm
+genera: genera.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ genera.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
 
 redde: redde.c $(BIBLIOTHECA) $(LIBISON) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ redde.c $(BIBLIOTHECA) $(LIBISON) $(LDFLAGS)
