@@ -133,10 +133,11 @@ static void adde_stellam(
         su.sidus.ubi.vagans.res.angulus = ang;
     }
 
-    int n       = u->numerus_stellarum;
-    u->stellae  = realloc(u->stellae, (size_t)(n + 1) * sizeof(sidus_universalis_t));
-    if (!u->stellae) return;
-    u->stellae[n] = su;
+    int n      = u->numerus_stellarum;
+    u->stellae = realloc(u->stellae, (size_t)(n + 1) * sizeof(sidus_universalis_t));
+    if (!u->stellae)
+        return;
+    u->stellae[n]        = su;
     u->numerus_stellarum = n + 1;
 }
 
@@ -156,10 +157,11 @@ static void adde_galaxiam(
     su.sidus.ubi.sequentia.pro.magnitudo   = mag;
     su.sidus.ubi.sequentia.pro.temperatura = temp;
 
-    int n        = u->numerus_galaxiarum;
-    u->galaxiae  = realloc(u->galaxiae, (size_t)(n + 1) * sizeof(sidus_universalis_t));
-    if (!u->galaxiae) return;
-    u->galaxiae[n] = su;
+    int n       = u->numerus_galaxiarum;
+    u->galaxiae = realloc(u->galaxiae, (size_t)(n + 1) * sizeof(sidus_universalis_t));
+    if (!u->galaxiae)
+        return;
+    u->galaxiae[n]        = su;
     u->numerus_galaxiarum = n + 1;
 }
 

@@ -64,14 +64,16 @@ static void lege_sidus(const char *raw, void *ctx_v)
     if (ctx->galaxia) {
         int n       = u->numerus_galaxiarum;
         u->galaxiae = realloc(u->galaxiae, (size_t)(n + 1) * sizeof(sidus_universalis_t));
-        if (!u->galaxiae) return;
-        u->galaxiae[n] = su;
+        if (!u->galaxiae)
+            return;
+        u->galaxiae[n]        = su;
         u->numerus_galaxiarum = n + 1;
     } else {
-        int n       = u->numerus_stellarum;
-        u->stellae  = realloc(u->stellae, (size_t)(n + 1) * sizeof(sidus_universalis_t));
-        if (!u->stellae) return;
-        u->stellae[n] = su;
+        int n      = u->numerus_stellarum;
+        u->stellae = realloc(u->stellae, (size_t)(n + 1) * sizeof(sidus_universalis_t));
+        if (!u->stellae)
+            return;
+        u->stellae[n]        = su;
         u->numerus_stellarum = n + 1;
     }
 }
@@ -98,10 +100,11 @@ universalis_t *universalis_ex_ison(const char *ison)
  * universalis_in_ison — scribit universalem in chordam ISON
  * ================================================================ */
 
-static void scribe_tabulam(FILE *f, const char *nomen,
-                           const sidus_universalis_t *tab, int n,
-                           int ultima)
-{
+static void scribe_tabulam(
+    FILE *f, const char *nomen,
+    const sidus_universalis_t *tab, int n,
+    int ultima
+) {
     fprintf(f, "  \"%s\": [\n", nomen);
     for (int i = 0; i < n; i++) {
         const sidus_universalis_t *su = &tab[i];

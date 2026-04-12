@@ -493,15 +493,10 @@ static void computare_perceptum(
     double ang  = ang_toro(pc->x, pc->y, sol->x, sol->y, lat, alt);
     double diag = sqrt((double)(lat * lat + alt * alt));
 
-    /* z > 0 = propior, sol magis post = umbra maior
-     * z < 0 = longinquior, sol magis ante = plenius illuminata */
-    double prox   = 1.0 / (1.0 + dist / (diag * 0.15));
-    double z_term = pc->z * 0.3;
-    double situs  = prox * 0.5 + z_term;
-    if (situs < 0.0)
-        situs = 0.0;
-    if (situs > 0.9)
-        situs = 0.9;
+    /* angulus phase 3D per atan2: dz > 0 = planeta ante solem (transit) */
+    double dz        = pc->z - sol->z;
+    double norm_dist = dist / (diag * 0.15);
+    double situs     = (atan2(dz, norm_dist) / (DUO_PI * 0.5) + 0.5) * 0.9;
 
     /* lumen inversus distantiae, proportionale luminositati solis */
     double sol_lum = sol->planeta.ubi.sol.res.luminositas;
@@ -516,8 +511,8 @@ static void computare_perceptum(
     static int dbg = 0;
     if (dbg++ % 300 == 0)
         fprintf(
-            stderr, "  perceptum: %s dist=%.0f ang=%.2f z=%.2f prox=%.2f situs=%.2f lumen=%.2f\n",
-            pc->nomen ? pc->nomen : "?", dist, ang, pc->z, prox, situs, lumen
+            stderr, "  perceptum: %s dist=%.0f ang=%.2f z=%.2f dz=%.2f situs=%.2f lumen=%.2f\n",
+            pc->nomen ? pc->nomen : "?", dist, ang, pc->z, dz, situs, lumen
         );
 }
 

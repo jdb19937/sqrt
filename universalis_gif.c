@@ -31,10 +31,10 @@ static void pixel_pone(int x, int y, uint32_t col)
 
 static void linea(int x0, int y0, int x1, int y1, uint32_t col)
 {
-    int dx = abs(x1 - x0);
-    int dy = abs(y1 - y0);
-    int sx = x0 < x1 ? 1 : -1;
-    int sy = y0 < y1 ? 1 : -1;
+    int dx  = abs(x1 - x0);
+    int dy  = abs(y1 - y0);
+    int sx  = x0 < x1 ? 1 : -1;
+    int sy  = y0 < y1 ? 1 : -1;
     int err = dx - dy;
 
     for (;;) {
@@ -42,8 +42,14 @@ static void linea(int x0, int y0, int x1, int y1, uint32_t col)
         if (x0 == x1 && y0 == y1)
             break;
         int e2 = 2 * err;
-        if (e2 > -dy) { err -= dy; x0 += sx; }
-        if (e2 <  dx) { err += dx; y0 += sy; }
+        if (e2 > -dy) {
+            err -= dy;
+            x0 += sx;
+        }
+        if (e2 <  dx) {
+            err += dx;
+            y0 += sy;
+        }
     }
 }
 
@@ -109,8 +115,8 @@ int main(int argc, char **argv)
 
     /* stellae super lineis */
     for (int i = 0; i < u->numerus_stellarum; i++) {
-        int ix = (int)((double)u->stellae[i].u / u->latitudo * LAT_IMG);
-        int iy = (int)((double)u->stellae[i].v / u->altitudo * ALT_IMG);
+        int ix     = (int)((double)u->stellae[i].u / u->latitudo * LAT_IMG);
+        int iy     = (int)((double)u->stellae[i].v / u->altitudo * ALT_IMG);
         double mag = u->stellae[i].sidus.ubi.sequentia.pro.magnitudo;
 
         if (mag < 2.0) {
@@ -145,8 +151,10 @@ int main(int argc, char **argv)
     pfr_gif_tabulam_adde(gif, imago);
     pfr_gif_fini(gif);
 
-    fprintf(stderr, "%d stellae, %d galaxiae, %s scriptum.\n",
-            u->numerus_stellarum, u->numerus_galaxiarum, argv[2]);
+    fprintf(
+        stderr, "%d stellae, %d galaxiae, %s scriptum.\n",
+        u->numerus_stellarum, u->numerus_galaxiarum, argv[2]
+    );
     universalis_destruere(u);
     return 0;
 }
