@@ -17,6 +17,7 @@
  *   Rota muris           — propinquare / recedere
  *   C                    — inscriptionem incipere / finire (→ MP4)
  *   L                    — unum cyclum inscribere (→ MP4 + GIF)
+ *   T                    — torum ostendere / celare
  *   R                    — restituere
  *   Q / Escape           — exire
  */
@@ -712,6 +713,7 @@ int main(int argc, char **argv)
     sidera_lucida_computare();
 
     /* curvatura (warp) status */
+    int    torus_visibilis  = 0;
     int    curvatura_activa = 0;
     int    curv_tabula      = 0;
 
@@ -1090,6 +1092,14 @@ int main(int argc, char **argv)
                         );
                     }
                     break;
+                case 't':
+                    torus_visibilis = !torus_visibilis;
+                    snprintf(
+                        status_nuntius, sizeof(status_nuntius),
+                        "Torus: %s",
+                        torus_visibilis ? "visibilis" : "celatus"
+                    );
+                    break;
                 case 'r':
                     theta     = 0.6;
                     phi       = 0.4;
@@ -1223,11 +1233,13 @@ int main(int argc, char **argv)
             delta_x, delta_y
         );
 
-        scaenam_reddere(
-            &tab, puncta_rot, normae_rot,
-            GRADUS_U(gradus), GRADUS_V(gradus), &cam,
-            helvea_illuminare_thema, pixel_bgra
-        );
+        if (torus_visibilis) {
+            scaenam_reddere(
+                &tab, puncta_rot, normae_rot,
+                GRADUS_U(gradus), GRADUS_V(gradus), &cam,
+                helvea_illuminare_thema, pixel_bgra
+            );
+        }
 
         pfx_applicare(
             &tab, helvea_themata[helvea_index_thematis].pfx,
