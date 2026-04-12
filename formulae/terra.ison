@@ -16,7 +16,6 @@
     "planetae_temp_min": 4200,
     "planetae_temp_max": 5800,
     "numerus_galaxiarum": 800,
-    "max_galaxiae": 0,
     "planetae": [
         {
             "nomen": "Nebula Diffusa",
@@ -274,7 +273,7 @@
                     "semen": 99901
                 },
                 "simulacrulum": {
-                    "nomen": "cordalis"
+                    "nomen": "verdanthos"
                 }
             },
             "orbita": {

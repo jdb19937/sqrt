@@ -1,0 +1,16 @@
+{
+    "latitudo": 4096,
+    "altitudo": 4096,
+    "numerus_stellarum": 512,
+    "densitas_galaxiae": 0.6,
+    "inclinatio_galaxiae": 0.3,
+    "latitudo_galaxiae": 0.15,
+    "semen": 42,
+    "galaxia_glow": 0.5,
+    "galaxia_rift": 0.3,
+    "galaxia_nebulae": 4,
+    "max_supergigantes": 5,
+    "max_gigantes": 12,
+    "max_exotica": 3,
+    "numerus_galaxiarum": 256
+}

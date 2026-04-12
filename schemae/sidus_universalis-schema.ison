@@ -1,0 +1,23 @@
+{
+    "titulus": "sidus_universalis",
+    "properties": {
+        "u": {
+            "type": "integer"
+        },
+        "v": {
+            "type": "integer"
+        },
+        "nomen": {
+            "type": "string"
+        },
+        "sidus": {
+            "$ref": "tesserae/sidus-schema.ison"
+        }
+    },
+    "required": [
+        "u",
+        "v",
+        "nomen",
+        "sidus"
+    ]
+}

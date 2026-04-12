@@ -46,7 +46,6 @@ typedef struct {
 
     /* galaxiae distantes */
     int          numerus_galaxiarum;
-    int          max_galaxiae;
 
     /* planetae (corpora — positio et perceptus in caela adduntur) */
     int                  numerus_planetarum_formulae;

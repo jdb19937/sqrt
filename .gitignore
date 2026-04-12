@@ -16,6 +16,8 @@ redde
 *.gif
 libsqrt.a
 genera
+gen_universalis
+universalis_gif
 *.swp
 *.swo
 caelae/*.ison

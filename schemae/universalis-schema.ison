@@ -1,0 +1,27 @@
+{
+    "titulus": "universalis",
+    "properties": {
+        "latitudo": {
+            "type": "integer"
+        },
+        "altitudo": {
+            "type": "integer"
+        },
+        "stellae": {
+            "type": "array",
+            "items": {
+                "$ref": "sidus_universalis-schema.ison"
+            }
+        },
+        "galaxiae": {
+            "type": "array",
+            "items": {
+                "$ref": "sidus_universalis-schema.ison"
+            }
+        }
+    },
+    "required": [
+        "latitudo",
+        "altitudo"
+    ]
+}

@@ -49,5 +49,6 @@ void sequentia_ex_ison(sequentia_t *s, const char *ison)
 void sequentia_in_ison(FILE *f, const sequentia_t *s)
 {
     fprintf(f, "{\"sidulum\": {\"magnitudo\": %.3f, \"temperatura\": %.1f}", s->pro.magnitudo, s->pro.temperatura);
+    fprintf(f, ", \"sequentiola\": {}");
     fprintf(f, "}");
 }

@@ -128,6 +128,9 @@ void sidus_ex_ison(sidus_t *s, const char *ison)
         free(tmp); s->qui = SIDUS_CRYSTALLINUM;
         crystallinum_ex_ison(&s->ubi.crystallinum, ison); return;
     }
+    if ((tmp = ison_da_crudum(ison, "sequentiola"))) {
+        free(tmp);
+    }
     /* praefinitum: sequentia (solum sidulum) */
     s->qui = SIDUS_SEQUENTIA;
     sequentia_ex_ison(&s->ubi.sequentia, ison);

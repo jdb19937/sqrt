@@ -275,8 +275,6 @@ caela_t *caela_ex_formula(const formula_t *f, int t)
     double pl_tmin     = f->planetae_temp_min;
     double pl_tmax     = f->planetae_temp_max;
     int num_galaxiarum = f->numerus_galaxiarum;
-    int max_galaxiae   = f->max_galaxiae;
-
     semen_loc = semen;
     int n_gi  = 0, n_sg = 0, n_ex = 0;
 
@@ -395,10 +393,7 @@ caela_t *caela_ex_formula(const formula_t *f, int t)
 
     /* galaxiae distantes */
     {
-        int n_gal = 0;
         for (int i = 0; i < num_galaxiarum; i++) {
-            if (max_galaxiae > 0 && n_gal >= max_galaxiae)
-                break;
 
             double r_mag = alea_f();
             double mag   = 3.0 + 3.0 * (1.0 - pow(r_mag, 0.4));
@@ -423,7 +418,6 @@ caela_t *caela_ex_formula(const formula_t *f, int t)
             int py           = (int)(alea_f() * c->altitudo);
 
             adde_sidus(c, px, py, SIDUS_GALAXIA, mag, temp_code, morph_id, ang);
-            n_gal++;
         }
     }
 

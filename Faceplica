@@ -8,7 +8,7 @@ LDFLAGS = -lm `cat $(PREFIX)/lib/nexus_phantasma`
 LIBISON = $(PREFIX)/lib/libison.a
 LIBPHANTASMA = $(PREFIX)/lib/libphantasma.a
 
-OBJECTA = pictura.o helvea.o campus.o instrumentum.o caela.o formula.o orbita.o \
+OBJECTA = pictura.o helvea.o campus.o instrumentum.o caela.o universalis.o formula.o designatio.o orbita.o \
           aspectus.o perceptus.o \
           tesserae/sidus.o tesserae/planeta.o tesserae/visio.o \
           tesserae/sidera/nanum_album.o tesserae/sidera/sequentia.o \
@@ -23,7 +23,7 @@ OBJECTA = pictura.o helvea.o campus.o instrumentum.o caela.o formula.o orbita.o 
           tesserae/visiones/torus.o tesserae/visiones/navis.o \
           tesserae/visiones/zeppelinus.o
 BIBLIOTHECA = libsqrt.a
-CAPITA = campus.h instrumentum.h aspectus.h caela.h formula.h orbita.h \
+CAPITA = campus.h instrumentum.h aspectus.h caela.h universalis.h formula.h designatio.h orbita.h \
          perceptus.h color.h vectores.h pictura.h helvea.h bessel.h \
          tesserae/sidus.h tesserae/sidus_communia.h \
          tesserae/planeta.h tesserae/planeta_communia.h \
@@ -34,7 +34,7 @@ CAELAE = caelae/terra.ison caelae/hubble.ison caelae/jwst.ison \
          caelae/nuclei.ison caelae/vacuum.ison caelae/mortis.ison \
          caelae/binarium.ison
 
-omnia: torus_planus torus_animare torus_specta caele genera redde astra_animare proba_planeta proba_caelae proba_visio
+omnia: torus_planus torus_animare torus_specta caele genera redde astra_animare gen_universalis universalis_gif proba_planeta proba_caelae proba_visio
 
 omnia: $(NOMEN)
 
@@ -114,6 +114,12 @@ caele: caele.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
 genera: genera.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ genera.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
+gen_universalis: gen_universalis.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ gen_universalis.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
+
+universalis_gif: universalis_gif.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ universalis_gif.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
+
 redde: redde.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ redde.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
@@ -122,13 +128,13 @@ astra_animare: astra_animare.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPIT
 
 colloca: omnia
 	install -d $(PREFIX)/bin $(PREFIX)/lib $(PREFIX)/include/sqrt/tesserae
-	install -m 755 torus_planus torus_animare torus_specta caele genera redde astra_animare $(PREFIX)/bin/
+	install -m 755 torus_planus torus_animare torus_specta caele genera redde astra_animare gen_universalis universalis_gif $(PREFIX)/bin/
 	install -m 644 $(BIBLIOTHECA) $(PREFIX)/lib/
 	install -m 644 campus.h instrumentum.h aspectus.h perceptus.h color.h vectores.h pictura.h helvea.h bessel.h tessera.h tessella.h $(PREFIX)/include/sqrt/
 	install -m 644 tesserae/sidus.h tesserae/planeta.h tesserae/visio.h $(PREFIX)/include/sqrt/tesserae/
 
 purga:
-	rm -f torus_planus torus_animare torus_specta proba_astra proba_planeta proba_caelae proba_visio caele genera redde astra_animare proba_prima
+	rm -f torus_planus torus_animare torus_specta proba_astra proba_planeta proba_caelae proba_visio caele genera redde astra_animare gen_universalis universalis_gif proba_prima
 	rm -f $(OBJECTA) $(BIBLIOTHECA)
 	rm -f caelae/*.ppm caelae/*.ison
 

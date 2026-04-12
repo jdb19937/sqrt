@@ -15,6 +15,5 @@
     "numerus_planetarum": 2,
     "planetae_temp_min": 3400,
     "planetae_temp_max": 5800,
-    "numerus_galaxiarum": 150,
-    "max_galaxiae": 0
+    "numerus_galaxiarum": 150
 }

@@ -66,7 +66,7 @@ void formula_ex_ison(formula_t *f, const char *ison)
     f->planetae_temp_min   = ison_da_f(ison, "planetae_temp_min", 4000);
     f->planetae_temp_max   = ison_da_f(ison, "planetae_temp_max", 6000);
     f->numerus_galaxiarum  = (int)ison_da_n(ison, "numerus_galaxiarum", 0);
-    f->max_galaxiae        = (int)ison_da_n(ison, "max_galaxiae", 0);
+
 
     ison_pro_quoque_elemento(ison, "planetae", lege_planetam, f);
 }
@@ -95,7 +95,6 @@ void formula_in_ison(FILE *f, const formula_t *form)
     fprintf(f, "  \"planetae_temp_min\": %.0f,\n", form->planetae_temp_min);
     fprintf(f, "  \"planetae_temp_max\": %.0f,\n", form->planetae_temp_max);
     fprintf(f, "  \"numerus_galaxiarum\": %d,\n", form->numerus_galaxiarum);
-    fprintf(f, "  \"max_galaxiae\": %d,\n", form->max_galaxiae);
 
     fprintf(f, "  \"planetae\": [\n");
     for (int i = 0; i < form->numerus_planetarum_formulae; i++) {
@@ -314,7 +313,7 @@ void formula_generare(
     if (f->planetae_temp_max < f->planetae_temp_min + 500)
         f->planetae_temp_max = f->planetae_temp_min + 500;
     f->numerus_galaxiarum = gen_n(50, 400);
-    f->max_galaxiae       = 0;
+
 
     /* sol */
     {
