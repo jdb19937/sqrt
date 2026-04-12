@@ -1,10 +1,12 @@
 /*
- * proba_caelae.c — probatio pipeline: caele → ison → reddit
+ * proba_caelae.c — probatio pipeline: formula → caela → campus → ppm
  *
- * Pro quaque plica .ison in caelae/ directorio:
- *   1. legit campum stellarum via caela_ex_ison() + campus_ex_caela()
- *   2. scribit PPM in probae/caelae/
- *   3. numerat pixels non nigros
+ * Pro quaque plica .ison in formulae/ directorio:
+ *   1. generat caelam via caela_ex_formula() ad passum temporis magnum
+ *   2. applicat orbitas et illuminationem via caela_orbitas_applicare()
+ *   3. reddit campum via campus_ex_caela()
+ *   4. scribit PPM in probae/caelae/
+ *   5. numerat pixels non nigros
  *
  * Usus: ./proba_caelae [instrumentum.ison]
  *   (praefinitum: instrumenta/jwst.ison)
@@ -13,13 +15,15 @@
 #include "instrumentum.h"
 #include "tessera.h"
 #include "campus.h"
-#include "caela.h"
+#include "formula.h"
 #include "ison.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
+
+#define PASSUS_TEMPORIS 150
 
 static void scribe_ppm(
     const char *via, const unsigned char *rgb,
@@ -52,11 +56,11 @@ int main(int argc, char **argv)
     const char *via_instr = (argc >= 2) ? argv[1] : "instrumenta/jwst.ison";
 
     fprintf(stderr, "=== CAELAE PROBA ===\n");
-    fprintf(stderr, "Instrumentum: %s\n\n", via_instr);
+    fprintf(stderr, "Instrumentum: %s, t=%d\n\n", via_instr, PASSUS_TEMPORIS);
 
-    /* proba_caelae/ creare si non exstat */
+    /* probae/caelae/ creare si non exstat */
 #if defined(_WIN32)
-    _mkdir("proba_caelae");
+    _mkdir("probae/caelae");
 #else
     {
         char cmd[64];
@@ -65,9 +69,9 @@ int main(int argc, char **argv)
     }
 #endif
 
-    DIR *dir = opendir("caelae");
+    DIR *dir = opendir("formulae");
     if (!dir) {
-        fprintf(stderr, "ERROR: caelae/ aperire non possum\n");
+        fprintf(stderr, "ERROR: formulae/ aperire non possum\n");
         return 1;
     }
 
@@ -90,26 +94,33 @@ int main(int argc, char **argv)
         if (len < 6 || strcmp(nomen + len - 5, ".ison") != 0)
             continue;
 
-        char via_caela[256];
-        snprintf(via_caela, sizeof(via_caela), "caelae/%s", nomen);
+        char via_formula[256];
+        snprintf(via_formula, sizeof(via_formula), "formulae/%s", nomen);
 
-        char *caela_ison = ison_lege_plicam(via_caela);
-        if (!caela_ison) {
-            fprintf(stderr, "  MALUM: %s legere non possum\n", via_caela);
+        char *form_ison = ison_lege_plicam(via_formula);
+        if (!form_ison) {
+            fprintf(stderr, "  MALUM: %s legere non possum\n", via_formula);
             n_mala++;
             continue;
         }
-        caela_t *caela = caela_ex_ison(caela_ison);
-        free(caela_ison);
+        formula_t form;
+        formula_ex_ison(&form, form_ison);
+        free(form_ison);
+
+        caela_t *caela = caela_ex_formula(&form, PASSUS_TEMPORIS);
         if (!caela) {
-            fprintf(stderr, "  MALUM: %s caelam legere non possum\n", via_caela);
+            fprintf(stderr, "  MALUM: %s caelam generare non possum\n", via_formula);
+            formula_purgare(&form);
             n_mala++;
             continue;
         }
+        caela_orbitas_applicare(caela, &form, PASSUS_TEMPORIS);
+        formula_purgare(&form);
+
         campus_t *campus = campus_ex_caela(caela, &inst);
         caela_destruere(caela);
         if (!campus) {
-            fprintf(stderr, "  MALUM: %s reddere non possum\n", via_caela);
+            fprintf(stderr, "  MALUM: %s reddere non possum\n", via_formula);
             n_mala++;
             continue;
         }
