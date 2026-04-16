@@ -25,9 +25,9 @@ for f in visiones/*.ison; do
     proba schemae/tesserae/visio-schema.ison "$f"
 done
 
-echo "campi:"
-for f in campi/*.ison; do
-    proba schemae/campus-schema.ison "$f"
+echo "formulae:"
+for f in formulae/*.ison; do
+    proba schemae/formula-schema.ison "$f"
 done
 
 echo ""
