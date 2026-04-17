@@ -8,7 +8,7 @@ LDFLAGS = -lm `cat $(PREFIX)/lib/nexus_phantasma`
 LIBISON = $(PREFIX)/lib/libison.a
 LIBPHANTASMA = $(PREFIX)/lib/libphantasma.a
 
-OBJECTA = pictura.o helvea.o campus.o instrumentum.o caela.o universalis.o formula.o designatio.o orbita.o permutationes.o \
+OBJECTA = pictura.o helvea.o campus.o instrumentum.o caela.o universalis.o formula.o designatio.o orbita.o permutationes.o locus.o \
           aspectus.o perceptus.o \
           tesserae/sidus.o tesserae/planeta.o tesserae/visio.o \
           tesserae/sidera/nanum_album.o tesserae/sidera/sequentia.o \
@@ -23,7 +23,7 @@ OBJECTA = pictura.o helvea.o campus.o instrumentum.o caela.o universalis.o formu
           tesserae/visiones/torus.o tesserae/visiones/navis.o \
           tesserae/visiones/zeppelinus.o
 BIBLIOTHECA = libsqrt.a
-CAPITA = campus.h instrumentum.h aspectus.h caela.h universalis.h formula.h designatio.h orbita.h permutationes.h \
+CAPITA = campus.h instrumentum.h aspectus.h caela.h universalis.h formula.h designatio.h orbita.h permutationes.h locus.h \
          perceptus.h color.h vectores.h pictura.h helvea.h bessel.h \
          tesserae/sidus.h tesserae/sidus_communia.h \
          tesserae/planeta.h tesserae/planeta_communia.h \

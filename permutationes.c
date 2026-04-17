@@ -22,11 +22,10 @@ static void erratum(const char *nuntius)
 }
 
 /* ================================================================
- * polynomia irreducibilia praedefinita super GF(2)
- *
- * repraesentata ut integer ubi bit i = coefficiens x^i.
- * polynomium gradus n habet bit n positum.
+ * arithmetica campi GF(2^n)
  * ================================================================ */
+
+typedef unsigned int gf_t;
 
 typedef struct {
     int   n;
@@ -62,7 +61,7 @@ static const gf_praedefinitum_t *gf_quaere_praedefinitum(int n)
     return NULL;
 }
 
-gf_t gf_polynomium(int n)
+static gf_t gf_polynomium(int n)
 {
     const gf_praedefinitum_t *gf = gf_quaere_praedefinitum(n);
     if (!gf)
@@ -71,7 +70,7 @@ gf_t gf_polynomium(int n)
 }
 
 /* multiplicatio in GF(2^n): multiplicatio polynomialis mod p */
-gf_t gf_multiplica(gf_t a, gf_t b, int n, gf_t poly)
+static gf_t gf_multiplica(gf_t a, gf_t b, int n, gf_t poly)
 {
     gf_t r = 0;
     for (int i = 0; i < n; i++) {
@@ -86,13 +85,13 @@ gf_t gf_multiplica(gf_t a, gf_t b, int n, gf_t poly)
 }
 
 /* quadratura in GF(2^n) */
-gf_t gf_quadra(gf_t a, int n, gf_t poly)
+static gf_t gf_quadra(gf_t a, int n, gf_t poly)
 {
     return gf_multiplica(a, a, n, poly);
 }
 
 /* inversio per potestiam: a^{-1} = a^{2^n - 2} */
-gf_t gf_inverte(gf_t a, int n, gf_t poly)
+static gf_t gf_inverte(gf_t a, int n, gf_t poly)
 {
     if (a == 0)
         erratum("inversio nullius in GF(2^n)");
@@ -109,7 +108,7 @@ gf_t gf_inverte(gf_t a, int n, gf_t poly)
 }
 
 /* a^e in GF(2^n) per quadraturam repetitam */
-gf_t gf_potestia(gf_t a, unsigned e, int n, gf_t poly)
+static gf_t gf_potestia(gf_t a, unsigned e, int n, gf_t poly)
 {
     if (e == 0)
         return 1;
@@ -136,14 +135,26 @@ gf_t gf_potestia(gf_t a, unsigned e, int n, gf_t poly)
  * punctum in infinito: (0, 0) per conventionem.
  * ================================================================ */
 
-const punctum_t INFINITUM = { 0, 0 };
+typedef struct {
+    gf_t a;
+    gf_t b;
+    int  n;
+    gf_t poly;
+} curva_t;
 
-int est_infinitum(punctum_t p)
+typedef struct {
+    gf_t x;
+    gf_t y;
+} punctum_t;
+
+static const punctum_t INFINITUM = { 0, 0 };
+
+static int est_infinitum(punctum_t p)
 {
     return p.x == 0 && p.y == 0;
 }
 
-int est_punctum_in_curva(punctum_t p, const curva_t *c)
+static int est_punctum_in_curva(punctum_t p, const curva_t *c)
 {
     if (est_infinitum(p))
         return 1;
@@ -156,7 +167,7 @@ int est_punctum_in_curva(punctum_t p, const curva_t *c)
     return sin == dex;
 }
 
-punctum_t curva_adde(punctum_t p, punctum_t q, const curva_t *c)
+static punctum_t curva_adde(punctum_t p, punctum_t q, const curva_t *c)
 {
     if (est_infinitum(p))
         return q;
@@ -188,7 +199,7 @@ punctum_t curva_adde(punctum_t p, punctum_t q, const curva_t *c)
     return r;
 }
 
-punctum_t curva_multiplica(int k, punctum_t p, const curva_t *c)
+static punctum_t curva_multiplica(int k, punctum_t p, const curva_t *c)
 {
     if (k < 0)
         erratum("multiplicatio negativa non sustinetur");
@@ -206,7 +217,7 @@ punctum_t curva_multiplica(int k, punctum_t p, const curva_t *c)
     return r;
 }
 
-unsigned curva_ordo_puncti(punctum_t p, const curva_t *c)
+static unsigned curva_ordo_puncti(punctum_t p, const curva_t *c)
 {
     if (est_infinitum(p))
         return 1;
@@ -225,7 +236,7 @@ unsigned curva_ordo_puncti(punctum_t p, const curva_t *c)
  * ================================================================ */
 
 static const curva_praedefinita_t curvae_praedefinitae[] = {
-    /*  n     a    b      gx      gy    ordo    |GF|=2^n  */
+    /* n    a    b   gx      gy      ordo      |GF|=2^n  */
     {  2, 0x1, 0x1, 0x2,    0x1,        8 }, /*       4  */
     {  3, 0x2, 0x3, 0x1,    0x0,       12 }, /*       8  */
     {  4, 0x2, 0x6, 0xD,    0x7,       24 }, /*      16  */
@@ -270,10 +281,24 @@ static int log2_integer(int m)
 }
 
 /* ================================================================
+ * permuta — delegat ad permutationem specificam per p.type
+ * ================================================================ */
+
+void permuta(permutatio_t p, locus_t *loci, int numerus, int modulus, int k)
+{
+    switch (p) {
+    case PERMUTATIO_CURVA:  permuta_curva(loci, numerus, modulus, k);  break;
+    case PERMUTATIO_DUCTUS: permuta_ductus(loci, numerus, modulus, k); break;
+    case PERMUTATIO_FELES:  permuta_feles(loci, numerus, modulus, k);  break;
+    default:                erratum("permutatio typus ignotus");
+    }
+}
+
+/* ================================================================
  * permuta_curva — permutatio per curvam ellipticam
  * ================================================================ */
 
-void permuta_curva(sidus_caeli_t *sidera, int numerus, int modulus, int k)
+void permuta_curva(locus_t *loci, int numerus, int modulus, int k)
 {
     if (!est_potestas_duo(modulus))
         erratum("modulus non est potestas duo");
@@ -308,81 +333,68 @@ void permuta_curva(sidus_caeli_t *sidera, int numerus, int modulus, int k)
     punctum_t kG = curva_multiplica(k_red, gen, &curva);
 
     for (int i = 0; i < numerus; i++) {
-        if (sidera[i].x < 0 || sidera[i].x >= modulus)
-            erratum("sidus x extra fines");
-        if (sidera[i].y < 0 || sidera[i].y >= modulus)
-            erratum("sidus y extra fines");
+        if (loci[i].u < 0 || loci[i].u >= modulus)
+            erratum("locus u extra fines");
+        if (loci[i].v < 0 || loci[i].v >= modulus)
+            erratum("locus v extra fines");
 
         punctum_t p;
-        p.x = (gf_t)sidera[i].x;
-        p.y = (gf_t)sidera[i].y;
+        p.x = (gf_t)loci[i].u;
+        p.y = (gf_t)loci[i].v;
 
         if (!est_punctum_in_curva(p, &curva))
-            erratum("sidus non est punctum curvae validum");
+            erratum("locus non est punctum curvae validum");
 
         punctum_t r = curva_adde(p, kG, &curva);
-        sidera[i].x = (int)r.x;
-        sidera[i].y = (int)r.y;
+        loci[i].u   = (int)r.x;
+        loci[i].v   = (int)r.y;
     }
 }
 
 /* ================================================================
- * potestiatio campi — (x,y) → (x^e, y^e)
+ * permuta_ductus — (x,y) → (2·x, 2·y) k vicibus
+ *
+ * elementum 2 = polynomium x in GF(2^n). Si polynomium definiens
+ * est primitivum, ordo = 2^n − 1.
+ * 2^k computatur per quadraturam repetitam in campo.
  * ================================================================ */
 
-static const potestia_praedefinita_t potestia_praedefinitae[] = {
-    /* n   e   ordo        2^n-1  */
-    {  2,  5,     2 },  /*     3  */
-    {  3,  3,     6 },  /*     7  */
-    {  4,  7,     4 },  /*    15  */
-    {  5,  3,    30 },  /*    31  */
-    {  6,  5,     6 },  /*    63  */
-    {  7,  3,   126 },  /*   127  */
-    {  8,  7,    16 },  /*   255  */
-    {  9,  3,    12 },  /*   511  */
-    { 10,  5,    30 },  /*  1023  */
-    { 11,  3,    88 },  /*  2047  */
-    { 12, 11,    12 },  /*  4095  */
-    { 13,  3,   910 },  /*  8191  */
-    { 14,  5,    42 },  /* 16383  */
-    { 15,  3,   150 },  /* 32767  */
-    { 16,  7,   256 },  /* 65535  */
-    { 0, 0, 0 }
-};
-
-const potestia_praedefinita_t *potestia_quaere(int n)
+ductus_praedefinitum_t ductus_quaere(int n)
 {
-    for (int i = 0; potestia_praedefinitae[i].n != 0; i++)
-        if (potestia_praedefinitae[i].n == n)
-            return &potestia_praedefinitae[i];
-    return NULL;
+    if (n < 2 || n > 16)
+        erratum("n extra fines pro ductu");
+    int modulus = 1 << n;
+    if (!est_potestas_duo(modulus))
+        erratum("modulus non est potestas duo");
+    ductus_praedefinitum_t dp;
+    dp.n    = n;
+    dp.gen  = 2;
+    dp.ordo = ductus_ordo(modulus);
+    return dp;
 }
 
-/* ordo e mod (2^n - 1): minimum k ubi e^k ≡ 1 */
-unsigned potestia_ordo(int n, unsigned e)
+/* periodus: minimum k ubi 2^k = 1 in GF(2^n). = 2^n - 1 si polynomium primitivum */
+unsigned ductus_ordo(int modulus)
 {
-    if (n < 1)
-        return 0;
+    if (!est_potestas_duo(modulus))
+        erratum("modulus non est potestas duo");
+
+    int n = log2_integer(modulus);
+    const gf_praedefinitum_t *gf = gf_quaere_praedefinitum(n);
+    if (!gf)
+        erratum("polynomium praedefinitum pro hoc n non invenitur");
+    gf_t poly  = gf->polynomium;
     unsigned m = ((unsigned)1 << n) - 1;
-    if (m <= 1)
-        return 1;
-    unsigned pot = e % m;
-    unsigned k   = 1;
-    while (pot != 1 && k <= m) {
-        pot = (unsigned)((unsigned long)pot * e % m);
+    gf_t a     = 1;
+    unsigned k = 0;
+    do {
+        a = gf_multiplica(a, 2, n, poly);
         k++;
-    }
+    } while (a != 1 && k <= m);
     return k;
 }
 
-/* ================================================================
- * permuta_potestia — (x,y) → (x^e, y^e) k vicibus
- *
- * k applicata: (x,y) → (x^{e^k}, y^{e^k}).
- * e^k computatur mod (2^n - 1).
- * ================================================================ */
-
-void permuta_potestia(sidus_caeli_t *sidera, int numerus, int modulus, int k)
+void permuta_ductus(locus_t *loci, int numerus, int modulus, int k)
 {
     if (!est_potestas_duo(modulus))
         erratum("modulus non est potestas duo");
@@ -393,55 +405,41 @@ void permuta_potestia(sidus_caeli_t *sidera, int numerus, int modulus, int k)
     if (!gf)
         erratum("polynomium praedefinitum pro hoc n non invenitur");
 
-    const potestia_praedefinita_t *pp = potestia_quaere(n);
-    if (!pp)
-        erratum("potestia praedefinita pro hoc n non invenitur");
+    gf_t poly = gf->polynomium;
 
-    gf_t poly  = gf->polynomium;
-    unsigned m = ((unsigned)1 << n) - 1;  /* ordo gruppi multiplicativi */
-
-    /* computa e^k mod m */
-    unsigned e    = pp->e;
-    unsigned ek   = 1;
-    unsigned base = e % m;
-    int kk        = k;
-    while (kk > 0) {
-        if (kk & 1)
-            ek = (unsigned)((unsigned long)ek * base % m);
-        base = (unsigned)((unsigned long)base * base % m);
-        kk >>= 1;
-    }
+    /* computa 2^k in GF(2^n) */
+    gf_t factor = gf_potestia(2, (unsigned)k, n, poly);
 
     for (int i = 0; i < numerus; i++) {
-        if (sidera[i].x < 0 || sidera[i].x >= modulus)
-            erratum("sidus x extra fines");
-        if (sidera[i].y < 0 || sidera[i].y >= modulus)
-            erratum("sidus y extra fines");
+        if (loci[i].u < 0 || loci[i].u >= modulus)
+            erratum("locus u extra fines");
+        if (loci[i].v < 0 || loci[i].v >= modulus)
+            erratum("locus v extra fines");
 
-        gf_t x      = (gf_t)sidera[i].x;
-        gf_t y      = (gf_t)sidera[i].y;
-        sidera[i].x = (int)gf_potestia(x, ek, n, poly);
-        sidera[i].y = (int)gf_potestia(y, ek, n, poly);
+        gf_t u    = (gf_t)loci[i].u;
+        gf_t v    = (gf_t)loci[i].v;
+        loci[i].u = (int)gf_multiplica(u, factor, n, poly);
+        loci[i].v = (int)gf_multiplica(v, factor, n, poly);
     }
 }
 
 /* ================================================================
  * permuta_feles — mappa felis Arnoldi
  *
- * [[2,1],[1,1]] applicata k vicibus ad (x,y) mod m.
+ * [[2,1],[1,1]] applicata k vicibus ad (u,v) mod m.
  * matrix potestiatur per quadraturam repetitam.
  * ================================================================ */
 
-void permuta_feles(sidus_caeli_t *sidera, int numerus, int modulus, int k)
+void permuta_feles(locus_t *loci, int numerus, int modulus, int k)
 {
     if (!est_potestas_duo(modulus))
         erratum("modulus non est potestas duo");
 
     for (int i = 0; i < numerus; i++) {
-        if (sidera[i].x < 0 || sidera[i].x >= modulus)
-            erratum("sidus x extra fines");
-        if (sidera[i].y < 0 || sidera[i].y >= modulus)
-            erratum("sidus y extra fines");
+        if (loci[i].u < 0 || loci[i].u >= modulus)
+            erratum("locus u extra fines");
+        if (loci[i].v < 0 || loci[i].v >= modulus)
+            erratum("locus v extra fines");
     }
 
     if (k <= 0)
@@ -474,10 +472,10 @@ void permuta_feles(sidus_caeli_t *sidera, int numerus, int modulus, int k)
     }
 
     for (int i = 0; i < numerus; i++) {
-        long x      = sidera[i].x;
-        long y      = sidera[i].y;
-        sidera[i].x = (int)((ra * x + rb * y) % modulus);
-        sidera[i].y = (int)((rc * x + rd * y) % modulus);
+        long u    = loci[i].u;
+        long v    = loci[i].v;
+        loci[i].u = (int)((ra * u + rb * v) % modulus);
+        loci[i].v = (int)((rc * u + rd * v) % modulus);
     }
 }
 
@@ -536,4 +534,342 @@ unsigned feles_ordo(int modulus)
         k++;
     }
     return k;
+}
+
+/* ================================================================
+ * probationes internae
+ * ================================================================ */
+
+static int proba_errores = 0;
+
+static void expecta(int condicio, const char *nuntius)
+{
+    if (!condicio) {
+        fprintf(stderr, "FALSUM: %s\n", nuntius);
+        proba_errores++;
+    }
+}
+
+/* --- probationes campi GF(2^n) --- */
+
+static void proba_gf_basica(void)
+{
+    fprintf(stderr, "--- GF(2^n) basica ---\n");
+
+    int n     = 4;
+    gf_t poly = gf_polynomium(n);
+
+    /* 0 * a = 0 */
+    expecta(gf_multiplica(0, 0x5, n, poly) == 0, "0 * a = 0");
+
+    /* 1 * a = a */
+    expecta(gf_multiplica(1, 0x7, n, poly) == 0x7, "1 * a = a");
+
+    /* a * 1 = a */
+    expecta(gf_multiplica(0x7, 1, n, poly) == 0x7, "a * 1 = a");
+
+    /* commutativitas */
+    gf_t ab = gf_multiplica(0x5, 0x3, n, poly);
+    gf_t ba = gf_multiplica(0x3, 0x5, n, poly);
+    expecta(ab == ba, "a*b = b*a");
+
+    /* associativitas */
+    gf_t a    = 0x7, b = 0x5, c = 0x3;
+    gf_t ab_c = gf_multiplica(gf_multiplica(a, b, n, poly), c, n, poly);
+    gf_t a_bc = gf_multiplica(a, gf_multiplica(b, c, n, poly), n, poly);
+    expecta(ab_c == a_bc, "(a*b)*c = a*(b*c)");
+}
+
+static void proba_gf_inversio(void)
+{
+    fprintf(stderr, "--- GF(2^n) inversio ---\n");
+
+    int n     = 4;
+    gf_t poly = gf_polynomium(n);
+    gf_t sz   = (gf_t)1 << n;
+
+    int bona = 1;
+    for (gf_t a = 1; a < sz; a++) {
+        gf_t inv  = gf_inverte(a, n, poly);
+        gf_t prod = gf_multiplica(a, inv, n, poly);
+        if (prod != 1) {
+            fprintf(
+                stderr, "  inversio fallax: a=0x%X inv=0x%X prod=0x%X\n",
+                a, inv, prod
+            );
+            bona = 0;
+        }
+    }
+    expecta(bona, "a * a^{-1} = 1 pro omni a in GF(2^4)");
+}
+
+static void proba_gf_generator(void)
+{
+    fprintf(stderr, "--- GF(2^n) generator ---\n");
+
+    for (int n = 2; n <= 8; n++) {
+        gf_t poly     = gf_polynomium(n);
+        gf_t gen      = 2;
+        unsigned ordo = ((unsigned)1 << n) - 1;
+
+        gf_t pot = 1;
+        unsigned k;
+        for (k = 1; k < ordo; k++) {
+            pot = gf_multiplica(pot, gen, n, poly);
+            if (pot == 1)
+                break;
+        }
+        char buf[80];
+        snprintf(buf, sizeof(buf), "GF(2^%d) generator ordo = %u", n, ordo);
+        expecta(k == ordo, buf);
+    }
+}
+
+/* --- probationes curvae ellipticae --- */
+
+static void proba_ec_infinitum(void)
+{
+    fprintf(stderr, "--- EC infinitum ---\n");
+
+    expecta(est_infinitum(INFINITUM), "INFINITUM est infinitum");
+    punctum_t p = { 1, 1 };
+    expecta(!est_infinitum(p), "(1,1) non est infinitum");
+}
+
+static void proba_ec_curva(void)
+{
+    fprintf(stderr, "--- EC in_curva ---\n");
+
+    int n = 4;
+    curva_t c;
+    c.a    = 1;
+    c.b    = 1;
+    c.n    = n;
+    c.poly = gf_polynomium(n);
+
+    expecta(est_punctum_in_curva(INFINITUM, &c), "infinitum in curva");
+
+    gf_t sz = (gf_t)1 << n;
+    int numerus_punctorum = 1;
+    for (gf_t x = 0; x < sz; x++)
+        for (gf_t y = 0; y < sz; y++) {
+        if (x == 0 && y == 0)
+            continue;
+        punctum_t p = { x, y };
+        if (est_punctum_in_curva(p, &c))
+            numerus_punctorum++;
+    }
+    fprintf(stderr, "  puncta curvae in GF(2^4): %d\n", numerus_punctorum);
+    expecta(numerus_punctorum >= 1, "curva habet puncta");
+}
+
+static void proba_ec_additio(void)
+{
+    fprintf(stderr, "--- EC additio ---\n");
+
+    int n = 4;
+    curva_t c;
+    c.a    = 1;
+    c.b    = 1;
+    c.n    = n;
+    c.poly = gf_polynomium(n);
+
+    gf_t sz = (gf_t)1 << n;
+    punctum_t p = { 0, 0 };
+    for (gf_t x = 1; x < sz && est_infinitum(p); x++)
+        for (gf_t y = 0; y < sz && est_infinitum(p); y++) {
+        punctum_t t = { x, y };
+        if (est_punctum_in_curva(t, &c))
+            p = t;
+    }
+    expecta(!est_infinitum(p), "punctum curvae inventum");
+    fprintf(stderr, "  P = (0x%X, 0x%X)\n", p.x, p.y);
+
+    punctum_t r = curva_adde(p, INFINITUM, &c);
+    expecta(r.x == p.x && r.y == p.y, "P + O = P");
+
+    r = curva_adde(INFINITUM, p, &c);
+    expecta(r.x == p.x && r.y == p.y, "O + P = P");
+
+    punctum_t neg_p = { p.x, p.x ^ p.y };
+    expecta(est_punctum_in_curva(neg_p, &c), "-P in curva");
+    r = curva_adde(p, neg_p, &c);
+    expecta(est_infinitum(r), "P + (-P) = O");
+
+    punctum_t q = { 0, 0 };
+    for (gf_t x = 1; x < sz; x++)
+        for (gf_t y = 0; y < sz; y++) {
+        punctum_t t = { x, y };
+        if (est_punctum_in_curva(t, &c) && (t.x != p.x || t.y != p.y)) {
+            q = t;
+            goto inventum;
+        }
+    }
+inventum:
+    if (!est_infinitum(q)) {
+        r = curva_adde(p, q, &c);
+        expecta(est_punctum_in_curva(r, &c), "P + Q in curva");
+        fprintf(stderr, "  P+Q = (0x%X, 0x%X)\n", r.x, r.y);
+    }
+}
+
+static void proba_ec_ordo(void)
+{
+    fprintf(stderr, "--- EC ordo ---\n");
+
+    for (int n = 2; n <= 8; n++) {
+        gf_t poly = gf_polynomium(n);
+        curva_t c;
+        c.a    = 1;
+        c.b    = 1;
+        c.n    = n;
+        c.poly = poly;
+
+        gf_t sz = (gf_t)1 << n;
+        punctum_t p = { 0, 0 };
+        for (gf_t x = 1; x < sz && est_infinitum(p); x++)
+            for (gf_t y = 0; y < sz && est_infinitum(p); y++) {
+            punctum_t t = { x, y };
+            if (est_punctum_in_curva(t, &c))
+                p = t;
+        }
+        if (est_infinitum(p))
+            continue;
+
+        unsigned ordo = curva_ordo_puncti(p, &c);
+
+        char buf[80];
+        snprintf(
+            buf, sizeof(buf),
+            "GF(2^%d): P=(0x%X,0x%X) ordo=%u", n, p.x, p.y, ordo
+        );
+        fprintf(stderr, "  %s\n", buf);
+
+        punctum_t r = curva_multiplica((int)ordo, p, &c);
+        snprintf(
+            buf, sizeof(buf),
+            "GF(2^%d): %u*P = O per multiplicam", n, ordo
+        );
+        expecta(est_infinitum(r), buf);
+    }
+}
+
+static void proba_curva_multiplica(void)
+{
+    fprintf(stderr, "--- EC multiplicatio scalaris ---\n");
+
+    int n = 4;
+    curva_t c;
+    c.a    = 1;
+    c.b    = 1;
+    c.n    = n;
+    c.poly = gf_polynomium(n);
+
+    gf_t sz = (gf_t)1 << n;
+    punctum_t p = { 0, 0 };
+    for (gf_t x = 1; x < sz && est_infinitum(p); x++)
+        for (gf_t y = 0; y < sz && est_infinitum(p); y++) {
+        punctum_t t = { x, y };
+        if (est_punctum_in_curva(t, &c))
+            p = t;
+    }
+
+    expecta(est_infinitum(curva_multiplica(0, p, &c)), "0*P = O");
+
+    punctum_t r = curva_multiplica(1, p, &c);
+    expecta(r.x == p.x && r.y == p.y, "1*P = P");
+
+    punctum_t dbl_add = curva_adde(p, p, &c);
+    punctum_t dbl_mul = curva_multiplica(2, p, &c);
+    expecta(dbl_add.x == dbl_mul.x && dbl_add.y == dbl_mul.y, "2*P = P+P");
+
+    punctum_t tpl_add = curva_adde(dbl_add, p, &c);
+    punctum_t tpl_mul = curva_multiplica(3, p, &c);
+    expecta(tpl_add.x == tpl_mul.x && tpl_add.y == tpl_mul.y, "3*P = P+P+P");
+
+    int bona = 1;
+    for (int k = 0; k <= 20; k++) {
+        r = curva_multiplica(k, p, &c);
+        if (!est_punctum_in_curva(r, &c)) {
+            fprintf(stderr, "  %d*P non in curva!\n", k);
+            bona = 0;
+        }
+    }
+    expecta(bona, "k*P in curva pro k=0..20");
+}
+
+/* --- probationes omnium camporum praedefinitorum --- */
+
+static void proba_omnes_campos(void)
+{
+    fprintf(stderr, "--- omnes campi praedefiniti ---\n");
+
+    for (int n = 1; n <= 16; n++) {
+        gf_t poly = gf_polynomium(n);
+        gf_t gen  = n == 1 ? 1 : 2;
+        unsigned ordo_expectatus = ((unsigned)1 << n) - 1;
+        char buf[120];
+
+        gf_t pot = 1;
+        unsigned ordo_inventus = 0;
+        for (unsigned k = 1; k <= ordo_expectatus; k++) {
+            pot = gf_multiplica(pot, gen, n, poly);
+            if (pot == 1) {
+                ordo_inventus = k;
+                break;
+            }
+        }
+
+        snprintf(
+            buf, sizeof(buf),
+            "GF(2^%d): gen=0x%X ordo=%u (expectatus %u)",
+            n, gen, ordo_inventus, ordo_expectatus
+        );
+        expecta(ordo_inventus == ordo_expectatus, buf);
+
+        int minimalis = 1;
+        pot = 1;
+        for (unsigned k = 1; k < ordo_inventus; k++) {
+            pot = gf_multiplica(pot, gen, n, poly);
+            if (pot == 1) {
+                snprintf(
+                    buf, sizeof(buf),
+                    "GF(2^%d): gen^%u = 1 ante ordinem", n, k
+                );
+                expecta(0, buf);
+                minimalis = 0;
+                break;
+            }
+        }
+        if (minimalis) {
+            snprintf(
+                buf, sizeof(buf),
+                "GF(2^%d): ordo minimalis", n
+            );
+            expecta(1, buf);
+        }
+
+        fprintf(stderr, "  GF(2^%2d): ordo=%u OK\n", n, ordo_inventus);
+    }
+}
+
+/* ================================================================
+ * proba_interna — interfacies publica probationum internarum
+ * ================================================================ */
+
+int proba_interna(void)
+{
+    proba_errores = 0;
+
+    proba_gf_basica();
+    proba_gf_inversio();
+    proba_gf_generator();
+    proba_omnes_campos();
+    proba_ec_infinitum();
+    proba_ec_curva();
+    proba_ec_additio();
+    proba_ec_ordo();
+    proba_curva_multiplica();
+
+    return proba_errores;
 }
