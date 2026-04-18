@@ -3,7 +3,7 @@
  */
 
 #include "aspectus.h"
-#include "ison.h"
+#include <ison/ison.h>
 
 planeta_aspectus_t planeta_aspectus_ex_ison(const char *ison)
 {

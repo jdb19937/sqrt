@@ -3,7 +3,7 @@
  */
 
 #include "orbita.h"
-#include "ison.h"
+#include <ison/ison.h>
 
 #include <math.h>
 #include <string.h>

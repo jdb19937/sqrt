@@ -2,7 +2,7 @@ PREFIX = /opt/apotheca
 
 CC      ?= cc
 AR      ?= ar
-CFLAGS  ?= -Wall -Wextra -pedantic -std=c99 -O2 -I$(PREFIX)/include/ison -I$(PREFIX)/include/phantasma
+CFLAGS  ?= -Wall -Wextra -pedantic -std=c99 -O2 -I$(PREFIX)/include
 LDFLAGS = -lm `cat $(PREFIX)/lib/nexus_phantasma`
 
 LIBISON = $(PREFIX)/lib/libison.a

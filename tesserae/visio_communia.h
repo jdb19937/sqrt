@@ -7,7 +7,7 @@
 
 #include "visio.h"
 #include "../pictura.h"
-#include "ison.h"
+#include <ison/ison.h>
 
 #include <math.h>
 #include <stdlib.h>

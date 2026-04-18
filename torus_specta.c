@@ -28,10 +28,10 @@
 #include "campus.h"
 #include "formula.h"
 #include "orbita.h"
-#include "ison.h"
+#include <ison/ison.h>
 
-#include "phantasma.h"
-#include "computo.h"
+#include <phantasma/phantasma.h>
+#include <phantasma/computo.h>
 
 #include <stdio.h>
 #include <stdlib.h>

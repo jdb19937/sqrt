@@ -8,7 +8,7 @@
 #define PLANETA_COMMUNIA_H
 
 #include "planeta.h"
-#include "ison.h"
+#include <ison/ison.h>
 
 #include <math.h>
 #include <stdlib.h>

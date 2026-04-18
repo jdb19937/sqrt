@@ -10,7 +10,6 @@
 #define ASPECTUS_H
 
 #include <stdio.h>
-#include "ison.h"
 
 /* ================================================================
  * typus

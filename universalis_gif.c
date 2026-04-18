@@ -8,8 +8,8 @@
  */
 
 #include "universalis.h"
-#include "ison.h"
-#include "phantasma.h"
+#include <ison/ison.h>
+#include <phantasma/phantasma.h>
 
 #include <math.h>
 #include <stdio.h>

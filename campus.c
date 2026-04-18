@@ -9,7 +9,7 @@
 #include "instrumentum.h"
 #include "aspectus.h"
 #include "perceptus.h"
-#include "ison.h"
+#include <ison/ison.h>
 
 #include <math.h>
 #include <stdio.h>
@@ -373,7 +373,7 @@ static int planeta_in_conspectu(
 
 void campus_planetas_reddere(campus_t *c, const caela_t *caela)
 {
-    campus_planetas_reddere_in_conspectu(c, caela, 0, 0, 0, 0);
+    campus_planetas_reddere_in_conspectu(c, caela, 0, 0, c->latitudo, c->altitudo);
 }
 
 typedef struct {

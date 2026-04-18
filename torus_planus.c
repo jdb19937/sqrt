@@ -15,7 +15,7 @@
 #include "tessera.h"
 #include "campus.h"
 #include "caela.h"
-#include "ison.h"
+#include <ison/ison.h>
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -33,14 +33,29 @@ void planeta_reddere(
     unsigned char *fenestra, const planeta_t *planeta
 ) {
     memset(fenestra, 0, FEN * FEN * 4);
+
     switch (planeta->qui) {
-    case PLANETA_SAXOSUM:  reddere_saxosum(fenestra, &planeta->ubi.saxosum);   break;
-    case PLANETA_GASEOSUM: reddere_gaseosum(fenestra, &planeta->ubi.gaseosum); break;
-    case PLANETA_GLACIALE: reddere_glaciale(fenestra, &planeta->ubi.glaciale); break;
-    case PLANETA_PARVUM:   reddere_parvum(fenestra, &planeta->ubi.parvum);     break;
-    case PLANETA_SOL:      reddere_sol(fenestra, &planeta->ubi.sol);           break;
-    case PLANETA_NEBULA:      reddere_nebula(fenestra, &planeta->ubi.nebula);           break;
-    case PLANETA_SIMULACRUM:  reddere_simulacrum(fenestra, &planeta->ubi.simulacrum);  break;
+    case PLANETA_SAXOSUM:
+        reddere_saxosum(fenestra, &planeta->ubi.saxosum);
+        break;
+    case PLANETA_GASEOSUM:
+        reddere_gaseosum(fenestra, &planeta->ubi.gaseosum);
+        break;
+    case PLANETA_GLACIALE:
+        reddere_glaciale(fenestra, &planeta->ubi.glaciale);
+        break;
+    case PLANETA_PARVUM:
+        reddere_parvum(fenestra, &planeta->ubi.parvum);
+        break;
+    case PLANETA_SOL:
+        reddere_sol(fenestra, &planeta->ubi.sol);
+        break;
+    case PLANETA_NEBULA:
+        reddere_nebula(fenestra, &planeta->ubi.nebula);
+        break;
+    case PLANETA_SIMULACRUM:
+        reddere_simulacrum(fenestra, &planeta->ubi.simulacrum);
+        break;
     }
 }
 

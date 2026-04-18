@@ -1,5 +1,5 @@
 #include "../planeta_communia.h"
-#include "phantasma.h"
+#include <phantasma/phantasma.h>
 /* simulacrum.c — renderer planetae simulacri (imago GIF) */
 
 void reddere_simulacrum(unsigned char *fen, const simulacrum_t *p)

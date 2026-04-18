@@ -26,8 +26,8 @@
 #include "tessera.h"
 #include "campus.h"
 #include "caela.h"
-#include "ison.h"
-#include "phantasma.h"
+#include <ison/ison.h>
+#include <phantasma/phantasma.h>
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -6,7 +6,7 @@
  */
 
 #include "tessera.h"
-#include "ison.h"
+#include <ison/ison.h>
 
 #include <stdio.h>
 #include <stdlib.h>

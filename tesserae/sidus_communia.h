@@ -9,7 +9,7 @@
 
 #include "sidus.h"
 #include "../instrumentum.h"
-#include "ison.h"
+#include <ison/ison.h>
 
 #include <math.h>
 #include <stdlib.h>

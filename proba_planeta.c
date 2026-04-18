@@ -7,7 +7,7 @@
 
 #include "tessera.h"
 #include "perceptus.h"
-#include "ison.h"
+#include <ison/ison.h>
 
 #include <stdio.h>
 #include <stdlib.h>

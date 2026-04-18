@@ -4,7 +4,7 @@
 
 #include "formula.h"
 #include "orbita.h"
-#include "ison.h"
+#include <ison/ison.h>
 
 #include <stdio.h>
 #include <stdlib.h>
