@@ -36,8 +36,8 @@
                 }
             },
             "orbita": {
-                "cx": 1800.0,
-                "cy": 960.0,
+                "cx": 3148.0,
+                "cy": 2448.0,
                 "periodus": 360
             }
         },
@@ -64,8 +64,8 @@
                 }
             },
             "orbita": {
-                "cx": 700.0,
-                "cy": 520.0,
+                "cx": 2048.0,
+                "cy": 2008.0,
                 "amplitudo_x": 800.0,
                 "amplitudo_y": 30.0,
                 "phase_y": 1.5708,
@@ -101,8 +101,8 @@
                 }
             },
             "orbita": {
-                "cx": 700.0,
-                "cy": 600.0,
+                "cx": 2048.0,
+                "cy": 2088.0,
                 "amplitudo_x": 900.0,
                 "amplitudo_y": 40.0,
                 "phase_x": 3.1416,
@@ -136,8 +136,8 @@
                 }
             },
             "orbita": {
-                "cx": 0.0,
-                "cy": 640.0,
+                "cx": 1348.0,
+                "cy": 2128.0,
                 "amplitudo_y": 60.0,
                 "frequentia_y": 2,
                 "revolutiones_x": 1,
@@ -169,8 +169,8 @@
                 }
             },
             "orbita": {
-                "cx": 0.0,
-                "cy": 700.0,
+                "cx": 1348.0,
+                "cy": 2188.0,
                 "amplitudo_y": 80.0,
                 "frequentia_y": 3,
                 "revolutiones_x": 2,
@@ -197,8 +197,8 @@
                 }
             },
             "orbita": {
-                "cx": 0.0,
-                "cy": 400.0,
+                "cx": 1348.0,
+                "cy": 1888.0,
                 "amplitudo_y": 100.0,
                 "frequentia_y": 2,
                 "revolutiones_x": 1,
@@ -229,8 +229,8 @@
                 }
             },
             "orbita": {
-                "cx": 0.0,
-                "cy": 850.0,
+                "cx": 1348.0,
+                "cy": 2338.0,
                 "amplitudo_y": 120.0,
                 "frequentia_y": 1,
                 "revolutiones_x": 1,
@@ -259,32 +259,9 @@
                 }
             },
             "orbita": {
-                "cx": 700.0,
-                "cy": 560.0,
+                "cx": 2048.0,
+                "cy": 2048.0,
                 "periodus": 360
-            }
-        },
-        {
-            "nomen": "Vortexa",
-            "scala": 0.40,
-            "planeta": {
-                "planetella": {
-                    "radius": 0.9,
-                    "semen": 99901
-                },
-                "simulacrulum": {
-                    "nomen": "verdanthos"
-                }
-            },
-            "orbita": {
-                "cx": 700.0,
-                "cy": 540.0,
-                "amplitudo_x": 500.0,
-                "amplitudo_y": 20.0,
-                "phase_y": 1.5708,
-                "periodus": 150,
-                "amplitudo_z": 0.2,
-                "phase_z": 1.5708
             }
         },
         {
@@ -306,8 +283,8 @@
                 }
             },
             "orbita": {
-                "cx": 700.0,
-                "cy": 560.0,
+                "cx": 2048.0,
+                "cy": 2048.0,
                 "amplitudo_x": 1800.0,
                 "amplitudo_y": 1800.0,
                 "phase_y": 1.5708,
