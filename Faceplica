@@ -7,6 +7,9 @@ LDFLAGS = -lm `cat $(PREFIX)/lib/nexus_phantasma`
 
 LIBISON = $(PREFIX)/lib/libison.a
 LIBPHANTASMA = $(PREFIX)/lib/libphantasma.a
+LIBDELPHI = $(PREFIX)/lib/libdelphi.a
+LIBCRISPUS = $(PREFIX)/lib/libcrispus.a
+LIBHOMUNCIO = $(PREFIX)/lib/libhomuncio.a
 
 OBJECTA = pictura.o helvea.o campus.o instrumentum.o caela.o universalis.o formula.o designatio.o orbita.o permutationes.o locus.o \
           aspectus.o perceptus.o \
@@ -34,7 +37,7 @@ CAELAE = caelae/terra.ison caelae/hubble.ison caelae/jwst.ison \
          caelae/nuclei.ison caelae/vacuum.ison caelae/mortis.ison \
          caelae/binarium.ison
 
-omnia: torus_planus torus_animare torus_specta caele genera redde astra_animare gen_universalis universalis_gif proba_planeta proba_caelae proba_visio
+omnia: torus_planus torus_animare torus_specta caele genera redde astra_animare gen_universalis universalis_gif proba_planeta proba_caelae proba_visio colloquium
 
 omnia: $(NOMEN)
 
@@ -129,6 +132,9 @@ redde: redde.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
 
 astra_animare: astra_animare.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(CAPITA)
 	$(CC) $(CFLAGS) -o $@ astra_animare.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
+
+colloquium: colloquium.c $(BIBLIOTHECA) $(LIBISON) $(LIBPHANTASMA) $(LIBDELPHI) $(LIBCRISPUS) $(LIBHOMUNCIO) $(CAPITA)
+	$(CC) $(CFLAGS) -o $@ colloquium.c $(BIBLIOTHECA) $(LIBDELPHI) $(LIBCRISPUS) $(LIBHOMUNCIO) $(LIBISON) $(LIBPHANTASMA) $(LDFLAGS)
 
 colloca: omnia
 	install -d $(PREFIX)/bin $(PREFIX)/lib $(PREFIX)/include/sqrt/tesserae
