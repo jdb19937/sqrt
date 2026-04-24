@@ -15,7 +15,7 @@
 
 #include <phantasma/phantasma.h>
 #include <delphi/oraculum.h>
-#include <homuncio/homuncio.h>
+#include <proplasma/artista.h>
 #include <ison/ison.h>
 
 #include <math.h>
@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 /* ================================================================
  * dimensiones
@@ -37,8 +38,8 @@
 #define PORTA_ALT       860
 #define PORTA_RADIUS    64
 
-#define IMAGO_LAT       160
-#define IMAGO_ALT       160
+#define IMAGO_LAT       256
+#define IMAGO_ALT       256
 
 #define ATLAS_LAT       512
 #define ATLAS_ALT       768
@@ -461,30 +462,94 @@ static int stellae_genera(void)
  * imago personae
  * ================================================================ */
 
-static void imago_genera(uint64_t semen)
-{
-    /* selectione pseudo-random per semen */
-    Archetypum arch = (Archetypum)(semen % ARCH_NUMERUS);
-    Gens gens       = (Gens)((semen >> 8) % GENS_NUMERUS);
-    Imago *im       = imago_nova(semen, arch, gens);
-    if (!im)
-        return;
-    uint8_t tmp[128 * 128 * 4];
-    imago_redde(im, tmp, MODUS_COMICUS, FX_VIGNETTA, 0.3f, 0.0f);
-    /* scala 128x128 -> IMAGO_LATxIMAGO_ALT (simplex) */
-    for (int y = 0; y < IMAGO_ALT; y++) {
-        int sy = y * 128 / IMAGO_ALT;
-        for (int x = 0; x < IMAGO_LAT; x++) {
-            int sx = x * 128 / IMAGO_LAT;
-            int si = (sy * 128 + sx) * 4;
-            int di = (y * IMAGO_LAT + x) * 4;
-            imago_rgba[di + 0] = tmp[si + 0];
-            imago_rgba[di + 1] = tmp[si + 1];
-            imago_rgba[di + 2] = tmp[si + 2];
-            imago_rgba[di + 3] = tmp[si + 3];
+/* scribe GIF bytes ad plicam temporariam, lege cum pfr_gif, unlinca */
+static int gif_bytes_ad_tabulam(
+    const unsigned char *bytes, size_t n, uint32_t *out, int lat, int alt
+) {
+    char via[] = "/tmp/colloquium_imago_XXXXXX.gif";
+    int fd = mkstemps(via, 4);
+    if (fd < 0)
+        return -1;
+    ssize_t w = 0;
+    while ((size_t)w < n) {
+        ssize_t k = write(fd, bytes + w, n - w);
+        if (k <= 0) { close(fd); unlink(via); return -1; }
+        w += k;
+    }
+    close(fd);
+    pfr_gif_lector_t *l = pfr_gif_lege_initia(via);
+    if (!l) { unlink(via); return -1; }
+    int glat = 0, galt = 0;
+    if (pfr_gif_lege_dimensiones(l, &glat, &galt) != 0) {
+        pfr_gif_lege_fini(l);
+        unlink(via);
+        return -1;
+    }
+    uint32_t *tmp = malloc((size_t)glat * galt * sizeof(uint32_t));
+    if (!tmp) {
+        pfr_gif_lege_fini(l);
+        unlink(via);
+        return -1;
+    }
+    int rc = pfr_gif_lege_tabulam(l, tmp);
+    pfr_gif_lege_fini(l);
+    unlink(via);
+    if (rc != 0) { free(tmp); return -1; }
+    /* scala glat x galt ad lat x alt */
+    for (int y = 0; y < alt; y++) {
+        int sy = y * galt / alt;
+        for (int x = 0; x < lat; x++) {
+            int sx = x * glat / lat;
+            out[y * lat + x] = tmp[sy * glat + sx];
         }
     }
-    imago_dele(im);
+    free(tmp);
+    return 0;
+}
+
+static void imago_genera(uint64_t semen)
+{
+    memset(imago_rgba, 0, sizeof(imago_rgba));
+
+    char err[256];
+    char *rogatum_img = artista_generare(semen, NULL, err, sizeof(err));
+    if (!rogatum_img) {
+        fprintf(stderr, "MONITUM: artista_generare defecit: %s\n", err);
+        return;
+    }
+
+    unsigned char *bytes = NULL;
+    size_t n             = 0;
+    int rc = oraculum_imago_roga(
+        "openai/gpt-5.4", rogatum_img, IMAGO_LAT, &bytes, &n
+    );
+    free(rogatum_img);
+    if (rc != 0 || !bytes || n == 0) {
+        fprintf(stderr, "MONITUM: oraculum_imago_roga defecit\n");
+        free(bytes);
+        return;
+    }
+
+    uint32_t *argb = malloc(IMAGO_LAT * IMAGO_ALT * sizeof(uint32_t));
+    if (!argb) { free(bytes); return; }
+    if (gif_bytes_ad_tabulam(bytes, n, argb, IMAGO_LAT, IMAGO_ALT) != 0) {
+        free(argb);
+        free(bytes);
+        return;
+    }
+    free(bytes);
+
+    for (int y = 0; y < IMAGO_ALT; y++) {
+        for (int x = 0; x < IMAGO_LAT; x++) {
+            uint32_t p = argb[y * IMAGO_LAT + x];
+            int di = (y * IMAGO_LAT + x) * 4;
+            imago_rgba[di + 0] = (p >> 16) & 0xFF;
+            imago_rgba[di + 1] = (p >> 8)  & 0xFF;
+            imago_rgba[di + 2] = p         & 0xFF;
+            imago_rgba[di + 3] = 0xFF;
+        }
+    }
+    free(argb);
 }
 
 /* ================================================================
