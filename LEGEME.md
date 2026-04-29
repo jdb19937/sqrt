@@ -105,7 +105,7 @@ astra_proba.c       probationes stellarum
 astra_animare.c     animatio campi stellarum (MP4/GIF)
 caelae/             configurationes camporum stellarum (ISON)
 instrumenta/        configurationes instrumentorum opticorum (ISON)
-schemae/            schemata ISON pro validatione
+schemata/            schemata ISON pro validatione
 ison/               submodulum: bibliotheca ISON
 ```
 

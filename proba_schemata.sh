@@ -17,17 +17,17 @@ proba() {
 
 echo "planetae:"
 for f in planetae/*.ison; do
-    proba schemae/tesserae/planeta-schema.ison "$f"
+    proba schemata/tesserae/planeta-schema.ison "$f"
 done
 
 echo "visiones:"
 for f in visiones/*.ison; do
-    proba schemae/tesserae/visio-schema.ison "$f"
+    proba schemata/tesserae/visio-schema.ison "$f"
 done
 
 echo "formulae:"
 for f in formulae/*.ison; do
-    proba schemae/formula-schema.ison "$f"
+    proba schemata/formula-schema.ison "$f"
 done
 
 echo ""
